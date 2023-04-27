@@ -80,7 +80,7 @@ if [ ! -d "$path" ]; then
             filename="$path/$today.html"
             configure_html_skeleton "$today_heading"
         fi
-        touch $filename
+        touch "$filename"
         echo "$html_skeleton" >> "$filename"
 
         firefox --new-window "$filename"
