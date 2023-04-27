@@ -1,3 +1,5 @@
 *.jpg
 *.png
 2023/
+
+.stignore
