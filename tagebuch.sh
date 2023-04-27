@@ -1,6 +1,11 @@
 #!/bin/bash
 # Tagebuch-Automatik
 
+# TODO: Nemo-Action und Tastaturkürzel hinzufügen <27-04-2023>
+#   https://stackoverflow.com/questions/41381003/how-to-add-keyboard-shortcut-for-custom-nemo-action
+#       Vergleiche Beispiel in der Antwort: Name=Open in _Atom
+#       => Der Unterstrich kommt in den Namen
+#   https://wiki.archlinux.org/title/Nemo#Nemo_Actions
 # TODO: Datei laden, wenn gespeichert wird <27-04-2023>
 # TODO: Neovim und Firefox Seite an Seite öffnen -> xdotool <27-04-2023>
 
