@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
 today=$(date +%F)
-month=$(date +%B)
+month_nmb=$(date +%m)
+month_name=$(date +%B)
 year=$(date +%Y)
 
-path=~/.tagebuch/$year/$month/$today
+# Create directory for today
+path=~/.tagebuch/$year/$month_nmb-$month_name/$today
 
 for img in $NEMO_SCRIPT_SELECTED_FILE_PATHS; do
 	cp $img $path
