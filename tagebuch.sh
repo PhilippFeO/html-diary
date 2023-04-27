@@ -9,9 +9,42 @@
 # TODO: Datei laden, wenn gespeichert wird <27-04-2023>
 # TODO: Neovim und Firefox Seite an Seite öffnen -> xdotool <27-04-2023>
 
+
 # Notwendig, damit GUIs funktionieren, zB. zenity, nemo, kitty\nvim
 export DISPLAY=:0
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+
+
+html_skeleton="" # Set in configure_html_skeleton()
+
+configure_html_skeleton() {
+    # Formats the html skeleton for a diary entry
+    # $1 formatted heading
+    html_skeleton="<!DOCTYPE html>
+<html>
+  <head>
+    <title>$1</title>
+    <!-- weitere Kopfinformationen -->
+    <!-- Styles für <pre> -->
+    <link rel=\"stylesheet\" href=\"/home/philipp/.tagebuch/style.css\">
+    <!-- <meta http-equiv="refresh" content="3"> -->
+  </head>
+  <body>
+    <h1 style=\"font-family: 'Fira Code'\">$1</h1><br /> 
+    <pre style=\"font-family: 'Fira Code'; font-size: 30px\">
+
+    </pre>"
+    # insert all images in directory
+    for img in *.jpg *.jpeg *.JPG *.JPEG; do
+        if [ -f $img ]; then
+            html_skeleton=$html_skeleton'
+    <img src="'./$img'" width="700" hspace="20" vspace="10"><br />'
+        fi
+    done
+    html_skeleton=$html_skeleton"
+  </body>
+</html>"
+}
 
 today=$(date +%F)
 month_nmb=$(date +%m)
@@ -35,37 +68,6 @@ if [ ! -d "$path" ]; then
         # open nemo do copy fotos via nemo script Fotos_kopieren.sh
         # Fotos are synced via syncthing
         nemo ~/Bilder/Handy-Fotos/
-
-        html_skeleton="" # Set in configure_html_skeleton()
-
-        configure_html_skeleton() {
-            # Formats the html skeleton for a diary entry
-            # $1 formatted heading
-            html_skeleton="<!DOCTYPE html>
-        <html>
-          <head>
-            <title>$1</title>
-            <!-- weitere Kopfinformationen -->
-            <!-- Styles für <pre> -->
-            <link rel=\"stylesheet\" href=\"/home/philipp/.tagebuch/style.css\">
-            <!-- <meta http-equiv="refresh" content="3"> -->
-          </head>
-          <body>
-            <h1 style=\"font-family: 'Fira Code'\">$1</h1><br /> 
-            <pre style=\"font-family: 'Fira Code'; font-size: 30px\">
-
-            </pre>"
-            # insert all images in directory
-            for img in *.jpg *.jpeg *.JPG *.JPEG; do
-                if [ -f $img ]; then
-                    html_skeleton=$html_skeleton'
-            <img src="'./$img'" width="700" hspace="20" vspace="10"><br />'
-                fi
-            done
-            html_skeleton=$html_skeleton"
-          </body>
-        </html>"
-        }
 
         # query for pagename/heading for the day
         # Can be left empty
