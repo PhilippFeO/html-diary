@@ -11,28 +11,51 @@ mkdir -p $path
 
 # nemo ~/Bilder/Handy-Fotos/
 
+# query for pagename/heading for the day
+# Can be left empty
 pagename=$(zenity --entry --title="Heutiger Seitenname")
-today_heading=$(date "+%d. %B %Y")
+today_heading=$(date "+%d. %B %Y") # Proper date formatting for heading
 filename=""
+html_skeleton=""
+
+configure_html_skeleton() {
+    # $1 formatted heading
+    html_skeleton="<!DOCTYPE html>
+<html>
+  <head>
+    <title>$1</title>
+    <!-- weitere Kopfinformationen -->
+    <!-- Kommentare werden im Browser nicht angezeigt. -->
+  </head>
+  <body>
+    <h1>$1</h1><br /> 
+    <p>Inhalt der Webseite</p>"
+    # insert all images in directory
+    for img in *.jpg *.jpeg *.JPG *.JPEG; do
+        if [ -f $img ]; then
+            # echo "[$img]($path/$img)" >> $filename
+            html_skeleton=$html_skeleton'
+    <img src="'$path/$img'" width="700" hspace="20" vspace="10"><br />'
+        fi
+    done
+    html_skeleton=$html_skeleton"
+  </body>
+</html>"
+}
 
 # is $pagename is not empty, append given $pagename to path
 if [ -n "$pagename" ]; then
     filename="$path/$today $pagename.html"
     touch $filename
-    echo "<h1>$today_heading: $pagename</h1><br />\n\n\n" >> "$filename"
+    configure_html_skeleton "$today_heading: $pagename"
+    echo "$html_skeleton" >> "$filename"
 else
     filename="$path/$today.html"
     touch $filename
-    echo "<h1>$today_heading</h1><br />\\n\\n\\n" >> $filename
+    configure_html_skeleton "$today_heading"
+    echo "$html_skeleton" >> "$filename"
 fi
 
-# insert all images in directory
-for img in *.jpg *.jpeg *.JPG *.JPEG; do
-    if [ -f $img ]; then
-        # echo "[$img]($path/$img)" >> $filename
-        echo '<img src="'$path/$img'" width="700" hspace="20" vspace="10"><br />' >> "$filename"
-    fi
-done
 
 # nvim "$filename"
 
