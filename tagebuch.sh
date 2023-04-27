@@ -8,10 +8,6 @@
 export DISPLAY=:0
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 
-# today_heading=$(date "+%d. %B %Y") # Proper date formatting for heading
-# # Answer saved in $?
-# zenity --question --text="Tagebucheintrag für heute, $today_heading, anlegen?" --ok-label="Ja" --cancel-label="Nein" --timeout=10
-
 today=$(date +%F)
 month_nmb=$(date +%m)
 month_name=$(date +%B)
@@ -58,7 +54,7 @@ if [ ! -d "$path" ]; then
             for img in *.jpg *.jpeg *.JPG *.JPEG; do
                 if [ -f $img ]; then
                     html_skeleton=$html_skeleton'
-            <img src="'$path/$img'" width="700" hspace="20" vspace="10"><br />'
+            <img src="'./$img'" width="700" hspace="20" vspace="10"><br />'
                 fi
             done
             html_skeleton=$html_skeleton"
