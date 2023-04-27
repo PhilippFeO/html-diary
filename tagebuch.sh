@@ -9,3 +9,4 @@ year=$(date +%Y)
 path=~/.tagebuch/$year/$month/$today
 mkdir -p $path
 
+nemo ~/Bilder/Handy-Fotos/

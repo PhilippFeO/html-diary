@@ -8,4 +8,7 @@ path=~/.tagebuch/$year/$month/$today
 
 for img in $NEMO_SCRIPT_SELECTED_FILE_PATHS; do
 	cp $img $path
+	echo $img
 done
+
+nemo --quit
