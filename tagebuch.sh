@@ -39,7 +39,7 @@ configure_html_skeleton() {
     for img in *.jpg *.jpeg *.JPG *.JPEG; do
         if [ -f $img ]; then
             html_skeleton=$html_skeleton'
-    <img src="'./$img'" width="700" hspace="20" vspace="10"><br />'
+    <img src="'./$img'" width="900" hspace="20" vspace="10"><br />'
         fi
     done
     html_skeleton=$html_skeleton"

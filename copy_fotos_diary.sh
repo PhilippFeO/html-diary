@@ -1,12 +1,11 @@
 #!/bin/bash
 # nemo action for hard linking selected fotos into the apropiate folder of the diary
 
-today=$(date +%F)
-month_nmb=$(date +%m)
-month_name=$(date +%B)
+today=$(date "+%F-%A")
+month=$(date "+%m-%B")
 year=$(date +%Y)
 
-path=~/.tagebuch/$year/$month_nmb-$month_name/$today
+path=~/.tagebuch/$year/$month/$today
 
 # If directory exists, hard link selected images into it
 if [ -d "$path" ]; then
