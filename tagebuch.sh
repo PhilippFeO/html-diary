@@ -47,17 +47,17 @@ configure_html_skeleton() {
 </html>"
 }
 
-today=$(date +%F)
-month_nmb=$(date +%m)
-month_name=$(date +%B)
+today=$(date "+%F-%A")
+# date -d 'now - 1 year' "+%F-%A"
+month=$(date "+%m-%B")
 year=$(date +%Y)
 
 # Check for existence because the script is run as a cronjob from 18-21 and I want to avoid getting asked if the job is already done.
-path=~/.tagebuch/$year/$month_nmb-$month_name/$today
+path=~/.tagebuch/$year/$month/$today
 if [ ! -d "$path" ]; then
 
     # Ask for new diary entry
-    today_heading=$(date "+%d. %B %Y") # Proper date formatting for heading
+    today_heading=$(date "+%A, %d. %B %Y") # Proper date formatting for heading
     # Answer saved in $?
     zenity --question --text="Tagebucheintrag für heute, $today_heading, anlegen?" --ok-label="Ja" --cancel-label="Nein" --timeout=10
 
@@ -66,8 +66,10 @@ if [ ! -d "$path" ]; then
         mkdir -p $path
         cd $path
 
-        # open nemo do copy fotos via nemo script Fotos_kopieren.sh
-        # Fotos are synced via syncthing
+        # open nemo to hard link fotos via
+        #   nemo script Fotos_kopieren.sh or
+        #   nemo action copy_fotos_diary.sh
+        # Fotos are synced via syncthing between cellphone and computer
         nemo ~/Bilder/Handy-Fotos/
 
         # query for pagename/heading for the day
