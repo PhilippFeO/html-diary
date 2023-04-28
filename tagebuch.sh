@@ -6,8 +6,9 @@
 #       Vergleiche Beispiel in der Antwort: Name=Open in _Atom
 #       => Der Unterstrich kommt in den Namen
 #   https://wiki.archlinux.org/title/Nemo#Nemo_Actions
+#   Ausführliches Beispiel mit Erklärungen: https://github.com/linuxmint/nemo/blob/master/files/usr/share/nemo/actions/sample.nemo_action
 # TODO: Datei laden, wenn gespeichert wird <27-04-2023>
-# TODO: Neovim und Firefox Seite an Seite öffnen -> xdotool <27-04-2023>
+# DONE: Neovim und Firefox Seite an Seite öffnen <27-04-2023>
 
 
 # Notwendig, damit GUIs funktionieren, zB. zenity, nemo, kitty\nvim
@@ -86,9 +87,47 @@ if [ ! -d "$path" ]; then
         touch "$filename"
         echo "$html_skeleton" >> "$filename"
 
-        firefox --new-window "$filename"
+        firefox --new-window "$filename" &
 
         # open Neovim with the cursor between the <pre>-tags and start insert mode
-        kitty nvim  "+call cursor(13, 0) | start" "$filename"
+        kitty nvim  "+call cursor(13, 0) | start" "$filename" &
+
+        while true; do
+            if wmctrl -l | grep $today.html > /dev/null; then
+                if wmctrl -l | grep "$today_heading" > /dev/null; then
+                   break
+                fi
+            fi
+        done
+
+        # sleep 1
+        # wmctrl -r "$today_heading" -b remove,maximized_vert,maximized_horz
+        # wmctrl -r "$today_heading" -e 0,960,0,960,1080
+        # wmctrl -r $today.html -e 0,0,0,960,1080
+
+        # The following is heavily inspired by
+        # https://unix.stackexchange.com/questions/53150/how-do-i-resize-the-active-window-to-50-with-wmctrl
+        SCREEN_WIDTH=$(xwininfo -root | awk '$1=="Width:" {print $2}')
+        SCREEN_HEIGHT=$(xwininfo -root | awk '$1=="Height:" {print $2}')
+
+        # new width and height
+        W=$(( $SCREEN_WIDTH / 2 ))
+        H=$SCREEN_HEIGHT
+
+        # Change to move left or right
+        # moving to the left
+        LEFT_HALF=0; 
+        # moving to the right half of the screen
+        RIGHT_HALF=$(( $SCREEN_WIDTH / 2 ))
+
+        Y=0
+
+        # Firefox
+        wmctrl -r "$today_heading" -b remove,maximized_vert,maximized_horz
+        wmctrl -r "$today_heading" -e 0,$RIGHT_HALF,$Y,$W,$H
+
+        # Neovim
+        wmctrl -r $today.html -e 0,$LEFT_HALF,$Y,$W,$H
+        wmctrl -R $today.html
     fi
 fi
