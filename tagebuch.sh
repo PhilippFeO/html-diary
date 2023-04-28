@@ -31,8 +31,8 @@ configure_html_skeleton() {
     <!-- <meta http-equiv="refresh" content="3"> -->
   </head>
   <body>
-    <h1 style=\"font-family: 'Fira Code'\">$1</h1><br /> 
-    <pre style=\"font-family: 'Fira Code'; font-size: 30px\">
+    <h1>$1</h1><br /> 
+    <pre>
 
     </pre>"
     # insert all images in directory

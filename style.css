@@ -1,4 +1,11 @@
 pre {
     white-space: pre-wrap;
     /* word-wrap: break-word; */
+    font-family: 'Fira Code';
+    font-size: 30px;
 }
+
+h1 {
+   font-family: 'Fira Code'; 
+}
+
