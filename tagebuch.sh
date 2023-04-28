@@ -1,13 +1,14 @@
 #!/bin/bash
 # Tagebuch-Automatik
 
-# TODO: Nemo-Action und Tastaturkürzel hinzufügen <27-04-2023>
+# TODO: Datei laden, wenn gespeichert wird <27-04-2023>
+#
+# DONE: Nemo-Action und Tastaturkürzel hinzufügen <27-04-2023>
 #   https://stackoverflow.com/questions/41381003/how-to-add-keyboard-shortcut-for-custom-nemo-action
 #       Vergleiche Beispiel in der Antwort: Name=Open in _Atom
 #       => Der Unterstrich kommt in den Namen
 #   https://wiki.archlinux.org/title/Nemo#Nemo_Actions
 #   Ausführliches Beispiel mit Erklärungen: https://github.com/linuxmint/nemo/blob/master/files/usr/share/nemo/actions/sample.nemo_action
-# TODO: Datei laden, wenn gespeichert wird <27-04-2023>
 # DONE: Neovim und Firefox Seite an Seite öffnen <27-04-2023>
 
 
@@ -91,10 +92,11 @@ if [ ! -d "$path" ]; then
 
         firefox --new-window "$filename" &
 
-        # open Neovim with the cursor between the <pre>-tags and start insert mode
+        # open default editor with the cursor between the <pre>-tags and start insert mode
         kitty $EDITOR "+call cursor(13, 0) | start" "$filename" &
 
-        # Place Neovim and Firefox next to each other using wmctrl
+        # Place Editor and Firefox next to each other using wmctrl
+        # ────────────────────────────────────────────────────────
         while true; do
             if wmctrl -l | grep $today.html > /dev/null; then
                 if wmctrl -l | grep "$today_heading" > /dev/null; then
@@ -129,8 +131,8 @@ if [ ! -d "$path" ]; then
         wmctrl -r "$today_heading" -b remove,maximized_vert,maximized_horz
         wmctrl -r "$today_heading" -e 0,$RIGHT_HALF,$Y,$W,$H
 
-        # Neovim
+        # Editor
         wmctrl -r $today.html -e 0,$LEFT_HALF,$Y,$W,$H
-        wmctrl -R $today.html
+        wmctrl -R $today.html # Refocus Editor
     fi
 fi
