@@ -1,0 +1,16 @@
+# Custom action for Nemo File Manager for Cinnamon.
+# Adds right-click open file/files or directory with Atom.
+# Place it under: ~/.local/share/nemo/actions/atom.nemo_action
+# For more info: https://github.com/linuxmint/nemo/blob/master/files/usr/share/nemo/actions/sample.nemo_action
+
+[Nemo Action]
+Active=true
+# _ in front of letter indicates keyboard shortcut
+# Right click, then "f" (small f)
+Name=Kopiere _Fotos
+Comment=Kopiere markierte Fotos ins Tagebuch
+Exec=<copy_fotos_diary.sh %F>
+# Icon-Name=atom
+Selection=any
+Extensions=any;
+Quote=double
