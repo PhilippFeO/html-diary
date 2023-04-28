@@ -92,6 +92,7 @@ if [ ! -d "$path" ]; then
         # open Neovim with the cursor between the <pre>-tags and start insert mode
         kitty nvim  "+call cursor(13, 0) | start" "$filename" &
 
+        # Place Neovim and Firefox next to each other using wmctrl
         while true; do
             if wmctrl -l | grep $today.html > /dev/null; then
                 if wmctrl -l | grep "$today_heading" > /dev/null; then
