@@ -90,7 +90,7 @@ if [ ! -d "$path" ]; then
         firefox --new-window "$filename" &
 
         # open Neovim with the cursor between the <pre>-tags and start insert mode
-        kitty nvim  "+call cursor(13, 0) | start" "$filename" &
+        kitty $EDITOR "+call cursor(13, 0) | start" "$filename" &
 
         # Place Neovim and Firefox next to each other using wmctrl
         while true; do
