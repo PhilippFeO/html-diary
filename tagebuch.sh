@@ -53,8 +53,8 @@ configure_html_skeleton() {
 </html>"
 }
 
-today=$(date "+%F-%A")
-month=$(date "+%m-%B")
+today=$(date "+%F-%A") # f.i.: 2023-04-28-Freitag
+month=$(date "+%m-%B") # f.i.: 04-April
 year=$(date +%Y)
 
 # Check for existence because the script is run as a cronjob from 18-21 and I want to avoid getting asked if the job is already done.
@@ -62,7 +62,7 @@ path=~/.tagebuch/$year/$month/$today
 if [ ! -d "$path" ]; then
 
     # Ask for new diary entry
-    today_heading=$(date "+%A, %d. %B %Y") # Proper date formatting for heading
+    today_heading=$(date "+%A, %d. %B %Y") # Proper date formatting for heading, f.i. Freitag, 28. April 2023
     # Answer saved in $?
     zenity --question --text="Tagebucheintrag für heute, $today_heading, anlegen?" --ok-label="Ja" --cancel-label="Nein" --timeout=10
 
