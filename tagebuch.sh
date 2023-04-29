@@ -23,6 +23,7 @@ html_skeleton="" # Set in configure_html_skeleton()
 configure_html_skeleton() {
     # Formats the html skeleton for a diary entry
     # $1 formatted heading
+    # $2 path to folder of the day
     # <!-- <meta http-equiv="refresh" content="3"> -->
 
     # KEEP THE HTML DOCUMENT AS SIMPLE AS POSSIBLE
@@ -45,7 +46,7 @@ configure_html_skeleton() {
     for img in *.jpg *.jpeg *.JPG *.JPEG; do
         if [ -f $img ]; then
             html_skeleton=$html_skeleton'
-    <img src="'./$img'" width="900" hspace="20" vspace="10"><br />'
+    <img src="'$2/$img'" width="900" hspace="20" vspace="10"><br />'
         fi
     done
     html_skeleton=$html_skeleton"
@@ -53,12 +54,12 @@ configure_html_skeleton() {
 </html>"
 }
 
-today=$(date "+%F-%A") # f.i.: 2023-04-28-Freitag
-month=$(date "+%m-%B") # f.i.: 04-April
+today=$(date "+%F-%A") # f.i. 2023-04-28-Freitag
+month=$(date "+%m-%B") # f.i. 04-April
 year=$(date +%Y)
 
 # Check for existence because the script is run as a cronjob from 18-21 and I want to avoid getting asked if the job is already done.
-path=~/.tagebuch/$year/$month/$today
+path=/home/philipp/.tagebuch/$year/$month/$today
 if [ ! -d "$path" ]; then
 
     # Ask for new diary entry
@@ -92,11 +93,11 @@ if [ ! -d "$path" ]; then
         # is $pagename is not empty, append given $pagename to path
         if [ -n "$pagename" ]; then
             filename=$(echo "$path/$today $pagename.html" | tr ' ' '-' )
-            configure_html_skeleton "$today_heading: $pagename"
+            configure_html_skeleton "$today_heading: $pagename" "$path"
         # no $pagename was provided
         else
             filename="$path/$today.html"
-            configure_html_skeleton "$today_heading"
+            configure_html_skeleton "$today_heading" "$path"
         fi
         touch "$filename"
         echo "$html_skeleton" >> "$filename"
@@ -104,7 +105,7 @@ if [ ! -d "$path" ]; then
         firefox --new-window "$filename" &
 
         # open default editor with the cursor between the <pre>-tags and start insert mode
-        kitty $EDITOR "+call cursor(12, 0) | start" "$filename" &
+        kitty $EDITOR "+call cursor(11, 0) | start" "$filename" &
 
         # Place Editor and Firefox next to each other using wmctrl
         # ────────────────────────────────────────────────────────
