@@ -2,6 +2,7 @@
 # Tagebuch-Automatik
 
 # TODO: Datei laden, wenn gespeichert wird <27-04-2023>
+# TODO: Leerzeichen im Namen zu - <29-04-2023>
 #
 # DONE: Nemo-Action und Tastaturkürzel hinzufügen <27-04-2023>
 #   https://stackoverflow.com/questions/41381003/how-to-add-keyboard-shortcut-for-custom-nemo-action
@@ -22,14 +23,14 @@ html_skeleton="" # Set in configure_html_skeleton()
 configure_html_skeleton() {
     # Formats the html skeleton for a diary entry
     # $1 formatted heading
+    # <!-- <meta http-equiv="refresh" content="3"> -->
     html_skeleton="<!DOCTYPE html>
 <html>
   <head>
     <title>$1</title>
     <!-- weitere Kopfinformationen -->
-    <!-- Styles für <pre> -->
+    <!-- Styles für h1, pre -->
     <link rel=\"stylesheet\" href=\"/home/philipp/.tagebuch/style.css\">
-    <!-- <meta http-equiv="refresh" content="3"> -->
   </head>
   <body>
     <h1>$1</h1><br /> 
