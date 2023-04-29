@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 # argv[2]   "which" past is parsed, s. past_dates.txt
 # argv[3]   formatted date for heading according to argv[2]
 
+# TODO: Add "vor 6 Monaten" <29-04-2023>
+
 with open(argv[1]) as fp:
     soup = BeautifulSoup(fp, 'html.parser')
 
