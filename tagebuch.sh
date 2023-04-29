@@ -2,8 +2,8 @@
 # Tagebuch-Automatik
 
 # TODO: Datei laden, wenn gespeichert wird <27-04-2023>
-# TODO: Leerzeichen im Namen zu - <29-04-2023>
-#
+
+# DONE: Leerzeichen im Namen zu - <29-04-2023>
 # DONE: Nemo-Action und Tastaturkürzel hinzufügen <27-04-2023>
 #   https://stackoverflow.com/questions/41381003/how-to-add-keyboard-shortcut-for-custom-nemo-action
 #       Vergleiche Beispiel in der Antwort: Name=Open in _Atom
@@ -24,11 +24,15 @@ configure_html_skeleton() {
     # Formats the html skeleton for a diary entry
     # $1 formatted heading
     # <!-- <meta http-equiv="refresh" content="3"> -->
+
+    # KEEP THE HTML DOCUMENT AS SIMPLE AS POSSIBLE
+    # Every tweak only applies to future diary entries NOT to old ones
+    # To enable changes there, every day has to be modiefied by hand.
+    # TODO: Write a script that applies changes to past entries <29-04-2023>
     html_skeleton="<!DOCTYPE html>
 <html>
   <head>
     <title>$1</title>
-    <!-- weitere Kopfinformationen -->
     <!-- Styles für h1, pre -->
     <link rel=\"stylesheet\" href=\"/home/philipp/.tagebuch/style.css\">
   </head>
@@ -50,7 +54,6 @@ configure_html_skeleton() {
 }
 
 today=$(date "+%F-%A")
-# date -d 'now - 1 year' "+%F-%A"
 month=$(date "+%m-%B")
 year=$(date +%Y)
 
@@ -72,16 +75,23 @@ if [ ! -d "$path" ]; then
         #   nemo script Fotos_kopieren.sh or
         #   nemo action copy_fotos_diary.sh
         # Fotos are synced via syncthing between cellphone and computer
+        # TODO: Doesn't work if there is already a nemo instance running <29-04-2023>
+        #   I.e. script doesn't wait until nemo was closed because the already running instance is not ascociated to the script. The script proceeds and queries for the pagename.
+        #   Workaround #1: --quit but then all open nemo instances are closed, i.e. could infere with current workflow but propably so rare that it is more convenient than closing nemo manually as in Workaround #2
+        nemo --quit
         nemo ~/Bilder/Handy-Fotos/
+        #   Workaround #2: Using --existing-window but then automatically closing nemo via nemo scripts & actions doesn't work
+        # nemo --existing-window ~/Bilder/Handy-Fotos/
 
         # query for pagename/heading for the day
         # Can be left empty
         pagename=$(zenity --entry --title="Neuer Tagebucheintrag" --text="Heutiger Seitenname:" --width=1000 --height=300)
+
         filename=""
 
         # is $pagename is not empty, append given $pagename to path
         if [ -n "$pagename" ]; then
-            filename="$path/$today $pagename.html"
+            filename=$(echo "$path/$today $pagename.html" | tr ' ' '-' )
             configure_html_skeleton "$today_heading: $pagename"
         # no $pagename was provided
         else
@@ -94,12 +104,13 @@ if [ ! -d "$path" ]; then
         firefox --new-window "$filename" &
 
         # open default editor with the cursor between the <pre>-tags and start insert mode
-        kitty $EDITOR "+call cursor(13, 0) | start" "$filename" &
+        kitty $EDITOR "+call cursor(12, 0) | start" "$filename" &
 
         # Place Editor and Firefox next to each other using wmctrl
         # ────────────────────────────────────────────────────────
+        # TODO: Redirect error to /dev/null/ <29-04-2023>
         while true; do
-            if wmctrl -l | grep $today.html > /dev/null; then
+            if wmctrl -l | grep "$today" > /dev/null; then
                 if wmctrl -l | grep "$today_heading" > /dev/null; then
                    break
                 fi
@@ -133,7 +144,7 @@ if [ ! -d "$path" ]; then
         wmctrl -r "$today_heading" -e 0,$RIGHT_HALF,$Y,$W,$H
 
         # Editor
-        wmctrl -r $today.html -e 0,$LEFT_HALF,$Y,$W,$H
-        wmctrl -R $today.html # Refocus Editor
+        wmctrl -r "$today" -e 0,$LEFT_HALF,$Y,$W,$H
+        wmctrl -R "$today" # Refocus Editor
     fi
 fi
