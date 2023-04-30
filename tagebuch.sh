@@ -17,135 +17,65 @@
 export DISPLAY=:0
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 
+zenity_width=1000
+zenity_height=300
 
-html_skeleton="" # Set in configure_html_skeleton()
-
-configure_html_skeleton() {
-    # Formats the html skeleton for a diary entry
-    # $1 formatted heading
-    # $2 path to folder of the day
-    # <!-- <meta http-equiv="refresh" content="3"> -->
-
-    # KEEP THE HTML DOCUMENT AS SIMPLE AS POSSIBLE
-    # Every tweak only applies to future diary entries NOT to old ones
-    # To enable changes there, every day has to be modiefied by hand.
-    # TODO: Write a script that applies changes to past entries <29-04-2023>
-    html_skeleton="<!DOCTYPE html>
-<html>
-  <head>
-    <title>$1</title>
-    <!-- Styles für h1, pre -->
-    <link rel=\"stylesheet\" href=\"/home/philipp/.tagebuch/style.css\">
-  </head>
-  <body>
-    <h1>$1</h1><br /> 
-    <pre>
-
-    </pre>"
-    # insert all images in directory
-    for img in *.jpg *.jpeg *.JPG *.JPEG; do
-        if [ -f $img ]; then
-            html_skeleton=$html_skeleton'
-    <img src="'$2/$img'" width="900" hspace="20" vspace="10"><br />'
-        fi
-    done
-    html_skeleton=$html_skeleton"
-  </body>
-</html>"
-}
-
-today=$(date "+%F-%A") # f.i. 2023-04-28-Freitag
+today=$(date "+%d-%m-%Y-%A") # f.i. 28-04-2023-Freitag
 month=$(date "+%m-%B") # f.i. 04-April
 year=$(date +%Y)
 
 # Check for existence because the script is run as a cronjob from 18-21 and I want to avoid getting asked if the job is already done.
-path=/home/philipp/.tagebuch/$year/$month/$today
-if [ ! -d "$path" ]; then
+path=~/.tagebuch/$year/$month/$today
+~/.tagebuch/check_today_dir_exists.sh $path # return value captured in $?
 
+if [ $? -eq 0 ]; then
     # Ask for new diary entry
     today_heading=$(date "+%A, %d. %B %Y") # Proper date formatting for heading, f.i. Freitag, 28. April 2023
     # Answer saved in $?
-    zenity --question --text="Tagebucheintrag für heute, $today_heading, anlegen?" --ok-label="Ja" --cancel-label="Nein" --timeout=10
+    zenity --question --text="Tagebucheintrag für heute, $today_heading, anlegen?" --ok-label="Ja" --cancel-label="Nein" --width=$zenity_width --height=$zenity_height --timeout=10
 
-    # if "Ja" (==0), then start diary routine
+    # If "Ja" (==0), then start diary routine
     if [ $? -eq 0 ]; then
-        mkdir -p $path
-        cd $path
+        # Query for pagename/heading for the day
+        # Can be left empty
+        pagename=$(zenity --entry --title="Neuer Tagebucheintrag" --text="Heutiger Seitenname:" --width=$zenity_width --height=$zenity_height)
+        # If $pagename was provided replace every space by -
+        # Precaution, having no spaces prevents troubles in case of escaping or iterating over files/folders
+        if [ -n "$pagename" ]; then
+            pagename_no_spaces=$(echo $pagename | tr ' ' '-')
+            heading="$today_heading: $pagename"
+        else
+            pagename_no_spaces=$pagename
+            heading="$today_heading"
+        fi
 
-        # open nemo to hard link fotos via
+        today_dir="$path-$pagename_no_spaces"
+        mkdir -p "$today_dir"
+
+        # Open nemo to hard link fotos via
         #   nemo script Fotos_kopieren.sh or
         #   nemo action copy_fotos_diary.sh
         # Fotos are synced via syncthing between cellphone and computer
-        # TODO: Doesn't work if there is already a nemo instance running <29-04-2023>
-        #   I.e. script doesn't wait until nemo was closed because the already running instance is not ascociated to the script. The script proceeds and queries for the pagename.
-        #   Workaround #1: --quit but then all open nemo instances are closed, i.e. could infere with current workflow but propably so rare that it is more convenient than closing nemo manually as in Workaround #2
+            # TODO: Doesn't work if there is already a nemo instance running <29-04-2023>
+            #   I.e. script doesn't wait until nemo was closed because the already running instance is not ascociated to the script. The script proceeds and queries for the pagename.
+            #   Workaround #1: --quit but then all open nemo instances are closed, i.e. could infere with current workflow but propably so rare that it is more convenient than closing nemo manually as in Workaround #2
         nemo --quit
         nemo ~/Bilder/Handy-Fotos/
-        #   Workaround #2: Using --existing-window but then automatically closing nemo via nemo scripts & actions doesn't work
-        # nemo --existing-window ~/Bilder/Handy-Fotos/
+            #   Workaround #2: Using --existing-window but then automatically closing nemo via nemo scripts & actions doesn't work
+            # nemo --existing-window ~/Bilder/Handy-Fotos/
 
-        # query for pagename/heading for the day
-        # Can be left empty
-        pagename=$(zenity --entry --title="Neuer Tagebucheintrag" --text="Heutiger Seitenname:" --width=1000 --height=300)
+        html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$today_dir")
 
-        filename=""
+        today_file="$today_dir/$today-$pagename_no_spaces.html"
+        echo "$html_skeleton" > $today_file
 
-        # is $pagename is not empty, append given $pagename to path
-        if [ -n "$pagename" ]; then
-            filename=$(echo "$path/$today $pagename.html" | tr ' ' '-' )
-            configure_html_skeleton "$today_heading: $pagename" "$path"
-        # no $pagename was provided
-        else
-            filename="$path/$today.html"
-            configure_html_skeleton "$today_heading" "$path"
-        fi
-        touch "$filename"
-        echo "$html_skeleton" >> "$filename"
+        # Open firefox and Neovim
+        firefox --new-window "$today_file" &
 
-        firefox --new-window "$filename" &
+        # Open Neovim with the cursor between the <pre>-tags and start insert mode
+        #   $EDITOR doesn't make sense due to cursor setting syntax
+        kitty nvim "+call cursor(11, 0) | start" "$today_file" &
 
-        # open default editor with the cursor between the <pre>-tags and start insert mode
-        kitty $EDITOR "+call cursor(11, 0) | start" "$filename" &
-
-        # Place Editor and Firefox next to each other using wmctrl
-        # ────────────────────────────────────────────────────────
-        # TODO: Redirect error to /dev/null/ <29-04-2023>
-        while true; do
-            if wmctrl -l | grep "$today" > /dev/null; then
-                if wmctrl -l | grep "$today_heading" > /dev/null; then
-                   break
-                fi
-            fi
-        done
-
-        # sleep 1
-        # wmctrl -r "$today_heading" -b remove,maximized_vert,maximized_horz
-        # wmctrl -r "$today_heading" -e 0,960,0,960,1080
-        # wmctrl -r $today.html -e 0,0,0,960,1080
-
-        # The following is heavily inspired by
-        # https://unix.stackexchange.com/questions/53150/how-do-i-resize-the-active-window-to-50-with-wmctrl
-        SCREEN_WIDTH=$(xwininfo -root | awk '$1=="Width:" {print $2}')
-        SCREEN_HEIGHT=$(xwininfo -root | awk '$1=="Height:" {print $2}')
-
-        # new width and height
-        W=$(( $SCREEN_WIDTH / 2 ))
-        H=$SCREEN_HEIGHT
-
-        # Change to move left or right
-        # moving to the left
-        LEFT_HALF=0; 
-        # moving to the right half of the screen
-        RIGHT_HALF=$(( $SCREEN_WIDTH / 2 ))
-
-        Y=0
-
-        # Firefox
-        wmctrl -r "$today_heading" -b remove,maximized_vert,maximized_horz
-        wmctrl -r "$today_heading" -e 0,$RIGHT_HALF,$Y,$W,$H
-
-        # Editor
-        wmctrl -r "$today" -e 0,$LEFT_HALF,$Y,$W,$H
-        wmctrl -R "$today" # Refocus Editor
+        ~/.tagebuch/tile_editor_firefox.sh "$today" "$today_heading"
     fi
 fi

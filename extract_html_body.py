@@ -2,7 +2,7 @@ from sys import argv
 from bs4 import BeautifulSoup
 # Extract the <body> of the submitted diary entry (html file)
 # argv[1]   diary entry as html file; body is extracted from this file
-# argv[2]   "which" past is parsed, s. past_dates.txt
+# argv[2]   index of (line) "which" past is parsed, s. past_dates.txt
 # argv[3]   formatted date for heading according to argv[2]
 
 # TODO: Add "vor 6 Monaten" <29-04-2023>
