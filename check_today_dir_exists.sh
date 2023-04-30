@@ -11,3 +11,5 @@ check_today_dir_exists() {
     done
     return 0 # Success, directory for today DOESN'T exists
 }
+
+check_today_dir_exists $1
