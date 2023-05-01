@@ -13,7 +13,7 @@
 # DONE: Neovim und Firefox Seite an Seite öffnen <27-04-2023>
 
 
-# Notwendig, damit GUIs funktionieren, zB. zenity, nemo, kitty\nvim
+# Notwendig, damit GUIs funktionieren, zB. zenity, nemo, kitty/nvim
 export DISPLAY=:0
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 
@@ -76,6 +76,6 @@ if [ $? -eq 0 ]; then
         #   $EDITOR doesn't make sense due to cursor setting syntax
         kitty nvim "+call cursor(11, 0) | start" "$today_file" &
 
-        ~/.tagebuch/tile_editor_firefox.sh "$today" "$today_heading"
+        ~/.tagebuch/arrange_editor_firefox.sh "$today" "$today_heading"
     fi
 fi
