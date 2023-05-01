@@ -35,6 +35,12 @@ if [ $? -eq 0 ]; then
 	fi
 
 	mkdir -p "$day_dir"
+	# write to pipe, so nemo actions/scripts have access to the directory of the selected date (past or today)
+	named_pipe=~/.tagebuch/transfer_date
+	if [ ! -p $named_pipe ]; then
+		mkfifo $named_pipe
+	fi
+	echo "$day_dir" > ~/.tagebuch/transfer_date &
 
 	# Open nemo to hard link path_fotos via
 	#   nemo script Fotos_kopieren.sh or
@@ -50,7 +56,6 @@ if [ $? -eq 0 ]; then
 
 	html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$day_dir")
 
-	# day_file="$day_dir/$day-$pagename_no_spaces.html"
 	echo "$html_skeleton" > "$day_file"
 
 	# Open firefox and Neovim
