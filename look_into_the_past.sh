@@ -24,6 +24,10 @@ configure_html_skeleton() {
 </html>"
 }
 
+zenity_width=1000
+zenity_height=150
+zenity_font_size=30
+
 past_entries=""
 html_skeleton=""
 
@@ -44,7 +48,7 @@ for past_date in ${past_dates[@]}; do
 	# ...and the user wants to look into the past
 	if [ -d "$path" ]; then
 		if [ $asked -eq 1 ]; then
-			zenity --question --text="In die Vergangenheit blicken?" --ok-label="Ja" --cancel-label="Nein" --width=1000 --height=300 --timeout=10
+			zenity --question --text="<span font='$zenity_font_size'>In die Vergangenheit blicken?</span>" --ok-label="Ja" --cancel-label="Nein" --width=$zenity_width --height=$zenity_height --timeout=10
 			answer=$?
 			if [ $answer -eq 1 ]; then
 				break
