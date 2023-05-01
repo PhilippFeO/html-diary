@@ -1,6 +1,6 @@
 *.jpg
 *.png
-2023/
+202*/
 todo.txt
 
 .stignore
