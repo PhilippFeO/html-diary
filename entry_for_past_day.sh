@@ -1,7 +1,6 @@
 #!/bin/bash
 
 zenity_width_cal=750
-zenity_height=150
 zenity_font_size=30
 year=2022
 
