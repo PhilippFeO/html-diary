@@ -16,9 +16,9 @@ html_skeleton="<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<title>$1</title>\n\t\t<!-
 
 # insert all images in today's directory
 for img in $2/*.jpg $2/*.jpeg $2/*.JPG $2/*.JPEG; do
-    if [ -f $img ]; then
+    if [ -f "$img" ]; then
         html_skeleton=$html_skeleton'
-    \n\t\t<img src="'$img'" width="900" hspace="20" vspace="10"><br/>'
+    \n\t\t<img src="'"$img"'" width="900" hspace="20" vspace="10"><br/>'
     fi
 done
 
