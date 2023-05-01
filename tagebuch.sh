@@ -18,7 +18,8 @@ export DISPLAY=:0
 export DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
 
 zenity_width=1000
-zenity_height=300
+zenity_height=150
+zenity_font_size=30
 
 today=$(date "+%d-%m-%Y-%A") # f.i. 28-04-2023-Freitag
 month=$(date "+%m-%B") # f.i. 04-April
@@ -30,52 +31,12 @@ path=~/.tagebuch/$year/$month/$today
 
 if [ $? -eq 0 ]; then
     # Ask for new diary entry
-    today_heading=$(date "+%A, %d. %B %Y") # Proper date formatting for heading, f.i. Freitag, 28. April 2023
+    today_heading=$(date "+%A, %d. %B %Y") # Proper date formatting for heading, f.i. Freitag, 29. April 2023
     # Answer saved in $?
-    zenity --question --text="Tagebucheintrag für heute, $today_heading, anlegen?" --ok-label="Ja" --cancel-label="Nein" --width=$zenity_width --height=$zenity_height --timeout=10
+    zenity --question --text="<span font='$zenity_font_size'>Tagebucheintrag für heute, $today_heading, anlegen?</span>" --ok-label="Ja" --cancel-label="Nein" --width=$zenity_width --height=$zenity_height --timeout=10
 
     # If "Ja" (==0), then start diary routine
     if [ $? -eq 0 ]; then
-        # Query for pagename/heading for the day
-        # Can be left empty
-        pagename=$(zenity --entry --title="Neuer Tagebucheintrag" --text="Heutiger Seitenname:" --width=$zenity_width --height=$zenity_height)
-        # If $pagename was provided replace every space by -
-        # Precaution, having no spaces prevents troubles in case of escaping or iterating over files/folders
-        if [ -n "$pagename" ]; then
-            pagename_no_spaces=$(echo $pagename | tr ' ' '-')
-            heading="$today_heading: $pagename"
-        else
-            pagename_no_spaces=$pagename
-            heading="$today_heading"
-        fi
-
-        today_dir="$path-$pagename_no_spaces"
-        mkdir -p "$today_dir"
-
-        # Open nemo to hard link fotos via
-        #   nemo script Fotos_kopieren.sh or
-        #   nemo action copy_fotos_diary.sh
-        # Fotos are synced via syncthing between cellphone and computer
-            # TODO: Doesn't work if there is already a nemo instance running <29-04-2023>
-            #   I.e. script doesn't wait until nemo was closed because the already running instance is not ascociated to the script. The script proceeds and queries for the pagename.
-            #   Workaround #1: --quit but then all open nemo instances are closed, i.e. could infere with current workflow but propably so rare that it is more convenient than closing nemo manually as in Workaround #2
-        nemo --quit
-        nemo ~/Bilder/Handy-Fotos/
-            #   Workaround #2: Using --existing-window but then automatically closing nemo via nemo scripts & actions doesn't work
-            # nemo --existing-window ~/Bilder/Handy-Fotos/
-
-        html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$today_dir")
-
-        today_file="$today_dir/$today-$pagename_no_spaces.html"
-        echo "$html_skeleton" > $today_file
-
-        # Open firefox and Neovim
-        firefox --new-window "$today_file" &
-
-        # Open Neovim with the cursor between the <pre>-tags and start insert mode
-        #   $EDITOR doesn't make sense due to cursor setting syntax
-        kitty nvim "+call cursor(11, 0) | start" "$today_file" &
-
-        ~/.tagebuch/arrange_editor_firefox.sh "$today" "$today_heading"
+        ~/.tagebuch/make_new_entry.sh $(date +%F) "Handy-Fotos/"
     fi
 fi
