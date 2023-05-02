@@ -28,9 +28,9 @@ if [ $? -eq 0 ]; then
 	day_file="$day_dir/$day.html"
 	heading="$day_heading"
 	if [ -n "$pagename" ]; then
-		pagename_no_spaces=$(echo $pagename | tr ' ' '-')
-		day_dir="$day_dir-$pagename_no_spaces"
-		day_file="$day_dir/$day-$pagename_no_spaces.html"
+		pagename_cleaned=$(echo $pagename | tr ' ' '-' | tr -d ',')
+		day_dir="$day_dir-$pagename_cleaned"
+		day_file="$day_dir/$day-$pagename_cleaned.html"
 		heading="$heading: $pagename"
 	fi
 
