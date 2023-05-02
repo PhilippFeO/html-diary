@@ -7,8 +7,8 @@ Active=true
 # Displayed Name in context menu
 # _ in front of letter indicates keyboard shortcut
 # Right click, then "f" (small f)
-Name=Dem Tagebuch hinzufügen
-Comment=Kopiere markierte Fotos ins Tagebuch
+Name=Tagebuch (ln)
+Comment=Hart-verknüpfe markierte Fotos ins Tagebuch (und behalte sie in diesem Verzeichnis)
 # <> necessary if scripts lies in nemo/actions/
 Exec=<hardlink_fotos_diary.sh %F>
 # Icon-Name=folder
