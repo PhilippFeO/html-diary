@@ -6,7 +6,6 @@
 Active=true
 # Displayed Name in context menu
 # _ in front of letter indicates keyboard shortcut
-# Right click, then "f" (small f)
 Name=Tagebuch (mv)
 Comment=Verschiebe markierte Fotos ins Tagebuch
 # <> necessary if scripts lies in nemo/actions/
