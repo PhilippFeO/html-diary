@@ -10,7 +10,7 @@ Active=true
 Name=Tagebuch (mv)
 Comment=Verschiebe markierte Fotos ins Tagebuch
 # <> necessary if scripts lies in nemo/actions/
-Exec=<hardlink_remove_fotos_diary.sh %F>
+Exec=<mv_fotos_diary.sh %F>
 # Icon-Name=folder
 Selection=any
 Extensions=any;
