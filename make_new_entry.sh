@@ -1,14 +1,15 @@
 #!/bin/bash
 
-# $1 dd-mm-yyyy
+# $1 date of the day to create an entry for, (in the %F format, i. e. yyyy-mm-dd)
 # $2 Path to path_fotos; can be empty
 
+date_entry=$1
 path_fotos=$2
 
-day=$(date --date="$1" "+%d-%m-%Y-%A")
-month=$(date --date="$1" "+%m-%B")
-year=$(date --date="$1" +%Y)
-day_heading=$(date --date="$1" "+%A, %d. %B %Y")
+day=$(date --date="$date_entry" "+%d-%m-%Y-%A")
+month=$(date --date="$date_entry" "+%m-%B")
+year=$(date --date="$date_entry" +%Y)
+day_heading=$(date --date="$date_entry" "+%A, %d. %B %Y")
 
 path=~/.tagebuch/$year/$month/$day
 
@@ -54,7 +55,7 @@ if [ $? -eq 0 ]; then
 		#   Workaround #2: Using --existing-window but then automatically closing nemo via nemo scripts & actions doesn't work
 		# nemo --existing-window ~/Bilder/Handy-Fotos/
 
-	html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$day_dir")
+	html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$day_dir" $date_entry)
 
 	echo "$html_skeleton" > "$day_file"
 
