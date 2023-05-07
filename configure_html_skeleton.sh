@@ -30,7 +30,7 @@ fi
 # Every tweak only applies to future diary entries NOT to old ones
 # To enable changes there, every day has to be modiefied by hand.
 # TODO: Write a script that applies changes to past entries <29-04-2023>
-html_skeleton="<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<title>$1</title>\n\t\t<link rel=\"stylesheet\" href=\"/home/philipp/.tagebuch/style.css\">\n\t</head>\n\t<body>\n\t\t<h1>$1</h1><br/>\n\t\t<pre>\n$retrospecitve_entry\n\t\t</pre>"
+html_skeleton="<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<title>$1</title>\n\t\t<link rel=\"stylesheet\" href=\"/home/philipp/.tagebuch/style.css\">\n\t</head>\n\t<body>\n\t\t<h1>$1</h1>\n\t\t<br/>\n\t\t<pre>\n$retrospecitve_entry\n\t\t</pre>"
 
 # insert all images in today's directory
 for img in $2/*.jpg $2/*.jpeg $2/*.JPG $2/*.JPEG $2/*.png $2/*.PNG; do
