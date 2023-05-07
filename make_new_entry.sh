@@ -37,7 +37,7 @@ if [ $? -eq 0 ]; then
 
 	mkdir -p "$day_dir"
 	# write to pipe, so nemo actions/scripts have access to the directory of the selected date (past or today)
-	named_pipe=~/.tagebuch/transfer_date
+	named_pipe=~/.tagebuch/transfer_path
 	if [ ! -p $named_pipe ]; then
 		mkfifo $named_pipe
 	fi
@@ -55,7 +55,7 @@ if [ $? -eq 0 ]; then
 		# nemo --existing-window ~/Bilder/Handy-Fotos/
 
 	# Inter process communication: Provide scripts in nemo/ with the apropiate path to link/move the files
-	echo "$day_dir" > ~/.tagebuch/transfer_date
+	echo "$day_dir" > ~/.tagebuch/transfer_path
 
 	html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$day_dir" $date_entry)
 
