@@ -35,8 +35,12 @@ html_skeleton="<!DOCTYPE html>\n<html>\n\t<head>\n\t\t<title>$1</title>\n\t\t<!-
 # insert all images in today's directory
 for img in $2/*.jpg $2/*.jpeg $2/*.JPG $2/*.JPEG $2/*.png $2/*.PNG; do
     if [ -f "$img" ]; then
-        html_skeleton=$html_skeleton'
-    \n\t\t<img src="'"$img"'" width="900" hspace="20" vspace="10"><br/>'
+        html_skeleton=$html_skeleton'\n\t\t<img src="'"$img"'" width="900" hspace="20" vspace="10">\n\t\t<br/>'
+    fi
+done
+for video in $2/*.mp4 $2/*.MP4; do
+    if [ -f "$video" ]; then
+        html_skeleton=$html_skeleton'\n\t\t<video controls loop>\n\t\t\t<source src="'$video'" type="video/mp4">\n\t\t</video>\n\t\t<br/>'
     fi
 done
 
