@@ -66,7 +66,7 @@ if [ $? -eq 0 ]; then
 
 	# Open Neovim with the cursor between the <pre>-tags and start insert mode
 	#   $EDITOR doesn't make sense due to cursor setting syntax
-	kitty nvim "+call cursor(11, 0) | start" "$day_file" &
+	kitty nvim "+call cursor(10, 0) | start" "$day_file" &
 
 	~/.tagebuch/arrange_editor_firefox.sh "$day" "$day_heading"
 fi
