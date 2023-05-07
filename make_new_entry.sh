@@ -41,7 +41,6 @@ if [ $? -eq 0 ]; then
 	if [ ! -p $named_pipe ]; then
 		mkfifo $named_pipe
 	fi
-	echo "$day_dir" > ~/.tagebuch/transfer_date &
 
 	# Open nemo to hard link path_fotos via
 	#   nemo script Fotos_kopieren.sh or
@@ -51,9 +50,12 @@ if [ $? -eq 0 ]; then
 		#   I.e. script doesn't wait until nemo was closed because the already running instance is not ascociated to the script. The script proceeds and queries for the pagename.
 		#   Workaround #1: --quit but then all open nemo instances are closed, i.e. could infere with current workflow but propably so rare that it is more convenient than closing nemo manually as in Workaround #2
 	nemo --quit
-	nemo ~/Bilder/$path_fotos
+	nemo ~/Bilder/$path_fotos &
 		#   Workaround #2: Using --existing-window but then automatically closing nemo via nemo scripts & actions doesn't work
 		# nemo --existing-window ~/Bilder/Handy-Fotos/
+
+	# Inter process communication: Provide scripts in nemo/ with the apropiate path to link/move the files
+	echo "$day_dir" > ~/.tagebuch/transfer_date
 
 	html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$day_dir" $date_entry)
 
