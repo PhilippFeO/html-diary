@@ -5,11 +5,7 @@ pre {
     font-size: 30px;
 }
 
-h1 {
-   font-family: 'Fira Code'; 
-}
-
-h2 {
+h1, h2 {
    font-family: 'Fira Code'; 
 }
 
