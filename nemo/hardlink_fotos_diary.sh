@@ -13,4 +13,5 @@ if [ -d "$path" ]; then
 	done
 
 	nemo --quit
+	echo "Image(s) linked" > ~/.tagebuch/transfer_path
 fi

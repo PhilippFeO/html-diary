@@ -56,6 +56,7 @@ if [ $? -eq 0 ]; then
 
 	# Inter process communication: Provide scripts in nemo/ with the apropiate path to link/move the files
 	echo "$day_dir" > ~/.tagebuch/transfer_path
+	cat < ~/.tagebuch/transfer_path
 
 	html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$day_dir" $date_entry)
 
