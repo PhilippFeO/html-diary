@@ -1,0 +1,16 @@
+# Custom action for Nemo File Manager for Cinnamon.
+# Copy selected Fotos to the according folder (resembling today's date)
+# For more info: https://github.com/linuxmint/nemo/blob/master/files/usr/share/nemo/actions/sample.nemo_action
+
+[Nemo Action]
+Active=true
+# Displayed Name in context menu
+# _ in front of letter indicates keyboard shortcut
+Name=Tagebuch (cp)
+Comment=Kopiere markierte Fotos ins Tagebuch
+# <> necessary if scripts lies in nemo/actions/
+Exec=<cp_fotos_diary.sh %F>
+# Icon-Name=folder
+Selection=any
+Extensions=any;
+Quote=double
