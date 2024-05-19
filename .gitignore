@@ -5,3 +5,4 @@ todo.txt
 
 .stignore
 transfer_path
+.tmp/
