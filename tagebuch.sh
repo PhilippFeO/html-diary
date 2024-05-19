@@ -25,8 +25,7 @@ today=$(date "+%d-%m-%Y-%A") # f.i. 28-04-2023-Freitag
 month=$(date "+%m-%B") # f.i. 04-April
 year=$(date +%Y)
 
-# imgs=~/Bilder/Handy-Fotos/
-imgs=~/Pictures/Screenshots/
+imgs=~/Bilder/Handy-Fotos/
 
 # Check for existence because the script is run as a cronjob from 18-21 and I want to avoid getting asked if the job is already done.
 path=~/.tagebuch/$year/$month/$today
@@ -64,7 +63,7 @@ if ~/.tagebuch/check_today_dir_exists.sh "$path"; then
         # nemo --quit
         # nemo $imgs
         # Move/Copy/Link files into .tagebuch/.tmp
-        nautilus $imgs
+        nemo $imgs
             #   Workaround #2: Using --existing-window but then automatically closing nemo via nemo scripts & actions doesn't work
             # nemo --existing-window ~/Bilder/Handy-Fotos/
 
