@@ -53,33 +53,41 @@ if ~/.tagebuch/check_today_dir_exists.sh "$path"; then
         today_dir="$path-$pagename_no_spaces"
         mkdir -p "$today_dir"
 
-        # Open nemo to hard link fotos via
-        #   nemo script Fotos_kopieren.sh or
-        #   nemo action copy_fotos_diary.sh
-        # Fotos are synced via syncthing between cellphone and computer
-            # TODO: Doesn't work if there is already a nemo instance running <29-04-2023>
-            #   I.e. script doesn't wait until nemo was closed because the already running instance is not ascociated to the script. The script proceeds and queries for the pagename.
-            #   Workaround #1: --quit but then all open nemo instances are closed, i.e. could infere with current workflow but propably so rare that it is more convenient than closing nemo manually as in Workaround #2
-        # nemo --quit
-        # nemo $imgs
-        # Move/Copy/Link files into .tagebuch/.tmp
-        nemo $imgs
-            #   Workaround #2: Using --existing-window but then automatically closing nemo via nemo scripts & actions doesn't work
-            # nemo --existing-window ~/Bilder/Handy-Fotos/
+        with_media_files=false
+        if [ "$with_media_files" = true ]; then
 
-        # Move files in .tmp into $today_dir
-        for f in .tmp/*; do
-            mv "$f" "$today_dir"
-        done
+            # Open nemo to hard link fotos via
+            #   nemo script Fotos_kopieren.sh or
+            #   nemo action copy_fotos_diary.sh
+            # Fotos are synced via syncthing between cellphone and computer
+                # TODO: Doesn't work if there is already a nemo instance running <29-04-2023>
+                #   I.e. script doesn't wait until nemo was closed because the already running instance is not ascociated to the script. The script proceeds and queries for the pagename.
+                #   Workaround #1: --quit but then all open nemo instances are closed, i.e. could infere with current workflow but propably so rare that it is more convenient than closing nemo manually as in Workaround #2
+            # nemo --quit
+            # nemo $imgs
+            # Move/Copy/Link files into .tagebuch/.tmp
+            nemo $imgs
+                #   Workaround #2: Using --existing-window but then automatically closing nemo via nemo scripts & actions doesn't work
+                # nemo --existing-window ~/Bilder/Handy-Fotos/
 
-        # Craft HTML skeleton
-        html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$today_dir")
+            # Move files in .tmp into $today_dir
+            for f in .tmp/*; do
+                mv "$f" "$today_dir"
+            done
 
+            # Craft HTML skeleton
+            html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$today_dir" true)
+        # HTML skeleton without media files, ie. plain text.
+        # Media files will be added later by another step.
+        else
+            # Mit Beautiful Soup Medien hinzufügen
+            html_skeleton=$(~/.tagebuch/configure_html_skeleton.sh "$heading" "$today_dir" false)
+        fi
         today_file="$today_dir/$today-$pagename_no_spaces.html"
         echo "$html_skeleton" > "$today_file"
 
         # Setup enviornment to edit entry
-        firefox-esr --new-window "$today_file" &
+        firefox --new-window "$today_file" &
         # Open Neovim with the cursor between the <pre>-tags and start insert mode
         #   $EDITOR doesn't make sense due to cursor setting syntax
         kitty --title "Tagebucheintrag" nvim "+call cursor(10, 0)" "$today_file" &
