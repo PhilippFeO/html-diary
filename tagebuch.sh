@@ -31,9 +31,9 @@ imgs=~/Bilder/Handy-Fotos/
 path=~/.tagebuch/$year/$month/$today
 if ~/.tagebuch/check_today_dir_exists.sh "$path"; then
     # Ask for new diary entry
-    today_heading=$(date "+%A, %d. %B %Y") # Proper date formatting for heading, f.i. Freitag, 28. April 2023
+    today_date_for_heading=$(date "+%A, %d. %B %Y") # Proper date formatting for heading, f.i. Freitag, 28. April 2023
     # Answer saved in $?
-    zenity --question --text="<span font='$zenity_font_size'>Tagebucheintrag für heute, $today_heading, anlegen?</span>" --ok-label="Ja" --cancel-label="Nein" --width=$zenity_width --height=$zenity_height --timeout=10
+    zenity --question --text="<span font='$zenity_font_size'>Tagebucheintrag für heute, $today_date_for_heading, anlegen?</span>" --ok-label="Ja" --cancel-label="Nein" --width=$zenity_width --height=$zenity_height --timeout=10
 
     # If "Ja" (==0), then start diary routine
     if [ $? -eq 0 ]; then
@@ -44,10 +44,10 @@ if ~/.tagebuch/check_today_dir_exists.sh "$path"; then
         # Precaution, having no spaces prevents troubles in case of escaping or iterating over files/folders
         if [ -n "$pagename" ]; then
             pagename_no_spaces=$(echo "$pagename" | tr ' ' '-')
-            heading="$today_heading: $pagename"
+            heading="$today_date_for_heading: $pagename"
         else
             pagename_no_spaces=$pagename
-            heading="$today_heading"
+            heading="$today_date_for_heading"
         fi
 
         today_dir="$path-$pagename_no_spaces"
@@ -82,8 +82,8 @@ if ~/.tagebuch/check_today_dir_exists.sh "$path"; then
         firefox-esr --new-window "$today_file" &
         # Open Neovim with the cursor between the <pre>-tags and start insert mode
         #   $EDITOR doesn't make sense due to cursor setting syntax
-        kitty nvim.appimage "+call cursor(11, 0) | start" "$today_file" &
+        kitty --title "Tagebucheintrag" nvim "+call cursor(10, 0)" "$today_file" &
 
-        ~/.tagebuch/arrange_editor_firefox.sh "$today" "$today_heading"
+        ~/.tagebuch/arrange_editor_firefox.sh "$heading"
     fi
 fi
