@@ -6,3 +6,5 @@ todo.txt
 .stignore
 transfer_path
 .tmp/
+.venv/
+__pycache__/
