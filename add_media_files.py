@@ -1,5 +1,7 @@
 import glob
 import os
+import logging
+import sys
 from pathlib import Path
 
 from bs4 import BeautifulSoup
@@ -8,11 +10,13 @@ from bs4 import BeautifulSoup
 def add_media_files(directories: set[str]) -> None:
     tagebuch_dir = Path.home()/'.tagebuch'
     for day_dir in directories:
+        logging.info(f"Add Media Files in Directory '{day_dir}' ...")
         # Load HTML file
         if len((html_files := glob.glob(os.path.join(day_dir, '*.html')))) == 1:
             html_file = html_files[0]
         else:
-            raise Exception(f"There are {len(html_files)} in {day_dir}. There should be exactly 1.")
+            logging.error(f"There are '{len(html_files)}' in '{day_dir}'. There should be exactly 1.")
+            sys.exit(1)
         with open(html_file, 'r') as file:
             html_content = file.read()
         soup = BeautifulSoup(html_content, 'html.parser')
@@ -30,6 +34,7 @@ def add_media_files(directories: set[str]) -> None:
                         # LIFO data structure, ie '<br/>' is the first element
                         pre_tag.insert_after(new_img)
                         pre_tag.insert_after(soup.new_tag('br'))
+                        logging.info(f"Add Foto: '{f}'")
                     # Add <video controls loop><source src='...'/></video>
                     case '.mp4':
                         # Empty string == True
@@ -42,11 +47,14 @@ def add_media_files(directories: set[str]) -> None:
                         # LIFO data structure, ie '<br/>' is the first element
                         pre_tag.insert_after(new_video)
                         pre_tag.insert_after(soup.new_tag('br'))
+                        logging.info(f"Add Video: '{f}'")
                     # Skip html file
                     case '.html':
                         ...
                     case _:
-                        raise Exception(f'There is a new file type: {f}')
+                        logging.error(f"There is a new File Type in '{day_dir}': '{f}'")
 
         with open(html_file, 'w') as file:
             file.write(soup.prettify())
+
+        logging.info(f"Media Files in '{day_dir}' added (if there were some).")

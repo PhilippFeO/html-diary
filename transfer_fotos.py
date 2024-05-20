@@ -1,4 +1,6 @@
+import datetime
 import glob
+import logging
 import os
 import shutil
 import subprocess
@@ -6,12 +8,21 @@ from pathlib import Path
 
 from add_media_files import add_media_files
 
-
 # Define the path to the directory containing the files
 tagebuch_dir = Path.home()/'.tagebuch'
 tmp_dir = tagebuch_dir/'.tmp'
-
 directories: set[str] = set()
+
+
+logging.basicConfig(level=logging.INFO,
+                    format='[%(levelname)s: %(asctime)s] %(message)s',
+                    # Mit Datum: %d.%m.%Y
+                    datefmt=' %H:%M:%S',
+                    filename=tagebuch_dir/'transfer_files_add_media_files.log.txt',
+                    filemode='a')
+length = 20
+logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
+
 
 # Loop through files in the directory
 for f in os.listdir(tmp_dir):
@@ -33,9 +44,12 @@ for f in os.listdir(tmp_dir):
             target_dir = matching_dirs[0]
             shutil.copy(file_path,
                         tagebuch_dir/target_dir/file_path.name)
+
+            logging.info(f"Copied '{file_path}' to '{tagebuch_dir/target_dir/file_path.name}'")
             directories.add(target_dir)
+            logging.info(f"Added '{target_dir}' to `directories`")
         else:
-            raise Exception(
-                f"Found {count} matching directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The directories are:\n{','.join(matching_dirs)}")
+            logging.error(
+                f"Found {count} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{','.join(matching_dirs)}")
 
 add_media_files(directories)
