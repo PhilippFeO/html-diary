@@ -27,11 +27,10 @@ logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
 def transfer_fotos(tmp_dir: Path,
                    tagebuch_dir: Path) -> set[str]:
     directories: set[str] = set()
-    extensions: tuple[str, ...] = tuple(f'.{ext}' for ext in ('mp4', 'jpg', 'jpeg', 'png', 'MP4', 'JPG', 'JPEG', 'PNG'))
     # Loop through files in the directory
     for f in os.listdir(tmp_dir):
         file_path = tmp_dir/f
-        if os.path.isfile(file_path) and file_path.suffix in extensions:
+        if os.path.isfile(file_path):
             # Extract creation date from EXIF data
             match file_path.suffix:
                 case '.mp4' | '.MP4':
@@ -45,8 +44,8 @@ def transfer_fotos(tmp_dir: Path,
                     exif_lines = exif_output.decode("utf-8").splitlines()
                     date_created = exif_lines[-1].split()[1]
                 case _:
-                    logging.error(f"New file type: {file_path}")
-                    raise Exception(f"New file type: {file_path}, check Logs.")
+                    logging.error(f"Nothing done for new File Type: {file_path}")
+                    continue
             # split 'yyyy:mm:dd'
             year, month, day = date_created.split(":", 2)
 
