@@ -27,15 +27,27 @@ logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
 def transfer_fotos(tmp_dir: Path,
                    tagebuch_dir: Path) -> set[str]:
     directories: set[str] = set()
+    extensions: tuple[str, ...] = tuple(f'.{ext}' for ext in ('mp4', 'jpg', 'jpeg', 'png', 'MP4', 'JPG', 'JPEG', 'PNG'))
     # Loop through files in the directory
     for f in os.listdir(tmp_dir):
-        # file_path = os.path.join(tmp_dir, f)
         file_path = tmp_dir/f
-        if os.path.isfile(file_path):
+        if os.path.isfile(file_path) and file_path.suffix in extensions:
             # Extract creation date from EXIF data
-            exif_output = subprocess.check_output(["exif", "-t", "0x9003", "--ifd=EXIF", file_path])
-            exif_lines = exif_output.decode("utf-8").splitlines()
-            date_created = exif_lines[-1].split()[1]
+            match file_path.suffix:
+                case '.mp4' | '.MP4':
+                    exif_output = subprocess.check_output(["exiftool", "-CreateDate", file_path])
+                    exif_output = exif_output.decode('utf-8')
+                    # Retrieve date from following line:
+                    # Create Date                     : 2023:05:12 13:58:16
+                    date_created = exif_output.split(' : ')[-1].split(' ')[0]
+                case '.jpg' | '.jpeg' | '.png' | '.MP4' | '.JPG' | '.JPEG':
+                    exif_output = subprocess.check_output(["exif", "-t", "0x9003", "--ifd=EXIF", file_path])
+                    exif_lines = exif_output.decode("utf-8").splitlines()
+                    date_created = exif_lines[-1].split()[1]
+                case _:
+                    logging.error(f"New file type: {file_path}")
+                    raise Exception(f"New file type: {file_path}, check Logs.")
+            # split 'yyyy:mm:dd'
             year, month, day = date_created.split(":", 2)
 
             # Find matching directories
