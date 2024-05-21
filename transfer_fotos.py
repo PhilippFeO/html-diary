@@ -11,9 +11,9 @@ from add_media_files import add_media_files
 # Define the path to the directory containing the files
 tagebuch_dir = Path.home()/'.tagebuch'
 tmp_dir = tagebuch_dir/'.tmp'
-directories: set[str] = set()
 
 
+# Use different Log file when executed as test
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
                     # Mit Datum: %d.%m.%Y
@@ -24,7 +24,9 @@ length = 20
 logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
 
 
-def transfer_fotos() -> None:
+def transfer_fotos(tmp_dir: Path,
+                   tagebuch_dir: Path) -> set[str]:
+    directories: set[str] = set()
     # Loop through files in the directory
     for f in os.listdir(tmp_dir):
         # file_path = os.path.join(tmp_dir, f)
@@ -51,9 +53,11 @@ def transfer_fotos() -> None:
                 logging.info(f"Added '{target_dir}' to `directories`")
             else:
                 logging.error(
-                    f"Found {count} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{','.join(matching_dirs)}")
+                    f"Found {count} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}")
+                raise Exception('Check Log-File')
+    return directories
 
 
 if __name__ == "__main__":
-    transfer_fotos()
+    directories: set[str] = transfer_fotos(tmp_dir, tagebuch_dir)
     add_media_files(directories)
