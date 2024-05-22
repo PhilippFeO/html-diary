@@ -1,8 +1,10 @@
 import glob
-from extract_html_body import extract_html_body
+import logging
 from datetime import datetime
+
 from bs4 import BeautifulSoup
 
+from extract_html_body import extract_html_body
 
 date = datetime.today().strftime('%d.%m.%Y')
 day, month, this_year = date.split(".", 2)
@@ -29,7 +31,7 @@ overview = BeautifulSoup(html_skeleton, 'html.parser')
 # for past_year in range(1996, int(this_year) + 1):
 for past_year in range(int(this_year), 1995, -1):
     matching_files = glob.glob(f"{past_year}/{month}-*/{day}-*/*.html")
-    match len(matching_files):
+    match (nmb_entries := len(matching_files)):
         case 0:
             print(f'No entry for year {past_year}.')
         case 1:
@@ -39,7 +41,8 @@ for past_year in range(int(this_year), 1995, -1):
             if overview.body:
                 overview.body.append(past_entry)
         case _:
-            raise NotImplementedError('Add Logging as in transfer_files.py')
+            files = ',\n\t'.join(matching_files)
+            logging.error(f'There are {nmb_entries} files whereas there should be 1 or 0. The files are:\n\t{files}')
 
 with open('/tmp/kombiniert.html', 'w') as f:
     f.write(overview.prettify())

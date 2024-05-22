@@ -6,8 +6,22 @@
 # TODO: Add "vor 6 Monaten" <29-04-2023>
 
 
-from bs4 import BeautifulSoup, NavigableString, Tag
+import logging
 from datetime import datetime
+from pathlib import Path
+
+from bs4 import BeautifulSoup, NavigableString, Tag
+
+tagebuch_dir = Path.home()/'.tagebuch'
+# Use different Log file when executed as test
+logging.basicConfig(level=logging.INFO,
+                    format='[%(levelname)s: %(asctime)s] %(message)s',
+                    # Mit Datum: %d.%m.%Y
+                    datefmt=' %H:%M:%S',
+                    filename=tagebuch_dir/'look_into_the_past.log.txt',
+                    filemode='a')
+length = 20
+logging.info(f'{"-" * length} {datetime.today()} {"-" * length}')
 
 
 def extract_html_body(html_file,
@@ -38,11 +52,9 @@ def extract_html_body(html_file,
     if isinstance(pre, Tag) and new_soup.h2:
         new_soup.h2.insert_after(pre)
     elif isinstance(pre, NavigableString):
-        # TODO: logging <22-05-2024>
-        raise Exception(f'Type of "pre" variable is "NavigableString". Should be "Tag". The affected file is {html_file}.')
+        logging.error(f'Type of "pre" variable is "NavigableString". Should be "Tag". The affected file is {html_file}.')
     else:
-        # TODO: logging <22-05-2024>
-        raise Exception(f'No Text, ie. <pre>-tag in {html_file}.')
+        logging.error(f'No Text, ie. no <pre>-tag in {html_file}.')
 
     # Extract images/fotos
     imgs = entry_soup.find_all('img')
