@@ -6,37 +6,59 @@
 # TODO: Add "vor 6 Monaten" <29-04-2023>
 
 
-from sys import argv
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString, Tag
+from datetime import datetime
 
-with open(argv[1]) as fp:
-    soup = BeautifulSoup(fp, 'html.parser')
 
-# "which" past is submitted as second argument
-# craft heading according to chosen past
-period = int(argv[2])
-match period:
-    case 0:
-        heading = f"...vier Wochen, {argv[3]}"
-    case 1:
-        heading = f"...einem Jahr, {argv[3]}"
+def extract_html_body(html_file,
+                      past_date: str) -> BeautifulSoup:
+    """Extracts the <pre>, <img> and <video> tags from `html_file`, assembles it with a heading indicating how far in the past the day is."""
 
-# Format past adapted headings
-h2 = f"<h2>{heading}</h2>"
-# Extract description in pre-tag
-pre = soup.find('pre')
-pre = f"<pre>{str(pre.contents[0]).strip()}</pre>"
-# Extract images/fotos
-imgs = soup.find_all('img')
-imgs = (f"{str(img)}\n<br/>" for img in imgs)
-# Extract videos
-videos = soup.find_all('video')
-videos = (f"{str(video)}\n<br/>" for video in videos)
+    with open(html_file) as fp:
+        entry_soup = BeautifulSoup(fp, 'html.parser')
 
-# Join all html elements
-html_body = "".join((h2, pre, *imgs, *videos))
-print(html_body)
+    # Past heading
+    # TODO: Use num2words <22-05-2024>
+    # this_year = int(datetime.today().strftime('%Y'))
+    # match (diff := this_year - int(past_date.split('.')[-1])):
+    #     case 1:
+    #         h2 = f"<h2>...{diff} Jahr, {past_date}</h2>"
+    #     case _:
+    #         h2 = f"<h2>...{diff} Jahren, {past_date}</h2>"
 
-# In case generated html should be saved formatted
-# soup = BeautifulSoup(html_body, 'html.parser')
-# print(soup.prettify())
+    # TODO: Consider that today's entry will also part of it <22-05-2024>
+    #   '...0 Jahren, "today"'
+    this_year = int(datetime.today().strftime('%Y'))
+    diff = this_year - int(past_date.split('.')[-1])
+    h2 = f"<h2>...{diff} Jahr{'en' if diff >= 2 else ''}, {past_date}</h2>"
+    new_soup = BeautifulSoup(h2, 'html.parser')
+
+    # Extract description
+    pre = entry_soup.find('pre')
+    if isinstance(pre, Tag) and new_soup.h2:
+        new_soup.h2.insert_after(pre)
+    elif isinstance(pre, NavigableString):
+        # TODO: logging <22-05-2024>
+        raise Exception(f'Type of "pre" variable is "NavigableString". Should be "Tag". The affected file is {html_file}.')
+    else:
+        # TODO: logging <22-05-2024>
+        raise Exception(f'No Text, ie. <pre>-tag in {html_file}.')
+
+    # Extract images/fotos
+    imgs = entry_soup.find_all('img')
+    for img in imgs:
+        br = new_soup.new_tag('br')
+        if new_soup.pre:
+            new_soup.pre.insert_after(img, br)
+    # Extract videos
+    videos = entry_soup.find_all('video')
+    for video in videos:
+        br = new_soup.new_tag('br')
+        if new_soup.pre:
+            new_soup.pre.insert_after(video, br)
+
+    return new_soup
+
+
+if __name__ == "__main__":
+    extract_html_body('2020/09-September/13-Bamberg/2020-09-13_Bamberg.html', '13.09.2020')
