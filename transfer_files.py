@@ -24,7 +24,7 @@ length = 20
 logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
 
 
-def transfer_fotos(tmp_dir: Path,
+def transfer_files(tmp_dir: Path,
                    tagebuch_dir: Path) -> set[str]:
     directories: set[str] = set()
     # Loop through files in the directory
@@ -70,5 +70,5 @@ def transfer_fotos(tmp_dir: Path,
 
 
 if __name__ == "__main__":
-    directories: set[str] = transfer_fotos(tmp_dir, tagebuch_dir)
+    directories: set[str] = transfer_files(tmp_dir, tagebuch_dir)
     add_media_files(directories)

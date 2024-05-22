@@ -6,7 +6,7 @@ git_root_dir := $(shell git rev-parse --show-toplevel)
 all:
 	# test -d 2024/ && rm -r 2024/ || return 0
 	# bash tagebuch.sh
-	# python3 transfer_fotos.py
+	# python3 transfer_files.py
 	echo "No Recipe defined"	
 
 # ─── Test ──────────

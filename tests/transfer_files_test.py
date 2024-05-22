@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from transfer_fotos import transfer_fotos
+from transfer_files import transfer_files
 
 if TYPE_CHECKING:
     from pathlib import Path
 
 
-def test_transfer_fotos(create_dirs: tuple['Path', 'Path'],
+def test_transfer_files(create_dirs: tuple['Path', 'Path'],
                         copy_fotos: tuple['Path', 'Path'],
                         copy_video: 'Path',
                         create_day_dir_fotos: 'Path',
@@ -19,7 +19,7 @@ def test_transfer_fotos(create_dirs: tuple['Path', 'Path'],
     foto_1, foto_2 = copy_fotos
     video_1 = copy_video
 
-    # Has to exists for transfer_fotos to work properly
+    # Has to exists for transfer_files to work properly
     day_dir_fotos = create_day_dir_fotos
     day_dir_video = create_day_dir_video
 
@@ -27,7 +27,7 @@ def test_transfer_fotos(create_dirs: tuple['Path', 'Path'],
     # Otherwise it will search ~/.tagebuch
     os.chdir(tagebuch_dir)
 
-    directories: set[str] = transfer_fotos(tmp_dir, tagebuch_dir)
+    directories: set[str] = transfer_files(tmp_dir, tagebuch_dir)
 
     assert os.path.isfile(day_dir_fotos/foto_1.name)
     assert os.path.isfile(day_dir_fotos/foto_2.name)
@@ -35,7 +35,7 @@ def test_transfer_fotos(create_dirs: tuple['Path', 'Path'],
     assert len(directories) == 2
 
 
-def test_transfer_fotos_no_day_dir(create_dirs: tuple['Path', 'Path'],
+def test_transfer_files_no_day_dir(create_dirs: tuple['Path', 'Path'],
                                    copy_fotos: tuple['Path', 'Path']):
     """Test if an Exception is raised if the corresponding `day_dir` is absent."""
     tmp_dir, tagebuch_dir = create_dirs
@@ -46,11 +46,11 @@ def test_transfer_fotos_no_day_dir(create_dirs: tuple['Path', 'Path'],
     os.chdir(tagebuch_dir)
 
     with pytest.raises(Exception) as e:
-        transfer_fotos(tmp_dir, tagebuch_dir)
+        transfer_files(tmp_dir, tagebuch_dir)
     assert e.type == Exception
 
 
-def test_transfer_fotos_two_day_dir(create_dirs: tuple['Path', 'Path'],
+def test_transfer_files_two_day_dir(create_dirs: tuple['Path', 'Path'],
                                     copy_fotos: tuple['Path', 'Path'],
                                     create_day_dir_fotos: 'Path'):
     """Test if two directories for the same day exists, here '2020/09-September/13-Bamberg' and '2020/09-September/13-Nicht-Bamberg'"""
@@ -67,6 +67,6 @@ def test_transfer_fotos_two_day_dir(create_dirs: tuple['Path', 'Path'],
     os.chdir(tagebuch_dir)
 
     with pytest.raises(Exception) as e:
-        transfer_fotos(tmp_dir, tagebuch_dir)
+        transfer_files(tmp_dir, tagebuch_dir)
     os.rmdir(day_dir2)
     assert e.type == Exception
