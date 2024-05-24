@@ -3,7 +3,7 @@
 *.mp4
 202*/
 todo.md
-*.log.txt
+.logs/
 *.tar.gz
 
 .stignore
