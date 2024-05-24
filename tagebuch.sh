@@ -39,7 +39,7 @@ if ~/.tagebuch/check_today_dir_exists.sh "$path"; then
     if [ $? -eq 0 ]; then
         # Query for pagename/heading for the day
         # Can be left empty
-        pagename=$(zenity --entry --title="Neuer Tagebucheintrag" --text="<span font='$zenity_font_size'>Heutiger Seitenname:</span>" --width=$zenity_width --height=$zenity_height)
+        pagename=$(zenity --entry --title="Neuer Tagebucheintrag" --text="Heutiger Seitenname:" --width=$zenity_width --height=$zenity_height)
         # If $pagename was provided replace every space by -
         # Precaution, having no spaces prevents troubles in case of escaping or iterating over files/folders
         if [ -n "$pagename" ]; then
