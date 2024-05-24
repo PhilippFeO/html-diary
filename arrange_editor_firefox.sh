@@ -38,5 +38,11 @@ wmctrl -r "$today_heading" -b remove,maximized_vert,maximized_horz
 wmctrl -r "$today_heading" -e 0,$RIGHT_HALF,$Y,$W,"$H"
 
 # Neovim
-wmctrl -r "Tagebucheintrag" -e 0,$LEFT_HALF,$Y,$W,"$H"
-wmctrl -R "Tagebucheintrag" # Refocus Editor
+# 'wmctrl -r Tagebucheintrag' doesn't work (no idea why), use -i instead
+# 'wmctrl -l | grep Tagebucheintrag' spawns new window with the title 'wmctrl -l | grep Tagebucheintag', hence, grep finds two entries.
+# This 'grep window' is filtered out by 'grep -v grep'
+nvim_winID=$(wmctrl -l | grep Tagebucheintrag | grep -v grep | cut -d ' ' -f 1)
+wmctrl -i -r "$nvim_winID" -b remove,maximized_vert
+wmctrl -i -r "$nvim_winID" -b remove,maximized_horz
+wmctrl -i -r "$nvim_winID" -e 0,$LEFT_HALF,$Y,$W,"$H"
+wmctrl -R Tagebucheintrag # Refocus Editor
