@@ -20,7 +20,27 @@ length = 20
 logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
 
 
-def look_into_the_past(date: str):
+def check(date: str) -> bool:
+    """If date of today is equal to the last date for which a summery was generated return `False`, ie. don't create a new summery. (The summery was alread red).
+    If they differ, ie. no summery for today has been created, create one."""
+    create_summery = True
+    with open((last := Path.home()/'.tagebuch/.last_look_into_the_past.txt'), 'r') as f:
+        last_date = f.read()
+        create_summery = last_date == date
+    if create_summery:
+        return False
+    else:
+        with open(last, 'w') as f:
+            f.write(date)
+        return True
+
+
+def look_into_the_past(date: str) -> tuple[bool, str]:
+    create_summery = check(date)
+    if not create_summery:
+        logging.info('The summery was already created and red.')
+        return False, ''
+
     day, month, this_year = date.split(".", 2)
 
     title = f'Heute, {date}, vor...'
@@ -75,4 +95,4 @@ if __name__ == "__main__":
             html_file.write(html)
         subprocess.run(['firefox', '--new-window', html_path])
     else:
-        logging.info(f"There aren't any past entries for {date}.")
+        logging.info(f"There aren't any past entries for {date} or a summery has already been created and red.")
