@@ -1,7 +1,7 @@
 # Execute all, especially Tests in the root dir of git repo
 git_root_dir := $(shell git rev-parse --show-toplevel) 
 
-.Phony: all test clean lk
+.Phony: all test clean lk past
 
 all: clean
 	bash tagebuch.sh
@@ -9,10 +9,15 @@ all: clean
 	# echo "No Recipe defined"	
 
 clean:
-	test -d ./2024/05-Mai/24-05-2024-Freitag* && rm -r ./2024/05-Mai/24-05-2024-Freitag* || return 0
+	@# test -d ./2024/05-Mai/24-05-2024-Freitag* && rm -r ./2024/05-Mai/24-05-2024-Freitag* || return 0
+	echo "Empty."
 
 lk:
 	ls -l ./2024/05-Mai/
+
+past:
+	python3 look_into_the_past.py
+
 
 # ─── Test ──────────
 # On one line, because every line is executed in it's own subshell
