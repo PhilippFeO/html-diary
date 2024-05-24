@@ -90,7 +90,8 @@ if ~/.tagebuch/check_today_dir_exists.sh "$path"; then
         firefox --new-window "$today_file" &
         # Open Neovim with the cursor between the <pre>-tags and start insert mode
         #   $EDITOR doesn't make sense due to cursor setting syntax
-        kitty --title "Tagebucheintrag" nvim "+call cursor(10, 0)" "$today_file" &
+        #   Hilft vllt: -i, dann HEX für -r
+        /home/philipp/.local/bin/kitty --title "Tagebucheintrag" nvim "+call cursor(10, 0) | startinsert" "$today_file" &
 
         ~/.tagebuch/arrange_editor_firefox.sh "$heading"
     fi
