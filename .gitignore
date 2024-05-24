@@ -6,6 +6,8 @@ todo.md
 .logs/
 *.tar.gz
 
+.last_look_into_the_past.txt
+
 .stignore
 transfer_path
 .tmp/
