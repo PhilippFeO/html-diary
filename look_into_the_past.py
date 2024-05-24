@@ -73,6 +73,6 @@ if __name__ == "__main__":
         # TODO: Use File Descriptors <24-05-2024>
         with open(html_path, 'w') as html_file:
             html_file.write(html)
-        subprocess.run(['firefox', html_path])
+        subprocess.run(['firefox', '--new-window', html_path])
     else:
         logging.info(f"There aren't any past entries for {date}.")
