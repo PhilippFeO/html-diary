@@ -3,7 +3,7 @@
 *.mp4
 202*/
 todo.md
-transfer_files_add_media_files.log.txt
+*.log.txt
 
 .stignore
 transfer_path
