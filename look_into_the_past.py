@@ -8,6 +8,18 @@ from bs4 import BeautifulSoup
 from extract_html_body import extract_html_body
 
 
+tagebuch_dir = Path.home()/'.tagebuch'
+# Use different Log file when executed as test
+logging.basicConfig(level=logging.INFO,
+                    format='[%(levelname)s: %(asctime)s] %(message)s',
+                    # Mit Datum: %d.%m.%Y
+                    datefmt=' %Y.%m.%d  %H:%M:%S',
+                    filename=tagebuch_dir/'.logs/look_into_the_past.log.txt',
+                    filemode='a')
+length = 20
+logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
+
+
 def look_into_the_past(date: str):
     day, month, this_year = date.split(".", 2)
 

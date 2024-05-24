@@ -8,20 +8,8 @@
 
 import logging
 from datetime import datetime
-from pathlib import Path
 
 from bs4 import BeautifulSoup, NavigableString, Tag
-
-tagebuch_dir = Path.home()/'.tagebuch'
-# Use different Log file when executed as test
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)s: %(asctime)s] %(message)s',
-                    # Mit Datum: %d.%m.%Y
-                    datefmt=' %H:%M:%S',
-                    filename=tagebuch_dir/'look_into_the_past.log.txt',
-                    filemode='a')
-length = 20
-logging.info(f'{"-" * length} {datetime.today()} {"-" * length}')
 
 
 def extract_html_body(html_file,

@@ -17,8 +17,8 @@ tmp_dir = tagebuch_dir/'.tmp'
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
                     # Mit Datum: %d.%m.%Y
-                    datefmt=' %H:%M:%S',
-                    filename=tagebuch_dir/'transfer_files_add_media_files.log.txt',
+                    datefmt=' %Y.%m.%d  %H:%M:%S',
+                    filename=tagebuch_dir/'.logs/transfer_files_add_media_files.log.txt',
                     filemode='a')
 length = 20
 logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
