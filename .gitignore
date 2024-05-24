@@ -4,6 +4,7 @@
 202*/
 todo.md
 *.log.txt
+*.tar.gz
 
 .stignore
 transfer_path
