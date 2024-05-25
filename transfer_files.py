@@ -74,7 +74,7 @@ def transfer_files(tmp_dir: Path,
                         except subprocess.CalledProcessError:
                             logging.error(f"Foto '{media_file}' has no 'GPSDateStamp' Tag in it's exif data.")
                 case _:
-                    logging.error(f"Nothing done for File Type: '{media_file.suffix}'. Full path: '{media_file}'")
+                    logging.warning(f"Nothing done for File Type: '{media_file.suffix}'. Full path: '{media_file}'")
                     continue
             # split 'yyyy:mm:dd'
             year, month, day = date_created.split(":", 2)
@@ -128,7 +128,7 @@ def transfer_files(tmp_dir: Path,
                         day_entry = day_dir/f'{day}-{month}-{year}.html'
                         with open(day_entry, 'w') as f:
                             f.write(entry.prettify())
-                        logging.info(f'Created empty File for {year}.{month}.{day}: "{day_entry}"')
+                        logging.info(f'Created no-description Entry for {year}-{month}-{day}: "{day_entry}"')
                         copy_helper(media_file,
                                     day_dir,
                                     tagebuch_dir)
