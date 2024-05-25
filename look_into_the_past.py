@@ -26,13 +26,11 @@ def check(date: str) -> bool:
     create_summery = True
     with open((last := Path.home()/'.tagebuch/.last_look_into_the_past.txt'), 'r') as f:
         last_date = f.read()
-        create_summery = last_date == date
+        create_summery = last_date != date
     if create_summery:
-        return False
-    else:
         with open(last, 'w') as f:
             f.write(date)
-        return True
+    return create_summery
 
 
 def look_into_the_past(date: str) -> tuple[bool, str]:
@@ -66,7 +64,7 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
 
     # for past_year in range(1996, int(this_year) + 1):
     for past_year in range(int(this_year), 1995, -1):
-        matching_files = glob.glob(f"/home/philipp/.tagebuch/{past_year}/{month}-*/{day}-*/*.html")
+        matching_files = glob.glob(f"{Path.home()}/.tagebuch/{past_year}/{month}-*/{day}-*/*.html")
         match (nmb_entries := len(matching_files)):
             case 0:
                 logging.info(f'No entry for year {past_year}.')
