@@ -1,7 +1,7 @@
 # Execute all, especially Tests in the root dir of git repo
 git_root_dir := $(shell git rev-parse --show-toplevel) 
 
-.Phony: all test clean lk past media
+.Phony: all test clean lk past media ltf llp
 
 all: clean
 	bash tagebuch.sh
@@ -20,6 +20,15 @@ past:
 
 media:
 	python3 transfer_files.py
+
+# [l]og [t]ransfer [f]iles
+ltf:
+	cat ./.logs/transfer_files_add_media_files.log.txt
+
+# [l]og [l]ook into the [p]ast
+llp:
+	cat ./.logs/look_into_the_past.log.txt
+
 
 
 # ─── Test ──────────
