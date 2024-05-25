@@ -83,7 +83,7 @@ def transfer_files(tmp_dir: Path,
 
             # Move/Copy the media files to their corresponding diary entry.
             # Ie the entry fitting their created date.
-            match (count := len(matching_dirs)):
+            match len(matching_dirs):
                 case 1:
                     # Transfer image to directory
                     day_dir = Path(matching_dirs[0])
@@ -140,7 +140,7 @@ def transfer_files(tmp_dir: Path,
                         logging.error('No h1-tag in `html_skeleton`.')
                 case _:
                     logging.warning(
-                        f"Found {count} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}")
+                        f"Found {len(matching_dirs)} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}")
     return directories
 
 
