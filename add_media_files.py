@@ -7,10 +7,10 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 
-def add_media_files(directories: set[str]) -> None:
+def add_media_files(directories: set[Path]) -> None:
     tagebuch_dir = Path.home()/'.tagebuch'
     for day_dir in directories:
-        logging.info(f"Add Media Files in Directory '{day_dir}' ...")
+        logging.info(f"Add Media Files to Directory '{day_dir}' ...")
         # Load HTML file
         if len((html_files := glob.glob(os.path.join(day_dir, '*.html')))) == 1:
             html_file = html_files[0]
