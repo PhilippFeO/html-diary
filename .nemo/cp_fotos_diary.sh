@@ -1,5 +1,5 @@
 #!/bin/bash
-# nemo action for copying fotos into the apropiate folder of the diary
+# nemo action for copying fotos into ~/.tagebuch/.tmp 
 
 for img in "$@"; do
 	# notify-send "img = $img"
