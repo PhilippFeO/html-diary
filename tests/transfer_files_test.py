@@ -1,7 +1,7 @@
+import glob
 import os
+import subprocess
 from typing import TYPE_CHECKING
-
-import pytest
 
 from transfer_files import transfer_files
 
@@ -38,35 +38,44 @@ def test_transfer_files(create_dirs: tuple['Path', 'Path'],
 def test_transfer_files_no_day_dir(create_dirs: tuple['Path', 'Path'],
                                    copy_fotos: tuple['Path', 'Path']):
     """Test if an Exception is raised if the corresponding `day_dir` is absent."""
-    tmp_dir, tagebuch_dir = create_dirs
-    _ = copy_fotos
+    _, test_tagebuch_dir = create_dirs
+    foto_1, _ = copy_fotos
+
+    exif_output = subprocess.check_output(["exif", "-t", "0x9003", "--ifd=EXIF", foto_1])
+    exif_lines = exif_output.decode("utf-8").splitlines()
+    date_created = exif_lines[-1].split()[1]
+    year, month, day = date_created.split(":", 2)
 
     # Change directory for glob.glob() call
     # Otherwise it will search ~/.tagebuch
-    os.chdir(tagebuch_dir)
+    os.chdir(test_tagebuch_dir)
 
-    with pytest.raises(Exception) as e:
-        transfer_files(tmp_dir, tagebuch_dir)
-    assert e.type == Exception
+    # Find matching directories
+    matching_dirs = glob.glob(f"{year}/{month}-*/{day}-{month}-{year}-*")
+    assert len(matching_dirs) == 0
 
 
 def test_transfer_files_two_day_dir(create_dirs: tuple['Path', 'Path'],
                                     copy_fotos: tuple['Path', 'Path'],
                                     create_day_dir_fotos: 'Path'):
     """Test if two directories for the same day exists, here '2020/09-September/13-Bamberg' and '2020/09-September/13-Nicht-Bamberg'"""
-    tmp_dir, tagebuch_dir = create_dirs
-    _ = copy_fotos
+    _, test_tagebuch_dir = create_dirs
+    foto_1, _ = copy_fotos
     _ = create_day_dir_fotos
 
     # Create second day_dir
-    day_dir2: Path = tagebuch_dir/'2020/09-September/13-Nicht-Bamberg'
+    day_dir2: Path = test_tagebuch_dir/'2020/09-September/13-09-2020-Nicht-Bamberg'
     os.makedirs(day_dir2)
+
+    exif_output = subprocess.check_output(["exif", "-t", "0x9003", "--ifd=EXIF", foto_1])
+    exif_lines = exif_output.decode("utf-8").splitlines()
+    date_created = exif_lines[-1].split()[1]
+    year, month, day = date_created.split(":", 2)
 
     # Change directory for glob.glob() call
     # Otherwise it will search ~/.tagebuch
-    os.chdir(tagebuch_dir)
+    os.chdir(test_tagebuch_dir)
 
-    with pytest.raises(Exception) as e:
-        transfer_files(tmp_dir, tagebuch_dir)
-    os.rmdir(day_dir2)
-    assert e.type == Exception
+    # Find matching directories
+    matching_dirs = glob.glob(f"{year}/{month}-*/{day}-{month}-{year}-*")
+    assert len(matching_dirs) == 2
