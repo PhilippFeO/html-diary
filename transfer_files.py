@@ -10,12 +10,11 @@ from bs4 import BeautifulSoup
 
 from add_media_files import add_media_files
 
+
 # Define the path to the directory containing the files
 tagebuch_dir = Path.home()/'.tagebuch'
 tmp_dir = tagebuch_dir/'.tmp'
 
-
-# Use different Log file when executed as test
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
                     # Mit Datum: %d.%m.%Y
@@ -81,6 +80,9 @@ def transfer_files(tmp_dir: Path,
 
             # Find matching directories
             matching_dirs = glob.glob(f"{year}/{month}-*/{day}-{month}-{year}-*")
+
+            # Move/Copy the media files to their corresponding diary entry.
+            # Ie the entry fitting their created date.
             match (count := len(matching_dirs)):
                 case 1:
                     # Transfer image to directory
