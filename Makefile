@@ -1,7 +1,7 @@
 # Execute all, especially Tests in the root dir of git repo
 git_root_dir := $(shell git rev-parse --show-toplevel) 
 
-.Phony: all test clean look media ltf llp past
+.Phony: all test clean look media le lt ll past
 
 all: clean
 	bash tagebuch.sh
@@ -12,14 +12,6 @@ clean:
 	@# test -d ./2024/05-Mai/24-05-2024-Freitag* && rm -r ./2024/05-Mai/24-05-2024-Freitag* || return 0
 	echo "Empty."
 
-# [l]og [t]ransfer [f]iles
-ltf:
-	cat ./.logs/transfer_files_add_media_files.log.txt
-
-# [l]og [l]ook into the [p]ast
-llp:
-	cat ./.logs/look_into_the_past.log.txt
-
 look:
 	python3 look_into_the_past.py
 
@@ -28,6 +20,20 @@ media:
 
 past:
 	./entry_for_past_day.sh
+
+
+# ─── Logs ──────────
+# [l]og [e]ntry for past day
+le:
+	cat ./.logs/entry_for_past_day.log.txt
+
+# [l]og [t]ransfer files
+lt:
+	cat ./.logs/transfer_files_add_media_files.log.txt
+
+# [l]og [l]ook into the past
+ll:
+	cat ./.logs/look_into_the_past.log.txt
 
 
 # ─── Test ──────────
