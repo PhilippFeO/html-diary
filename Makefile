@@ -1,7 +1,7 @@
 # Execute all, especially Tests in the root dir of git repo
 git_root_dir := $(shell git rev-parse --show-toplevel) 
 
-.Phony: all test clean lk look media ltf llp past
+.Phony: all test clean look media ltf llp past
 
 all: clean
 	bash tagebuch.sh
@@ -11,9 +11,6 @@ all: clean
 clean:
 	@# test -d ./2024/05-Mai/24-05-2024-Freitag* && rm -r ./2024/05-Mai/24-05-2024-Freitag* || return 0
 	echo "Empty."
-
-lk:
-	ls -l ./2024/05-Mai/
 
 # [l]og [t]ransfer [f]iles
 ltf:
