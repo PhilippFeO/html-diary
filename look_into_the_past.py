@@ -24,6 +24,8 @@ def check(date: str) -> bool:
     """If date of today is equal to the last date for which a summery was generated return `False`, ie. don't create a new summery. (The summery was alread red).
     If they differ, ie. no summery for today has been created, create one."""
     create_summery = True
+    # TODO: tagebuch-Dir as parameter for testing <26-05-2024>
+    #   This function is currently not tested
     with open((last := Path.home()/'.tagebuch/.last_look_into_the_past.txt'), 'r') as f:
         last_date = f.read()
         create_summery = last_date != date
