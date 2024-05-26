@@ -5,6 +5,13 @@ from typing import TYPE_CHECKING
 
 from transfer_files import transfer_files
 
+from fixtures_transfer_files import (
+    copy_fotos,
+    copy_video,
+    create_day_dir_fotos,
+    create_day_dir_video,
+)
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -27,7 +34,7 @@ def test_transfer_files(create_dirs: tuple['Path', 'Path'],
     # Otherwise it will search ~/.tagebuch
     os.chdir(tagebuch_dir)
 
-    directories: set[str] = transfer_files(tmp_dir, tagebuch_dir)
+    directories: set[Path] = transfer_files(tmp_dir, tagebuch_dir)
 
     assert os.path.isfile(day_dir_fotos/foto_1.name)
     assert os.path.isfile(day_dir_fotos/foto_2.name)
