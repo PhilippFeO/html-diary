@@ -42,7 +42,7 @@ def extract_html_body(html_file,
     elif isinstance(pre, NavigableString):
         logging.error(f'Type of "pre" variable is "NavigableString". Should be "Tag". The affected file is {html_file}.')
     else:
-        logging.error(f'No Text, ie. no <pre>-tag in {html_file}.')
+        logging.warning(f'No Text, ie. no <pre>-tag in {html_file}.')
 
     # Extract images/fotos
     imgs = entry_soup.find_all('img')

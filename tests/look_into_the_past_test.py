@@ -10,7 +10,7 @@ from look_into_the_past import look_into_the_past
 def setup_entries(create_dirs):
     _, test_tagebuch_dir = create_dirs
     tests_dir = Path.home()/'.tagebuch'/'tests'
-    for year in (f'202{x}' for x in {0, 2, 3}):
+    for year in (f'202{x}' for x in {0, 1, 2, 3}):
         os.symlink(tests_dir/year, test_tagebuch_dir/year)
     yield test_tagebuch_dir.parent
 
@@ -41,9 +41,9 @@ def test_look_into_the_past(monkeypatch, setup_entries):
 
     # TODO: Was besseres einfallen lassen <24-05-2024>
     result = BeautifulSoup(html, 'html.parser')
-    assert len(result.find_all('img')) == 6
-    assert len(result.find_all('pre')) == 3
-    assert len(result.find_all('video')) == 1
+    assert len(result.find_all('img')) == 7
+    assert len(result.find_all('pre')) == 4
+    assert len(result.find_all('video')) == 2
 
 
 def test_no_past_entries():
