@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from add_media_files import add_media_files
 
 
+# TODO: in ifmain <26-05-2024>
 # Define the path to the directory containing the files
 tagebuch_dir = Path.home()/'.tagebuch'
 tmp_dir = tagebuch_dir/'.tmp'
@@ -92,6 +93,7 @@ def transfer_files(tmp_dir: Path,
                                 tagebuch_dir)
                     directories.add(day_dir)
                     logging.info(f"Added '{day_dir}' to `directories`.")
+                # TODO: Add Test for this case <26-05-2024>
                 case 0:
                     # Create new empty entry
                     # Media files were added if there was an entry fitting the created date.
@@ -120,7 +122,7 @@ def transfer_files(tmp_dir: Path,
                         h1_tag.insert_after(empty_pre_tag)
                         month_name = date_obj.strftime('%B')
                         # Create entry with empty pre-tag
-                        day_dir: Path = Path.home()/f'.tagebuch/{year}/{month}-{month_name}/{day}-{month}-{year}-{weekday}'
+                        day_dir: Path = tagebuch_dir/year/f'{month}-{month_name}/{day}-{month}-{year}-{weekday}'
                         os.makedirs(day_dir)
                         logging.info(f"Created Directory: '{day_dir}'")
                         # Write the HTML (media files are added later as usual)
