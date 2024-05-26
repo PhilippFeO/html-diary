@@ -5,8 +5,6 @@ git_root_dir := $(shell git rev-parse --show-toplevel)
 
 all: clean
 	bash tagebuch.sh
-	# python3 look_into_the_past.py
-	# echo "No Recipe defined"	
 
 clean:
 	@# test -d ./2024/05-Mai/24-05-2024-Freitag* && rm -r ./2024/05-Mai/24-05-2024-Freitag* || return 0
