@@ -79,7 +79,7 @@ def transfer_files(tmp_dir: Path,
             year, month, day = date_created.split(":", 2)
 
             # Find matching directories
-            matching_dirs = glob.glob(f"{year}/{month}-*/{day}-{month}-{year}-*")
+            matching_dirs = glob.glob(f"{Path.home()}/.tagebuch/{year}/{month}-*/{day}-{month}-{year}-*")
 
             # Move/Copy the media files to their corresponding diary entry.
             # Ie the entry fitting their created date.
@@ -98,9 +98,6 @@ def transfer_files(tmp_dir: Path,
                     # Some media files have no according entry for their created date. In this block,
                     # the (empty) entry is created to avoid remaining media files in .tmp/.
                     date_obj = datetime.datetime.strptime(date_created, '%Y:%m:%d').date()
-                    # Necessary because returned values are in English
-                    import locale
-                    locale.setlocale(locale.LC_ALL, '')
                     weekday = date_obj.strftime('%A')
                     title = f"{weekday}, {date_obj.strftime('%d. %B %Y')}"
                     html_skeleton = "<!DOCTYPE html>" + \
@@ -145,5 +142,8 @@ def transfer_files(tmp_dir: Path,
 
 
 if __name__ == "__main__":
+    # Necessary because returned values are in English
+    import locale
+    locale.setlocale(locale.LC_ALL, '')
     directories: set[Path] = transfer_files(tmp_dir, tagebuch_dir)
     add_media_files(directories)
