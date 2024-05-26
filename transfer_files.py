@@ -79,7 +79,7 @@ def transfer_files(tmp_dir: Path,
             year, month, day = date_created.split(":", 2)
 
             # Find matching directories
-            matching_dirs = glob.glob(f"{Path.home()}/.tagebuch/{year}/{month}-*/{day}-{month}-{year}-*")
+            matching_dirs = glob.glob(f"{tagebuch_dir}/{year}/{month}-*/{day}-{month}-{year}-*")
 
             # Move/Copy the media files to their corresponding diary entry.
             # Ie the entry fitting their created date.
