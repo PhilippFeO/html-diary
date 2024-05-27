@@ -4,15 +4,16 @@ from pathlib import Path
 import pytest
 from bs4 import BeautifulSoup
 from look_into_the_past import look_into_the_past
+from vars import tagebuch_dir
 
 
 @pytest.fixture
 def setup_entries(create_dirs):
-    _, test_tagebuch_dir = create_dirs
-    tests_dir = Path.home()/'.tagebuch'/'tests'
+    _, tmp_tagebuch_dir = create_dirs
+    tests_dir = tagebuch_dir/'tests/test_tagebuch'
     for year in (f'202{x}' for x in {0, 1, 2, 3}):
-        os.symlink(tests_dir/year, test_tagebuch_dir/year)
-    yield test_tagebuch_dir.parent
+        os.symlink(tests_dir/year, tmp_tagebuch_dir/year)
+    yield tmp_tagebuch_dir.parent
 
 
 def test_look_into_the_past(monkeypatch, setup_entries):
