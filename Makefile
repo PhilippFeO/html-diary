@@ -1,9 +1,10 @@
 # Execute all, especially Tests in the root dir of git repo
 git_root_dir := $(shell git rev-parse --show-toplevel) 
+test_diary_dir := './tests/test_tagebuch'
 
-.Phony: all test clean look media le lt ll past
+.Phony: all test clean cleantest look media le lt ll past
 
-all: clean
+all:
 	bash tagebuch.sh
 
 clean:
@@ -38,7 +39,13 @@ ll:
 # On one line, because every line is executed in it's own subshell
 # ie. every line is stateless
 # -q: less verbose test output
-test:
+
+# || return 0 necessary. Otherwise the target returns false if no test_diary_dir present.
+# Then 'test' is not executed.
+cleantest:
+	cd $(git_root_dir) && rm -r $(test_diary_dir) || return 0
+
+test: cleantest
 	@cd $(git_root_dir) && python3 -m pytest -rA -s -q tests/
 
 # Verbose tests, ie. with normal output
