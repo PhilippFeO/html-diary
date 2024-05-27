@@ -6,9 +6,9 @@ import subprocess
 
 from bs4 import BeautifulSoup
 from extract_html_body import extract_html_body
+from vars import tagebuch_dir
 
 
-tagebuch_dir = Path.home()/'.tagebuch'
 # Use different Log file when executed as test
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
@@ -26,7 +26,7 @@ def check(date: str) -> bool:
     create_summery = True
     # TODO: tagebuch-Dir as parameter for testing <26-05-2024>
     #   This function is currently not tested
-    with open((last := Path.home()/'.tagebuch/.last_look_into_the_past.txt'), 'r') as f:
+    with open((last := tagebuch_dir/'.last_look_into_the_past.txt'), 'r') as f:
         last_date = f.read()
         create_summery = last_date != date
     if create_summery:
@@ -35,7 +35,12 @@ def check(date: str) -> bool:
     return create_summery
 
 
-def look_into_the_past(date: str) -> tuple[bool, str]:
+def look_into_the_past(date: str,
+                       tagebuch_dir: Path) -> tuple[bool, str]:
+    """Collects past entries of the current date.
+
+    - `date`: `str` in the format `dd.mm.yyyy`. No consistency checks are performed.
+    - `tagebuch_dir`: `Path` of the diary."""
     create_summery = check(date)
     if not create_summery:
         logging.info('The summery was already created and red.')
@@ -66,7 +71,7 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
 
     # for past_year in range(1996, int(this_year) + 1):
     for past_year in range(int(this_year), 1995, -1):
-        matching_files = glob.glob(f"{Path.home()}/.tagebuch/{past_year}/{month}-*/{day}-*/*.html")
+        matching_files = glob.glob(f"{tagebuch_dir}/{past_year}/{month}-*/{day}-*/*.html")
         match (nmb_entries := len(matching_files)):
             case 0:
                 logging.info(f'No entry for year {past_year}.')
@@ -86,7 +91,7 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
 
 if __name__ == "__main__":
     date = datetime.datetime.today().strftime('%d.%m.%Y')
-    past_entries, html = look_into_the_past(date)
+    past_entries, html = look_into_the_past(date, tagebuch_dir)
     if past_entries:
         html_path = Path('/tmp/look_into_the_past.html')
         logging.info(f"Write collected past entried to '{html_path}'.")
