@@ -5,7 +5,6 @@ from pathlib import Path
 import subprocess
 
 from bs4 import BeautifulSoup
-from num2words import num2words
 from extract_html_body import extract_html_body
 
 
