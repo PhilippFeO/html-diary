@@ -10,6 +10,7 @@ import logging
 from datetime import datetime
 
 from bs4 import BeautifulSoup, NavigableString, Tag
+from num2words import num2words
 
 
 def extract_html_body(html_file,
@@ -19,20 +20,16 @@ def extract_html_body(html_file,
     with open(html_file) as fp:
         entry_soup = BeautifulSoup(fp, 'html.parser')
 
-    # Past heading
-    # TODO: Use num2words <22-05-2024>
-    # this_year = int(datetime.today().strftime('%Y'))
-    # match (diff := this_year - int(past_date.split('.')[-1])):
-    #     case 1:
-    #         h2 = f"<h2>...{diff} Jahr, {past_date}</h2>"
-    #     case _:
-    #         h2 = f"<h2>...{diff} Jahren, {past_date}</h2>"
-
-    # TODO: Consider that today's entry will also part of it <22-05-2024>
-    #   '...0 Jahren, "today"'
     this_year = int(datetime.today().strftime('%Y'))
-    diff = this_year - int(past_date.split('.')[-1])
-    h2 = f"<h2>...{diff} Jahr{'en' if diff >= 2 else ''}, {past_date}</h2>"
+    diff = this_year - (past_date_year := int(past_date.split('.')[-1]))
+    assert diff > 0, f'Difference between {this_year} and {past_date_year} is {diff} <0. Should be >=0.'
+    match diff:
+        case 0:
+            h2 = f"... {past_date}<h2>"
+        case 1:
+            h2 = f"<h2>... {past_date}, vor einem Jahr</h2>"
+        case _:
+            h2 = f"<h2>... {past_date}, vor {num2words(diff, lang='de')} Jahren</h2>"
     new_soup = BeautifulSoup(h2, 'html.parser')
 
     # Extract description

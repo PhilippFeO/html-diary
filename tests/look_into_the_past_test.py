@@ -33,11 +33,12 @@ def test_look_into_the_past(monkeypatch, setup_entries):
     # Change back for other tests
     os.chdir(tagebuch_dir)
 
-    # html_path = Path('/tmp/look_into_the_past.html')
-    # with open(html_path, 'w') as html_file:
-    #     html_file.write(html)
-    # import subprocess
-    # subprocess.run(['firefox', html_path])
+    # TODO: Use CLI arg for pytest to trigger this block <27-05-2024>
+    html_path = Path('/tmp/look_into_the_past.html')
+    with open(html_path, 'w') as html_file:
+        html_file.write(html)
+    import subprocess
+    subprocess.run(['firefox', html_path])
 
     # TODO: Was besseres einfallen lassen <24-05-2024>
     result = BeautifulSoup(html, 'html.parser')

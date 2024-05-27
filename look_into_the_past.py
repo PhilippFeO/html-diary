@@ -5,6 +5,7 @@ from pathlib import Path
 import subprocess
 
 from bs4 import BeautifulSoup
+from num2words import num2words
 from extract_html_body import extract_html_body
 
 
@@ -43,7 +44,7 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
 
     day, month, this_year = date.split(".", 2)
 
-    title = f'Heute, {date}, vor...'
+    title = f'Heute, {date}, am...'
     # Contents of past days will be inserted after h1
     # TODO: Check if body or h1 is better for appending <22-05-2024>
     html_skeleton = "<!DOCTYPE html>" + \
