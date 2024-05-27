@@ -12,8 +12,10 @@ def extract_html_body(html_file,
     with open(html_file) as fp:
         entry_soup = BeautifulSoup(fp, 'html.parser')
 
+    # Configure heading for entry depending on the number of years it lays in the past
     this_year = int(datetime.today().strftime('%Y'))
     diff = this_year - (past_date_year := int(past_date.split('.')[-1]))
+    # Just to be sure
     assert diff > 0, f'Difference between {this_year} and {past_date_year} is {diff} <0. Should be >=0.'
     match diff:
         case 0:
