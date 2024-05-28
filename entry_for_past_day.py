@@ -1,14 +1,14 @@
 import datetime
 import glob
-import os
+import locale
 import logging
+import os
 import sys
 
 from bs4 import BeautifulSoup, Tag
 
 from vars import tagebuch_dir
 
-import locale
 locale.setlocale(locale.LC_ALL, '')
 
 
@@ -59,39 +59,26 @@ def entry_for_past_day(date: str):
         case 1:
             logging.info(f'Directory for {date} already exists: {day_dirs[0]}')
             html_files = glob.glob(f'{day_dir_pattern}/*.html')
-            match len(html_files):
-                case 0:  # There is a day-dir but no HTML entry -> Can't happen currently
-                    raise Exception(f'"{day_dirs[0]} doesn\'t contain a HTML file')
-                case 1:
-                    html_file = html_files[0]
-                    logging.info(f'Entry for {date} exists: {html_file}')
-                    with open(html_file, 'r') as f:
-                        html = f.read()
-                    if not html:
-                        raise Exception(f'"{html_file}" could not be red')
-                    entry_soup = BeautifulSoup(html, 'html.parser')
-                    pre = entry_soup.find_all('pre')
-                    match len(pre):
-                        case 0:
-                            raise Exception(f'File "{html_file}" doesn\'t contain a <pre> tag')
-                        case 1:
-                            pre_tag = pre[0]
-                            if pre_tag.string:
-                                raise Exception(f'Description for {date} exists: "{html_file}"')
-                            else:
-                                # Query user for input
-                                description = input(f'Enter description for {date}:\n')
-                                pre_tag.string = description
-                                with open(html_file, 'w') as f:
-                                    f.write(entry_soup.prettify())
-                                logging.info(f'Description for Date {date} added to File "{html_file}"')
-                        # Too many pre-tags in HTML file
-                        case _:
-                            raise Exception(f'"{len(pre)} instead of 1 pre-tags in "{html_file}"')
-                # Too many HTML files in day_dir
-                case _:
-                    html_files_str = ',\n\t'.join(html_files)
-                    raise Exception(f'There are too many HTML files in "{day_dirs}":\n{html_files_str}')
+            assert len(html_files) == 1, f'"{day_dirs[0]}" contains {len(html_files)} HTML files. There should be exactly 1.'
+            html_file = html_files[0]
+            logging.info(f'Entry for {date} exists: {html_file}')
+            with open(html_file, 'r') as f:
+                html = f.read()
+            if not html:
+                raise Exception(f'"{html_file}" could not be red')
+            entry_soup = BeautifulSoup(html, 'html.parser')
+            pre = entry_soup.find_all('pre')
+            assert len(pre) == 1, f'Number of pre-tags: {len(pre)}. There should be exactly 1 in "{html_file}".'
+            pre_tag = pre[0]
+            if pre_tag.string:
+                raise Exception(f'Description for {date} exists: "{html_file}"')
+            else:
+                # Query user for input
+                description = input(f'Enter description for {date}:\n')
+                pre_tag.string = description
+                with open(html_file, 'w') as f:
+                    f.write(entry_soup.prettify())
+                logging.info(f'Description for Date {date} added to File "{html_file}"')
         # To many day_dirs
         case _:
             raise Exception(
@@ -99,7 +86,7 @@ def entry_for_past_day(date: str):
 
 
 if __name__ == "__main__":
-    # TODO: in ifmain <26-05-2024>
+    # TODO: No logs are written during Test. Do I want this? <28-05-2024>
     # Define the path to the directory containing the files
     tmp_dir = tagebuch_dir/'.tmp'
 
