@@ -8,6 +8,9 @@ from bs4 import BeautifulSoup, Tag
 
 from vars import tagebuch_dir
 
+import locale
+locale.setlocale(locale.LC_ALL, '')
+
 
 def entry_for_past_day(date: str):
     date_obj = datetime.datetime.strptime(date, '%Y-%m-%d').date()
@@ -96,8 +99,6 @@ def entry_for_past_day(date: str):
 
 
 if __name__ == "__main__":
-    import locale
-    locale.setlocale(locale.LC_ALL, '')
     # TODO: in ifmain <26-05-2024>
     # Define the path to the directory containing the files
     tmp_dir = tagebuch_dir/'.tmp'
