@@ -16,7 +16,7 @@ def entry_for_past_day(date: str):
     date_obj = datetime.datetime.strptime(date, '%Y-%m-%d').date()
     weekday = date_obj.strftime('%A')
     month_name = date_obj.strftime('%B')
-    # split 'dd.mm.yyyy'
+    # split 'yyyy-mm-dd'
     year, month, day = date.split('-', 2)
 
     # Find matching directories
