@@ -1,48 +1,46 @@
 import os
 import shutil
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
+from tests.vars import (
+    foto_1_name,
+    foto_2_name,
+    test_tmp_dir,
+    tests_dir,
+    test_diary_dir,
+    tf_foto_no_day_dir,
+    tf_foto_two_day_dir,
+    video_1_name,
+)
 
-tagebuch_dir = Path.home()/'.tagebuch'
-
-
-@pytest.fixture
-def create_day_dir_fotos(create_dirs):
-    _, test_tagebuch_dir = create_dirs
-    os.makedirs((day_dir_foto := test_tagebuch_dir/'2020/09-September/13-09-2020-Bamberg'))
-    yield day_dir_foto
-    # os.rmdir() raises Exception because it isn't empty after test_transfer_files()
-    shutil.rmtree(day_dir_foto)
-
-
-@pytest.fixture
-def create_day_dir_video(create_dirs):
-    _, test_tagebuch_dir = create_dirs
-    os.makedirs((day_dir_video := test_tagebuch_dir/'2023/05-Mai/12-05-2023-Eisbachwelle'))
-    yield day_dir_video
-    # os.rmdir() raises Exception because it isn't empty after test_transfer_files()
-    shutil.rmtree(day_dir_video)
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 @pytest.fixture
-def copy_fotos(create_dirs):
-    tagebuch_dir = Path(Path.home()/'.tagebuch')
-    test_tmp_dir, _ = create_dirs
-    foto_1 = Path('transfer_files_foto_1.jpg')
-    foto_2 = Path('transfer_files_foto_2.jpg')
-    # Copy fotos into 'test .tmp dir'
-    shutil.copy(tagebuch_dir/'tests'/foto_1,
-                (foto_1 := test_tmp_dir/foto_1))
-    shutil.copy(tagebuch_dir/'tests'/foto_2,
-                (foto_2 := test_tmp_dir/foto_2))
-    yield foto_1, foto_2
+def copy_fotos_tmp_dir(request):
+    # Get the parameter for the current test function
+    param_map: dict[str, tuple[Path, ...]] = {
+        'test_transfer_files': (tests_dir / foto_1_name,
+                                tests_dir / foto_2_name,
+                                tests_dir / video_1_name),
+        'test_transfer_files_no_day_dir': (tests_dir / tf_foto_no_day_dir,),
+        'test_transfer_files_two_day_dir': (tests_dir /
+                                            tf_foto_two_day_dir,)
+    }
+    param = param_map[request.node.name]
+    for media_file in param:
+        shutil.copy(media_file, test_tmp_dir)
+    # TODO: yield und teardown nötig? <28-05-2024>
+    # yield
+    # for media_file in os.listdir(test_transfered_dir):
+    #     os.remove(test_transfered_dir / media_file)
 
 
 @pytest.fixture
-def copy_video(create_dirs):
-    test_tmp_dir, _ = create_dirs
-    # Copy video into 'test .tmp dir'
-    shutil.copy((video_1 := Path(f'{tagebuch_dir}/tests/transfer_files_video_1.mp4')),
-                test_tmp_dir)
-    yield video_1
+def create_second_day_dir():
+    day_dir2: Path = test_diary_dir/'2020/09-September/13-09-2020-Nicht-Bamberg'
+    os.makedirs(day_dir2)
+    yield
+    shutil.rmtree(day_dir2)

@@ -10,6 +10,10 @@ from bs4 import BeautifulSoup
 
 from add_media_files import add_media_files
 
+# Necessary because returned values are in English
+# Can't stay in main because also needed during testing
+import locale
+locale.setlocale(locale.LC_ALL, '')
 
 # TODO: in ifmain <26-05-2024>
 # Define the path to the directory containing the files
@@ -144,8 +148,5 @@ def transfer_files(tmp_dir: Path,
 
 
 if __name__ == "__main__":
-    # Necessary because returned values are in English
-    import locale
-    locale.setlocale(locale.LC_ALL, '')
     directories: set[Path] = transfer_files(tmp_dir, tagebuch_dir)
     add_media_files(directories)

@@ -3,86 +3,103 @@ import os
 import subprocess
 from typing import TYPE_CHECKING
 
-from transfer_files import transfer_files
-
-from fixtures_transfer_files import (
-    copy_fotos,
-    copy_video,
-    create_day_dir_fotos,
-    create_day_dir_video,
+from tests.fixtures_transfer_files import copy_fotos_tmp_dir, create_second_day_dir
+from tests.vars import (
+    foto_1_name,
+    foto_2_name,
+    tf_foto_no_day_dir,
+    tf_foto_two_day_dir,
+    video_1_name,
+    test_diary_dir,
+    test_tmp_dir,
+    test_transfered_dir,
 )
+from transfer_files import transfer_files
 
 if TYPE_CHECKING:
     from pathlib import Path
 
 
-def test_transfer_files(create_dirs: tuple['Path', 'Path'],
-                        copy_fotos: tuple['Path', 'Path'],
-                        copy_video: 'Path',
-                        create_day_dir_fotos: 'Path',
-                        create_day_dir_video: 'Path'):
-    """Tests if one foto is copied correctly from `tmp_dir` to it's corresponding `day_dir_{fotos, video}`."""
-    tmp_dir, tagebuch_dir = create_dirs
-    foto_1, foto_2 = copy_fotos
-    video_1 = copy_video
+def test_transfer_files(setup_diary, copy_fotos_tmp_dir):
+    """Tests if one foto is copied correctly from `tmp_dir` to it's corresponding 'day_dir_{fotos, video}'. This directory must exists for `transfer_files()` to work properly."""
+    _ = setup_diary
+    _ = copy_fotos_tmp_dir
 
-    # Has to exists for transfer_files to work properly
-    day_dir_fotos = create_day_dir_fotos
-    day_dir_video = create_day_dir_video
-
-    # Change directory for glob.glob() call
-    # Otherwise it will search ~/.tagebuch
-    os.chdir(tagebuch_dir)
-
-    directories: set[Path] = transfer_files(tmp_dir, tagebuch_dir)
-
-    assert os.path.isfile(day_dir_fotos/foto_1.name)
-    assert os.path.isfile(day_dir_fotos/foto_2.name)
-    assert os.path.isfile(day_dir_video/video_1.name)
+    directories: set[Path] = transfer_files(test_tmp_dir, test_diary_dir)
     assert len(directories) == 2
 
+    day_dir_fotos = test_diary_dir/'2020/09-September/13-09-2020-Bamberg-tf'
+    day_dir_video = test_diary_dir/'2023/05-Mai/12-05-2023-Eisbachwelle-tf'
 
-def test_transfer_files_no_day_dir(create_dirs: tuple['Path', 'Path'],
-                                   copy_fotos: tuple['Path', 'Path']):
-    """Test if an Exception is raised if the corresponding `day_dir` is absent."""
-    _, test_tagebuch_dir = create_dirs
-    foto_1, _ = copy_fotos
+    assert os.path.isfile(day_dir_fotos / foto_1_name)
+    assert os.path.isfile(day_dir_fotos / foto_2_name)
+    assert os.path.isfile(day_dir_video / video_1_name)
+    # Assert media files were moved to 'tmp/transfered/'
+    assert not os.path.isfile(test_tmp_dir / foto_1_name)
+    assert not os.path.isfile(test_tmp_dir / foto_2_name)
+    assert not os.path.isfile(test_tmp_dir / video_1_name)
+    assert os.path.isfile(test_transfered_dir / foto_1_name)
+    assert os.path.isfile(test_transfered_dir / foto_2_name)
+    assert os.path.isfile(test_transfered_dir / video_1_name)
+
+
+def test_transfer_files_no_day_dir(setup_diary, copy_fotos_tmp_dir):
+    """Test if the directory for the foto and an HTML entry are created."""
+    _ = copy_fotos_tmp_dir
+    _ = setup_diary
+
+    foto_1 = test_tmp_dir / tf_foto_no_day_dir
 
     exif_output = subprocess.check_output(["exif", "-t", "0x9003", "--ifd=EXIF", foto_1])
     exif_lines = exif_output.decode("utf-8").splitlines()
+    # 2024, 05, 13
     date_created = exif_lines[-1].split()[1]
     year, month, day = date_created.split(":", 2)
 
-    # Change directory for glob.glob() call
-    # Otherwise it will search ~/.tagebuch
-    os.chdir(test_tagebuch_dir)
-
-    # Find matching directories
+    # Find matching directories -> should be emtpy before transfer_files()
     matching_dirs = glob.glob(f"{year}/{month}-*/{day}-{month}-{year}-*")
     assert len(matching_dirs) == 0
 
+    directories: set[Path] = transfer_files(test_tmp_dir, test_diary_dir)
 
-def test_transfer_files_two_day_dir(create_dirs: tuple['Path', 'Path'],
-                                    copy_fotos: tuple['Path', 'Path'],
-                                    create_day_dir_fotos: 'Path'):
+    # Assert newly created diary is added
+    assert len(directories) == 1
+    # Assert 1 day dir was created
+    day_dirs = glob.glob(str(test_diary_dir / f'{year}/{month}-*/{day}-{month}-{year}-*'))
+    assert len(day_dirs) == 1
+    assert os.path.isdir((day_dir := day_dirs[0]))
+    # Assert 1 html entry for the day was created
+    html_entries = glob.glob(os.path.join(day_dir, f'{day}-{month}-{year}*.html'))
+    assert len(html_entries) == 1
+    assert os.path.isfile(html_entries[0])
+    # Assert that foto was copied correctly to day dir
+    assert os.path.isfile(day_dir/tf_foto_no_day_dir)
+    # Assert foto was moved from .tmp/ to .tmp/transfered/
+    assert not os.path.isfile(foto_1)
+    assert os.path.isfile(test_transfered_dir / tf_foto_no_day_dir)
+
+
+def test_transfer_files_two_day_dir(setup_diary, copy_fotos_tmp_dir, create_second_day_dir):
     """Test if two directories for the same day exists, here '2020/09-September/13-Bamberg' and '2020/09-September/13-Nicht-Bamberg'"""
-    _, test_tagebuch_dir = create_dirs
-    foto_1, _ = copy_fotos
-    _ = create_day_dir_fotos
+    _ = setup_diary
+    _ = copy_fotos_tmp_dir
+    _ = create_second_day_dir
 
-    # Create second day_dir
-    day_dir2: Path = test_tagebuch_dir/'2020/09-September/13-09-2020-Nicht-Bamberg'
-    os.makedirs(day_dir2)
+    foto_1 = test_tmp_dir / tf_foto_two_day_dir
 
     exif_output = subprocess.check_output(["exif", "-t", "0x9003", "--ifd=EXIF", foto_1])
     exif_lines = exif_output.decode("utf-8").splitlines()
+    # 2020, 05, 13
     date_created = exif_lines[-1].split()[1]
     year, month, day = date_created.split(":", 2)
 
-    # Change directory for glob.glob() call
-    # Otherwise it will search ~/.tagebuch
-    os.chdir(test_tagebuch_dir)
+    directories: set[Path] = transfer_files(test_tmp_dir, test_diary_dir)
 
-    # Find matching directories
-    matching_dirs = glob.glob(f"{year}/{month}-*/{day}-{month}-{year}-*")
+    # Assert no directory was added (for further processing)
+    assert len(directories) == 0
+    # Assert there are 2 dirs for the date
+    matching_dirs = glob.glob(f"{test_diary_dir}/{year}/{month}-*/{day}-{month}-{year}-*")
     assert len(matching_dirs) == 2
+    # Assert foto was not move from .tmp/ to .tmp/transfered
+    assert os.path.isfile(foto_1)
+    assert not os.path.isfile(test_transfered_dir / tf_foto_two_day_dir)
