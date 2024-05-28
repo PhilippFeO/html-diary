@@ -1,12 +1,14 @@
 from bs4 import BeautifulSoup
 from look_into_the_past import look_into_the_past
+from tests.vars import test_diary_dir
 
 
 def test_look_into_the_past(monkeypatch, setup_diary):
+    _ = setup_diary
     date = '23.05.2024'
     monkeypatch.setattr('look_into_the_past.check', lambda _: True)
 
-    past_entries, html = look_into_the_past(date, setup_diary)
+    past_entries, html = look_into_the_past(date, test_diary_dir)
     assert past_entries
 
     # TODO: Use CLI arg for pytest to trigger this block <27-05-2024>
