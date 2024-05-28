@@ -26,17 +26,8 @@ if TYPE_CHECKING:
 
 @pytest.fixture
 def copy_fotos_tmp_dir(request):
-    # Get the parameter for the current test function
-    param_map: dict[str, tuple[Path, ...]] = {
-        'test_transfer_files': (tests_dir / foto_1_name,
-                                tests_dir / foto_2_name,
-                                tests_dir / video_1_name),
-        'test_transfer_files_no_day_dir': (tests_dir / tf_foto_no_day_dir,),
-        'test_transfer_files_two_day_dir': (tests_dir /
-                                            tf_foto_two_day_dir,)
-    }
-    param = param_map[request.node.name]
-    for media_file in param:
+    media_files = request.node.get_closest_marker('media_files').args[0]
+    for media_file in media_files:
         shutil.copy(media_file, test_tmp_dir)
 
 
@@ -49,6 +40,10 @@ def create_second_day_dir():
 
 
 # ─── Tests ──────────
+
+@pytest.mark.media_files((tests_dir / foto_1_name,
+                          tests_dir / foto_2_name,
+                          tests_dir / video_1_name))
 def test_transfer_files(setup_diary, copy_fotos_tmp_dir):
     """Tests if one foto is copied correctly from `tmp_dir` to it's corresponding 'day_dir_{fotos, video}'. This directory must exists for `transfer_files()` to work properly."""
     _ = setup_diary
@@ -72,6 +67,7 @@ def test_transfer_files(setup_diary, copy_fotos_tmp_dir):
     assert os.path.isfile(test_transfered_dir / video_1_name)
 
 
+@pytest.mark.media_files((tests_dir / tf_foto_no_day_dir,))
 def test_transfer_files_no_day_dir(setup_diary, copy_fotos_tmp_dir):
     """Test if the directory for the foto and an HTML entry are created."""
     _ = copy_fotos_tmp_dir
@@ -108,6 +104,7 @@ def test_transfer_files_no_day_dir(setup_diary, copy_fotos_tmp_dir):
     assert os.path.isfile(test_transfered_dir / tf_foto_no_day_dir)
 
 
+@pytest.mark.media_files((tests_dir / tf_foto_two_day_dir,))
 def test_transfer_files_two_day_dir(setup_diary, copy_fotos_tmp_dir, create_second_day_dir):
     """Test if two directories for the same day exists, here '2020/09-September/13-Bamberg' and '2020/09-September/13-Nicht-Bamberg'"""
     _ = setup_diary
