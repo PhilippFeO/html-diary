@@ -7,7 +7,8 @@ from bs4 import BeautifulSoup
 
 
 def add_media_files(directories: set[Path]) -> None:
-    logging.info(f'Entered "{__name__}"')
+    """Adds media files to a diary entry, ie. `directories` contains the directories to which media files were added but not yet embedded into the HTML file laying in the same directory. This function iterates over all files in each directory, creates the according HTML tag and adds it to the diary entry."""
+    logging.info(f'{__name__}({directories})')
     tagebuch_dir = Path.home()/'.tagebuch'
     for day_dir in directories:
         # Load HTML file
