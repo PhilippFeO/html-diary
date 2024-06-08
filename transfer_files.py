@@ -7,6 +7,7 @@ import subprocess
 from pathlib import Path
 
 from bs4 import BeautifulSoup
+from vars import tagebuch_dir
 
 from add_media_files import add_media_files
 
@@ -17,7 +18,6 @@ locale.setlocale(locale.LC_ALL, '')
 
 # TODO: in ifmain <26-05-2024>
 # Define the path to the directory containing the files
-tagebuch_dir = Path.home()/'.tagebuch'
 tmp_dir = tagebuch_dir/'.tmp'
 
 logging.basicConfig(level=logging.INFO,
