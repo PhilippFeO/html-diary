@@ -21,7 +21,7 @@ logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
 
 
 def open_file(html_file):
-    logging.info(f'open_file({html_file})')
+    logging.info(f"open_file('{html_file}')")
     if '.tagebuch' in html_file:
         # Remove file:// from html_file
         len_protocol = len('file://')
@@ -43,13 +43,13 @@ def open_file(html_file):
                     html_file.write(bytes(soup.encode('utf-8')))
                     html_file.flush()
                     logging.info(f'Open {html_file.name}')
-                    subprocess.run(['open', html_file.name])
+                    html_file = html_file.name
             else:
                 logging.error('`href` is not of type `str` but `list[str] | None`.')
         else:
-            logging.warning('Either no `soup.head`, `soup.head.base` or `href` attribute within `soup.head.base`.')
-    else:
-        subprocess.run(['open', html_file])
+            logging.info('Either no `soup.head`, `soup.head.base` or `href` attribute within `soup.head.base`.')
+            logging.info(f'Open {html_file}')
+    subprocess.run(['open', html_file])
 
 
 if __name__ == "__main__":
