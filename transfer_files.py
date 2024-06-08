@@ -68,7 +68,7 @@ def transfer_files(tmp_dir: Path,
                     except subprocess.CalledProcessError:
                         logging.error(f"Foto '{media_file}' has no Tag with ID 0x9003 in it's exif data.")
                     # PANO*.jpg
-                    if date_created is None:
+                    if date_created == '':
                         try:
                             # Panorama images dont have anything like 'date created', hence I have to use 'GPS Date Stamp':
                             # GPS Date Stamp                  : 2024:05:22
