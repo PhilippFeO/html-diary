@@ -9,6 +9,7 @@ from vars import tagebuch_dir
 
 
 def add_media_files_dir_file(html_file: str, day_dir: Path) -> BeautifulSoup:
+    logging.info(f'add_media_files_dir_file({html_file}, {day_dir})')
     with open(html_file, 'r') as file:
         html_content = file.read()
     soup = BeautifulSoup(html_content, 'html.parser')
