@@ -6,6 +6,7 @@ todo.md
 .logs/
 *.tar.gz
 
+höhepunkte.txt
 .last_look_into_the_past.txt
 
 tests/test_tagebuch.original
