@@ -1,0 +1,16 @@
+# Custom action for Nemo File Manager for Cinnamon.
+# Move diary entry via custom handler
+# For more info: https://github.com/linuxmint/nemo/blob/master/files/usr/share/nemo/actions/sample.nemo_action
+
+[Nemo Action]
+Active=true
+# Displayed Name in context menu
+# _ in front of letter indicates keyboard shortcut
+Name=Tagebuch
+Comment=Öffne Tagebucheintrag
+# <> necessary if scripts lies in nemo/actions/
+# %U = file:// + absolute path
+Exec=<open_diary.sh %U>
+Selection=any
+Extensions=any;
+Quote=double
