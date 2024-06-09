@@ -8,8 +8,8 @@ from bs4 import BeautifulSoup
 from vars import tagebuch_dir
 
 
-def add_media_files_dir_file(html_file: str, day_dir: Path) -> BeautifulSoup:
-    logging.info(f'add_media_files_dir_file({html_file}, {day_dir})')
+def add_media_files_dir_file(html_file: str | Path, foto_dir: Path) -> BeautifulSoup:
+    logging.info(f'add_media_files_dir_file({html_file}, {foto_dir})')
     with open(html_file, 'r') as file:
         html_content = file.read()
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -18,8 +18,17 @@ def add_media_files_dir_file(html_file: str, day_dir: Path) -> BeautifulSoup:
 
     # Insert the new elements after the <pre> tag
     if pre_tag:  # pre_tag may be None, insert_after() doesn't work on None
-        for filename in os.listdir(day_dir):
-            f = Path(os.path.join(day_dir, filename))
+        # When called with the intent to temporarly embed fotos from a folder, it is not guaranteed that this filder exists (I may have renamed it).
+        if not os.path.isdir(foto_dir):
+            logging.error(f"'{foto_dir}' doesn't exists")
+            # Add visual feedback
+            b = soup.new_tag('b')
+            b.append(f'{foto_dir} EXISTIERT NICHT')
+            pre_tag.insert_after(b)
+            pre_tag.insert_after(soup.new_tag('br'))
+            return soup
+        for filename in os.listdir(foto_dir):
+            f = Path(os.path.join(foto_dir, filename))
             match f.suffix:
                 # Add <img src='...'/> tag for each foto
                 case '.jpg' | '.jpeg' | '.JPG' | '.JPEG' | '.png' | '.PNG':
@@ -45,7 +54,7 @@ def add_media_files_dir_file(html_file: str, day_dir: Path) -> BeautifulSoup:
                 case '.html':
                     logging.info(f'(Obviously) Skipping the HTML Entry: "{f}"')
                 case _:
-                    logging.warning(f"There is a new File Type in '{day_dir}': '{f}'")
+                    logging.warning(f"There is a new File Type in '{foto_dir}': '{f}'")
 
     return soup
 
