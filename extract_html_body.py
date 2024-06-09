@@ -16,6 +16,7 @@ def extract_html_body(html_file,
     this_year = int(datetime.today().strftime('%Y'))
     diff = this_year - (past_date_year := int(past_date.split('.')[-1]))
     # Just to be sure
+    # TODO: Reformulieren, ich finde es besser, wenn Text mit "vor einem Jahr, DATUM" startet <09-06-2024>
     assert diff > 0, f'Difference between {this_year} and {past_date_year} is {diff} <0. Should be >=0.'
     match diff:
         case 0:
