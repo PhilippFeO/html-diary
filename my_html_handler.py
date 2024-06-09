@@ -62,5 +62,7 @@ if __name__ == "__main__":
     html_file = sys.argv[1]
     prefix = 'file://'
     html_file = html_file[len(prefix):]
-    dir_path = read_base_href(html_file)
-    helper(html_file, dir_path)
+    if (dir_path := read_base_href(html_file)):
+        helper(html_file, dir_path)
+    else:
+        subprocess.run(['open', html_file])
