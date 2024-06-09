@@ -7,10 +7,6 @@ from bs4 import BeautifulSoup
 
 from vars import tagebuch_dir
 
-# Liste zurückgeben, die angehängt wird
-#   In my_html_handler kein Problem, Ziel HTML wird dort geparst
-#
-
 
 def add_media_files_dir_file(html_file: str | Path, foto_dir: str | Path):
     """Returns a list with the tags to be inserted after the pre-tag."""
