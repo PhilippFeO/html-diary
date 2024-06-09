@@ -85,7 +85,7 @@ def test_transfer_files_no_day_dir(setup_diary, copy_fotos_tmp_dir):
     year, month, day = date_created.split(":", 2)
 
     # Find matching directories -> should be emtpy before transfer_files()
-    matching_dirs = glob.glob(f"{year}/{month}-*/{day}-{month}-{year}-*")
+    matching_dirs = glob.glob(f"{test_diary_dir}/{year}/{month}-*/{day}-{month}-{year}-*")
     assert len(matching_dirs) == 0
 
     directories: set[Path] = transfer_files(test_tmp_dir, test_diary_dir)
