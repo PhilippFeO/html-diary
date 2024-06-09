@@ -1,4 +1,4 @@
-pre {
+pre, b {
     white-space: pre-wrap;
     /* word-wrap: break-word; */
     font-family: 'Fira Code';
