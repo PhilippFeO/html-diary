@@ -7,13 +7,19 @@ from bs4 import BeautifulSoup
 
 from vars import tagebuch_dir
 
+# Liste zurückgeben, die angehängt wird
+#   In my_html_handler kein Problem, Ziel HTML wird dort geparst
+#
 
-def add_media_files_dir_file(html_file: str | Path, foto_dir: Path) -> BeautifulSoup:
+
+def add_media_files_dir_file(html_file: str | Path, foto_dir: str | Path):
+    """Returns a list with the tags to be inserted after the pre-tag."""
     logging.info(f'add_media_files_dir_file({html_file}, {foto_dir})')
+    tags = []
+
     with open(html_file, 'r') as file:
         html_content = file.read()
     soup = BeautifulSoup(html_content, 'html.parser')
-
     pre_tag = soup.find('pre')
 
     # Insert the new elements after the <pre> tag
@@ -24,9 +30,9 @@ def add_media_files_dir_file(html_file: str | Path, foto_dir: Path) -> Beautiful
             # Add visual feedback
             b = soup.new_tag('b')
             b.append(f'{foto_dir} EXISTIERT NICHT')
-            pre_tag.insert_after(b)
-            pre_tag.insert_after(soup.new_tag('br'))
-            return soup
+            tags.append(b)
+            tags.append(soup.new_tag('br'))
+            return tags
         for filename in os.listdir(foto_dir):
             f = Path(os.path.join(foto_dir, filename))
             match f.suffix:
@@ -34,8 +40,8 @@ def add_media_files_dir_file(html_file: str | Path, foto_dir: Path) -> Beautiful
                 case '.jpg' | '.jpeg' | '.JPG' | '.JPEG' | '.png' | '.PNG':
                     new_img = soup.new_tag('img', src=tagebuch_dir/f)
                     # LIFO data structure, ie '<br/>' is the first element
-                    pre_tag.insert_after(new_img)
-                    pre_tag.insert_after(soup.new_tag('br'))
+                    tags.append(new_img)
+                    tags.append(soup.new_tag('br'))
                     logging.info(f"Added Foto: '{f}'")
                 # Add <video controls loop><source src='...'/></video>
                 case '.mp4':
@@ -47,16 +53,15 @@ def add_media_files_dir_file(html_file: str | Path, foto_dir: Path) -> Beautiful
                     # Append the <source> tag to the <video> tag
                     new_video.append(new_source)
                     # LIFO data structure, ie '<br/>' is the first element
-                    pre_tag.insert_after(new_video)
-                    pre_tag.insert_after(soup.new_tag('br'))
+                    tags.append(new_video)
+                    tags.append(soup.new_tag('br'))
                     logging.info(f"Added Video: '{f}'")
                 # Skip html file
                 case '.html':
                     logging.info(f'(Obviously) Skipping the HTML Entry: "{f}"')
                 case _:
                     logging.warning(f"There is a new File Type in '{foto_dir}': '{f}'")
-
-    return soup
+    return tags
 
 
 def add_media_files(directories: set[Path]) -> None:
@@ -71,6 +76,12 @@ def add_media_files(directories: set[Path]) -> None:
             continue
         logging.info(f'Add Media Files in "{day_dir}" to "{html_file}" ...')
 
-        soup = add_media_files_dir_file(html_file, day_dir)
+        # Insert tags after pre-tag
+        tags = add_media_files_dir_file(html_file, day_dir)
+        soup = None
+        with open(html_file, 'r') as file:
+            soup = BeautifulSoup(file.read(), 'html.parser')
+            if (pre_tag := soup.find('pre')):
+                pre_tag.insert_after(*tags)
         with open(html_file, 'w') as file:
             file.write(soup.prettify())

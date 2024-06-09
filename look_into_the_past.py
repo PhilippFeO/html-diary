@@ -1,13 +1,16 @@
 import datetime
 import glob
 import logging
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
 from bs4 import BeautifulSoup
-from extract_html_body import extract_html_body
-from vars import tagebuch_dir
 
+from add_media_files import add_media_files_dir_file
+from extract_html_body import extract_html_body
+from my_html_handler import read_base_href
+from extract_html_body import past_heading
+from vars import tagebuch_dir
 
 # Use different Log file when executed as test
 logging.basicConfig(level=logging.INFO,
@@ -77,11 +80,19 @@ def look_into_the_past(date: str,
                 logging.info(f'No entry for year {past_year}.')
             case 1:
                 past_entries = True
-                logging.info(f'{past_year}: File exists: "{matching_files[0]}". Extract media files.')
-                past_entry: 'BeautifulSoup' = extract_html_body(matching_files[0], f'{day}.{month}.{past_year}')
+                h1 = overview.h1
+                past_entry: 'BeautifulSoup'
+                logging.info(f'{past_year}: File exists: "{(html_entry := matching_files[0])}". Extract media files.')
+                if (dir_path := read_base_href(html_entry)):
+                    tags = add_media_files_dir_file(html_entry, dir_path)
+                    past_entry = past_heading(f'{day}.{month}.{past_year}')
+                    if (h2 := past_entry.h2):
+                        h2.insert_after(*tags)
+                else:
+                    past_entry = extract_html_body(html_entry, f'{day}.{month}.{past_year}')
                 # Merge past day into overview
-                if overview.h1:
-                    overview.h1.append(past_entry)
+                if h1:
+                    h1.append(past_entry)
             case _:
                 files = ',\n\t'.join(matching_files)
                 logging.error(f'There are {nmb_entries} files whereas there should be 1 or 0. The files are:\n\t{files}')
