@@ -5,8 +5,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from bs4 import BeautifulSoup
-from utils import count_directories
+from utils import count_directories, make_new_entry, create_dir_file
 from vars import tagebuch_dir
 
 from add_media_files import add_media_files
@@ -34,7 +33,7 @@ def copy_helper(media_file: Path,
                 day_dir: Path,
                 tagebuch_dir: Path):
     shutil.copy(media_file,
-                tagebuch_dir/day_dir/media_file.name)
+                day_dir/media_file.name)
     logging.info(f"Copied '{media_file}' to '{tagebuch_dir/day_dir/media_file.name}'")
     shutil.move(media_file,
                 (transfered_dir := tagebuch_dir/'.tmp/transfered'))
@@ -84,6 +83,7 @@ def transfer_files(tmp_dir: Path,
             year, month, day = date_created.split(":", 2)
 
             matching_dirs = count_directories(day, month, year)
+            # matching_dirs = count_directories(tagebuch_dir, day, month, year)
 
             # Move/Copy the media files to their corresponding diary entry.
             # Ie the entry fitting their created date.
@@ -98,48 +98,13 @@ def transfer_files(tmp_dir: Path,
                     logging.info(f"Added '{day_dir}' to `directories`.")
                 # TODO: Add Test for this case <26-05-2024>
                 case 0:
-                    # Create new empty entry
-                    # Media files were added if there was an entry fitting the created date.
-                    # Some media files have no according entry for their created date. In this block,
-                    # the (empty) entry is created to avoid remaining media files in .tmp/.
-                    date_obj = datetime.datetime.strptime(date_created, '%Y:%m:%d').date()
-                    weekday = date_obj.strftime('%A')
-                    title = f"{weekday}, {date_obj.strftime('%d. %B %Y')}"
-                    html_skeleton = "<!DOCTYPE html>" + \
-                        '<html>' + \
-                        '  <head>' + \
-                        f'	<title>{title}</title>' + \
-                        '	<!-- weitere Kopfinformationen -->' + \
-                        '	<!-- Styles für <pre> -->' + \
-                        '	<link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">' + \
-                        '  </head>' + \
-                        '  <body>' + \
-                        f'	<h1>{title}</h1>' + \
-                        '  </body>' + \
-                        '</html>'
-                    entry = BeautifulSoup(html_skeleton, 'html.parser')
-                    # For the sake of consistency, add an (empty) pre-tag
-                    # consistency: Every entry has one and add_media_files(…) logic is based on the existence of this pre-tag
-                    empty_pre_tag = entry.new_tag('pre')
-                    if (h1_tag := entry.find('h1')):
-                        h1_tag.insert_after(empty_pre_tag)
-                        month_name = date_obj.strftime('%B')
-                        # Create entry with empty pre-tag
-                        day_dir: Path = tagebuch_dir/year/f'{month}-{month_name}/{day}-{month}-{year}-{weekday}'
-                        os.makedirs(day_dir)
-                        logging.info(f"Created Directory: '{day_dir}'")
-                        # Write the HTML (media files are added later as usual)
-                        day_entry = day_dir/f'{day}-{month}-{year}.html'
-                        with open(day_entry, 'w') as f:
-                            f.write(entry.prettify())
-                        logging.info(f'Created no-description Entry for {year}-{month}-{day}: "{day_entry}"')
-                        copy_helper(media_file,
-                                    day_dir,
-                                    tagebuch_dir)
-                        directories.add(day_dir)
-                        logging.info(f"Added '{day_dir}' to `directories`.")
-                    else:
-                        logging.error('No h1-tag in `html_skeleton`.')
+                    day_dir, html_entry = make_new_entry(tagebuch_dir, day, month, year)
+                    create_dir_file(html_entry, day_dir, day, month, year)
+                    copy_helper(media_file,
+                                day_dir,
+                                tagebuch_dir)
+                    directories.add(day_dir)
+                    logging.info(f"Added '{day_dir}' to `directories`.")
                 case _:
                     logging.warning(
                         f"Found {len(matching_dirs)} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}")

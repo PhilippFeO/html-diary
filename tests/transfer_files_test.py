@@ -1,3 +1,4 @@
+import vars
 import glob
 import shutil
 import pytest
@@ -47,10 +48,11 @@ def create_second_day_dir():
 @pytest.mark.media_files((tests_dir / foto_1_name,
                           tests_dir / foto_2_name,
                           tests_dir / video_1_name))
-def test_transfer_files(setup_diary, copy_fotos_tmp_dir):
+def test_transfer_files(setup_diary, copy_fotos_tmp_dir, monkeypatch):
     """Tests if media files are copied correctly from `.tmp/` to it's corresponding 'day_dir_{fotos, video}'. This directory must exists for `transfer_files()` to work properly."""
     _ = setup_diary
     _ = copy_fotos_tmp_dir
+    monkeypatch.setattr(vars, 'tagebuch_dir', test_diary_dir)
 
     directories: set[Path] = transfer_files(test_tmp_dir, test_diary_dir)
     assert len(directories) == 2
@@ -71,10 +73,11 @@ def test_transfer_files(setup_diary, copy_fotos_tmp_dir):
 
 
 @pytest.mark.media_files((tests_dir / tf_foto_no_day_dir,))
-def test_transfer_files_no_day_dir(setup_diary, copy_fotos_tmp_dir):
+def test_transfer_files_no_day_dir(setup_diary, monkeypatch, copy_fotos_tmp_dir):
     """Test if the directory for the foto and an HTML entry are created, if there is was none beforehand."""
     _ = copy_fotos_tmp_dir
     _ = setup_diary
+    monkeypatch.setattr(vars, 'tagebuch_dir', test_diary_dir)
 
     foto_1 = test_tmp_dir / tf_foto_no_day_dir
 
@@ -108,11 +111,12 @@ def test_transfer_files_no_day_dir(setup_diary, copy_fotos_tmp_dir):
 
 
 @pytest.mark.media_files((tests_dir / tf_foto_two_day_dir,))
-def test_transfer_files_two_day_dir(setup_diary, copy_fotos_tmp_dir, create_second_day_dir):
+def test_transfer_files_two_day_dir(setup_diary, monkeypatch, copy_fotos_tmp_dir, create_second_day_dir):
     """Test if two directories for the same day exists, here '2020/09-September/13-Bamberg' and '2020/09-September/13-Nicht-Bamberg'."""
     _ = setup_diary
     _ = copy_fotos_tmp_dir
     _ = create_second_day_dir
+    monkeypatch.setattr(vars, 'tagebuch_dir', test_diary_dir)
 
     foto_1 = test_tmp_dir / tf_foto_two_day_dir
 
