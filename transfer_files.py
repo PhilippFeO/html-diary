@@ -1,5 +1,4 @@
 import datetime
-import glob
 import logging
 import os
 import shutil
@@ -7,6 +6,7 @@ import subprocess
 from pathlib import Path
 
 from bs4 import BeautifulSoup
+from utils import count_directories
 from vars import tagebuch_dir
 
 from add_media_files import add_media_files
@@ -83,8 +83,7 @@ def transfer_files(tmp_dir: Path,
             # split 'yyyy:mm:dd'
             year, month, day = date_created.split(":", 2)
 
-            # Find matching directories
-            matching_dirs = glob.glob(f"{tagebuch_dir}/{year}/{month}-*/{day}-{month}-{year}-*")
+            matching_dirs = count_directories(day, month, year)
 
             # Move/Copy the media files to their corresponding diary entry.
             # Ie the entry fitting their created date.
