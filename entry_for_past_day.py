@@ -6,6 +6,7 @@ import os
 import sys
 
 from bs4 import BeautifulSoup, Tag
+from utils import create_stump
 
 from vars import tagebuch_dir
 
@@ -32,19 +33,7 @@ def entry_for_past_day(date: str):
             day_dir = day_dir_pattern.replace('*', x)
             os.makedirs(day_dir)
             logging.info(f'Directory for {date} created: {day_dir}')
-            html_skeleton = "<!DOCTYPE html>" + \
-                '<html>' + \
-                '  <head>' + \
-                f'	<title>{title}</title>' + \
-                '	<!-- weitere Kopfinformationen -->' + \
-                '	<!-- Styles für <pre> -->' + \
-                '	<link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">' + \
-                '  </head>' + \
-                '  <body>' + \
-                f'	<h1>{title}</h1>' + \
-                '  <pre></pre>' + \
-                '  </body>' + \
-                '</html>'
+            html_skeleton = create_stump(title)
             entry_soup = BeautifulSoup(html_skeleton, 'html.parser')
             pre_tag = entry_soup.find('pre')
             if not isinstance(pre_tag, Tag):

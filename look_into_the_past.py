@@ -4,12 +4,12 @@ import logging
 import subprocess
 from pathlib import Path
 
-from bs4 import BeautifulSoup
-
 from add_media_files import add_media_files_dir_file
-from extract_html_body import extract_html_body
+from bs4 import BeautifulSoup
+from extract_html_body import extract_html_body, past_heading
 from my_html_handler import read_base_href
-from extract_html_body import past_heading
+from utils import create_stump
+
 from vars import tagebuch_dir
 
 # Use different Log file when executed as test
@@ -54,19 +54,7 @@ def look_into_the_past(date: str,
     title = f'Heute, {date}, am...'
     # Contents of past days will be inserted after h1
     # TODO: Check if body or h1 is better for appending <22-05-2024>
-    html_skeleton = "<!DOCTYPE html>" + \
-        '<html>' + \
-        '  <head>' + \
-        f'	<title>{title}</title>' + \
-        '	<!-- weitere Kopfinformationen -->' + \
-        '	<!-- Styles für <pre> -->' + \
-        '	<link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">' + \
-        '  </head>' + \
-        '  <body>' + \
-        f'	<h1>{title}</h1>' + \
-        '  </body>' + \
-        '</html>'
-
+    html_skeleton = create_stump(title)
     overview = BeautifulSoup(html_skeleton, 'html.parser')
 
     # In case there are no past entries for a date, the returned is basically empty. Further processing is not necessary, then.

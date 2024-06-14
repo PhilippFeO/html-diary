@@ -3,12 +3,26 @@ import logging
 import os
 from datetime import datetime
 from bs4 import BeautifulSoup
-# from vars import tagebuch_dir
 import vars
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+
+def create_stump(title: str) -> str:
+    return "<!DOCTYPE html>" + \
+        '<html>' + \
+        '  <head>' + \
+        f'	<title>{title}</title>' + \
+        '	<!-- weitere Kopfinformationen -->' + \
+        '	<!-- Styles für <pre> -->' + \
+        '	<link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">' + \
+        '  </head>' + \
+        '  <body>' + \
+        f'	<h1>{title}</h1>' + \
+        '  </body>' + \
+        '</html>'
 
 
 def count_directories(day: str, month: str, year: str) -> list[str]:
@@ -37,18 +51,7 @@ def make_new_entry(tagebuch_dir: "Path", day: str, month: str, year: str) -> tup
     date_obj = datetime.strptime(f'{year}:{month}:{day}', '%Y:%m:%d').date()
     weekday = date_obj.strftime('%A')
     title = f"{weekday}, {date_obj.strftime('%d. %B %Y')}"
-    html_skeleton = "<!DOCTYPE html>" + \
-        '<html>' + \
-        '  <head>' + \
-        f'	<title>{title}</title>' + \
-        '	<!-- weitere Kopfinformationen -->' + \
-        '	<!-- Styles für <pre> -->' + \
-        '	<link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">' + \
-        '  </head>' + \
-        '  <body>' + \
-        f'	<h1>{title}</h1>' + \
-        '  </body>' + \
-        '</html>'
+    html_skeleton = create_stump(title)
     entry = BeautifulSoup(html_skeleton, 'html.parser')
     # For the sake of consistency, add an (empty) pre-tag
     # consistency: Every entry has one and add_media_files(…) logic is based on the existence of this pre-tag
