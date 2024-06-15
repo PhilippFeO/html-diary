@@ -1,28 +1,28 @@
-from glob import glob
 import logging
-import os
 from datetime import datetime
-from bs4 import BeautifulSoup
-import vars
-from typing import TYPE_CHECKING
+from glob import glob
+from pathlib import Path
 
-if TYPE_CHECKING:
-    from pathlib import Path
+from bs4 import BeautifulSoup
+
+import vars
 
 
 def create_stump(title: str) -> str:
-    return "<!DOCTYPE html>" + \
-        '<html>' + \
-        '  <head>' + \
-        f'	<title>{title}</title>' + \
-        '	<!-- weitere Kopfinformationen -->' + \
-        '	<!-- Styles für <pre> -->' + \
-        '	<link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">' + \
-        '  </head>' + \
-        '  <body>' + \
-        f'	<h1>{title}</h1>' + \
-        '  </body>' + \
+    return (
+        "<!DOCTYPE html>"
+        '<html>'
+        '  <head>'
+        f'	<title>{title}</title>'
+        '	<!-- weitere Kopfinformationen -->'
+        '	<!-- Styles für <pre> -->'
+        '	<link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">'
+        '  </head>'
+        '  <body>'
+        f'	<h1>{title}</h1>'
+        '  </body>'
         '</html>'
+    )
 
 
 def count_directories(day: str, month: str, year: str) -> list[str]:
@@ -34,16 +34,15 @@ def create_dir_file(html_entry: BeautifulSoup,
                     day: str,
                     month: str,
                     year: str) -> None:
-    os.makedirs(day_dir)
+    Path.mkdir(day_dir, parents=True)
     logging.info(f"Created Directory: '{day_dir}'")
     # Write the HTML (media files are added later as usual)
     day_entry = day_dir/f'{day}-{month}-{year}.html'
-    with open(day_entry, 'w') as f:
-        f.write(html_entry.prettify())
+    Path(day_entry).write_text(html_entry.prettify())
     logging.info(f'Created no-description Entry for {year}-{month}-{day}: "{day_entry}"')
 
 
-def make_new_entry(tagebuch_dir: "Path", day: str, month: str, year: str) -> tuple["Path", BeautifulSoup]:
+def make_new_entry(day: str, month: str, year: str) -> tuple["Path", BeautifulSoup]:
     # Create new empty entry
     # Media files were added if there was an entry fitting the created date.
     # Some media files have no according entry for their created date. In this block,
@@ -60,7 +59,7 @@ def make_new_entry(tagebuch_dir: "Path", day: str, month: str, year: str) -> tup
         h1_tag.insert_after(empty_pre_tag)
         month_name = date_obj.strftime('%B')
         # Create entry with empty pre-tag
-        day_dir: Path = tagebuch_dir/year/f'{month}-{month_name}/{day}-{month}-{year}-{weekday}'
+        day_dir: Path = vars.DIARY_DIR/year/f'{month}-{month_name}/{day}-{month}-{year}-{weekday}'
         return day_dir, entry
-    logging.error((msg := 'Parsing HTML Skeleton in `make_new_entry` went wrong. No h1-Tag.'))
+    logging.error(msg := 'Parsing HTML Skeleton in `make_new_entry` went wrong. No h1-Tag.')
     raise Exception(msg)

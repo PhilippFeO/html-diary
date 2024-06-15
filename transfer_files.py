@@ -1,17 +1,19 @@
 import datetime
+
+# Necessary because returned values are in English
+# Can't stay in main because also needed during testing
+import locale
 import logging
 import os
 import shutil
 import subprocess
 from pathlib import Path
 
-from utils import count_directories, make_new_entry, create_dir_file
-import vars
 from add_media_files import add_media_files
+from utils import count_directories, create_dir_file, make_new_entry
 
-# Necessary because returned values are in English
-# Can't stay in main because also needed during testing
-import locale
+import vars
+
 locale.setlocale(locale.LC_ALL, '')
 
 # TODO: in ifmain <26-05-2024>
@@ -41,26 +43,27 @@ def copy_helper(media_file: Path,
 # def transfer_files(tmp_dir: Path,
 #                    tagebuch_dir: Path) -> set[Path]:
 def transfer_files() -> set[Path]:
-    """Copies Media files from .tmp to the according directory of the created date.
+    """Copy Media files from .tmp to the according directory of the created date.
 
-    To test this function, `tagebuch_dir` has to be parameter. Via pytest, I create a fake Tagebuch under `tmp_path`."""
+    To test this function, `tagebuch_dir` has to be parameter. Via pytest, I create a fake Tagebuch under `tmp_path`.
+    """
     directories: set[Path] = set()
     # Loop through files in the directory
     for f in os.listdir(vars.TMP_DIR):
         media_file = vars.TMP_DIR/f
-        if os.path.isfile(media_file):
+        if Path.is_file(media_file):
             # Extract creation date from EXIF data
-            exif_output: bytes = bytes()
+            exif_output: bytes = b''
             date_created: str = ''
             match media_file.suffix:
                 case '.mp4' | '.MP4':
-                    exif_output = subprocess.check_output(["exiftool", "-CreateDate", media_file])
+                    exif_output = subprocess.check_output(["/usr/bin/exiftool", "-CreateDate", media_file])
                     # Retrieve date from following line:
                     # Create Date                     : 2023:05:12 13:58:16
                     date_created = exif_output.decode('utf-8').split(' : ')[-1].split(' ')[0]
                 case '.jpg' | '.jpeg' | '.png' | '.MP4' | '.JPG' | '.JPEG':
                     try:
-                        exif_output = subprocess.check_output(["exif", "-t", "0x9003", "--ifd=EXIF", media_file])
+                        exif_output = subprocess.check_output(["/usr/bin/exif", "-t", "0x9003", "--ifd=EXIF", media_file])
                         exif_lines = exif_output.decode("utf-8").splitlines()
                         date_created = exif_lines[-1].split()[1]
                     except subprocess.CalledProcessError:
@@ -70,7 +73,7 @@ def transfer_files() -> set[Path]:
                         try:
                             # Panorama images dont have anything like 'date created', hence I have to use 'GPS Date Stamp':
                             # GPS Date Stamp                  : 2024:05:22
-                            exif_output = subprocess.check_output(["exiftool", "-GPSDateStamp", media_file])
+                            exif_output = subprocess.check_output(["/usr/bin/exiftool", "-GPSDateStamp", media_file])
                             # In comparison to the mp4 usecase, exif_output has a trailing \n which has to be removed
                             date_created = exif_output.decode('utf-8').rstrip().split(' : ')[-1]
                         except subprocess.CalledProcessError:
@@ -97,7 +100,7 @@ def transfer_files() -> set[Path]:
                     logging.info(f"Added '{day_dir}' to `directories`.")
                 # TODO: Add Test for this case <26-05-2024>
                 case 0:
-                    day_dir, html_entry = make_new_entry(vars.DIARY_DIR, day, month, year)
+                    day_dir, html_entry = make_new_entry(day, month, year)
                     create_dir_file(html_entry, day_dir, day, month, year)
                     copy_helper(media_file,
                                 day_dir,
