@@ -3,8 +3,7 @@ from look_into_the_past import look_into_the_past
 from tests.vars import test_diary_dir
 
 
-def test_look_into_the_past(monkeypatch, setup_diary):
-    _ = setup_diary
+def test_look_into_the_past(monkeypatch):
     date = '23.05.2024'
     monkeypatch.setattr('look_into_the_past.check', lambda _: True)
 
@@ -32,8 +31,7 @@ def test_no_past_entries(setup_diary):
     assert not past_entries
 
 
-def test_base_href(monkeypatch, setup_diary):
-    _ = setup_diary
+def test_base_href(monkeypatch):
     date = '04.06.2024'
     monkeypatch.setattr('look_into_the_past.check', lambda _: True)
 

@@ -4,7 +4,7 @@ from vars import tagebuch_dir
 from tests.vars import test_diary_dir
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='session', autouse=True)
 def setup_diary():
     """Copy the test diary `test/test_tagebuch.original` to `tests/test_tagebuch`.
 
