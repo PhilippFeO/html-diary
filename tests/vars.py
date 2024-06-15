@@ -1,8 +1,8 @@
 from pathlib import Path
-from vars import tagebuch_dir
 
+import vars
 
-tests_dir = tagebuch_dir / 'tests'
+tests_dir = vars.DIARY_DIR / 'tests'
 test_diary_dir: Path = tests_dir / 'test_tagebuch'
 test_tmp_dir: Path = test_diary_dir / '.tmp'
 test_transfered_dir: Path = test_tmp_dir / 'transfered'

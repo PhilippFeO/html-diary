@@ -8,7 +8,7 @@ import sys
 from bs4 import BeautifulSoup, Tag
 from utils import create_stump
 
-from vars import tagebuch_dir
+from vars import DIARY_DIR
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -21,7 +21,7 @@ def entry_for_past_day(date: str):
     year, month, day = date.split('-', 2)
 
     # Find matching directories
-    day_dir_pattern = f'{tagebuch_dir}/{year}/{month}-{month_name}/{day}-{month}-{year}-{weekday}-*'
+    day_dir_pattern = f'{DIARY_DIR}/{year}/{month}-{month_name}/{day}-{month}-{year}-{weekday}-*'
     day_dirs = glob.glob(day_dir_pattern)
 
     match len(day_dirs):
@@ -77,13 +77,13 @@ def entry_for_past_day(date: str):
 if __name__ == "__main__":
     # TODO: No logs are written during Test. Do I want this? <28-05-2024>
     # Define the path to the directory containing the files
-    tmp_dir = tagebuch_dir/'.tmp'
+    tmp_dir = DIARY_DIR/'.tmp'
 
     logging.basicConfig(level=logging.INFO,
                         format='[%(levelname)s: %(asctime)s] %(message)s',
                         # Mit Datum: %d.%m.%Y
                         datefmt=' %Y.%m.%d  %H:%M:%S',
-                        filename=tagebuch_dir/'.logs/entry_for_past_day.log.txt',
+                        filename=DIARY_DIR/'.logs/entry_for_past_day.log.txt',
                         filemode='a')
     length = 20
     logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')

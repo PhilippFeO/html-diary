@@ -5,7 +5,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-from vars import tagebuch_dir
+from vars import DIARY_DIR
 
 
 def add_media_files_dir_file(html_file: str | Path, foto_dir: str | Path):
@@ -34,7 +34,7 @@ def add_media_files_dir_file(html_file: str | Path, foto_dir: str | Path):
             match f.suffix:
                 # Add <img src='...'/> tag for each foto
                 case '.jpg' | '.jpeg' | '.JPG' | '.JPEG' | '.png' | '.PNG':
-                    new_img = soup.new_tag('img', src=tagebuch_dir/f)
+                    new_img = soup.new_tag('img', src=DIARY_DIR/f)
                     # LIFO data structure, ie '<br/>' is the first element
                     tags.append(new_img)
                     tags.append(soup.new_tag('br'))
@@ -45,7 +45,7 @@ def add_media_files_dir_file(html_file: str | Path, foto_dir: str | Path):
                     #   To be precise, any value equals True, for False, attribute has to be absent
                     # becomes <video controls loop>
                     new_video = soup.new_tag('video', controls="", loop="")
-                    new_source = soup.new_tag('source', src=tagebuch_dir/f)
+                    new_source = soup.new_tag('source', src=DIARY_DIR/f)
                     # Append the <source> tag to the <video> tag
                     new_video.append(new_source)
                     # LIFO data structure, ie '<br/>' is the first element

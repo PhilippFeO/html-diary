@@ -1,7 +1,17 @@
 import pytest
 import shutil
-from vars import tagebuch_dir
-from tests.vars import test_diary_dir
+import vars
+from tests.vars import test_diary_dir, test_tmp_dir
+
+
+@pytest.fixture(autouse=True)
+def mock_diary_dir(monkeypatch) -> None:
+    monkeypatch.setattr(vars, 'DIARY_DIR', test_diary_dir)
+
+
+@pytest.fixture(autouse=True)
+def mock_tmp_dir(monkeypatch) -> None:
+    monkeypatch.setattr(vars, 'TMP_DIR', test_tmp_dir)
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -12,7 +22,7 @@ def setup_diary():
 
     Not using any sort of pytest's `tmp_path` fixture because then the paths to the media files in the HTML files point to files outside of `tmp_path` which is not the point of the test. The generated HTML summary would show place holders for the media files. The paths work now."""
     # shutil.copytree() returns destination directory but this is static variable anyway
-    _ = shutil.copytree(tagebuch_dir/'tests/test_tagebuch.original',
+    _ = shutil.copytree(vars.DIARY_DIR/'tests/test_tagebuch.original',
                         test_diary_dir,
                         ignore=lambda src, names: ('README.md',))
     yield

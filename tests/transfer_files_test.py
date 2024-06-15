@@ -1,4 +1,3 @@
-import vars
 import glob
 import shutil
 import pytest
@@ -48,12 +47,12 @@ def create_second_day_dir():
 @pytest.mark.media_files((tests_dir / foto_1_name,
                           tests_dir / foto_2_name,
                           tests_dir / video_1_name))
-def test_transfer_files(copy_fotos_tmp_dir, monkeypatch):
+def test_transfer_files(copy_fotos_tmp_dir):
     """Tests if media files are copied correctly from `.tmp/` to it's corresponding 'day_dir_{fotos, video}'. This directory must exists for `transfer_files()` to work properly."""
     _ = copy_fotos_tmp_dir
-    monkeypatch.setattr(vars, 'tagebuch_dir', test_diary_dir)
 
-    directories: set[Path] = transfer_files(test_tmp_dir, test_diary_dir)
+    # directories: set[Path] = transfer_files(test_tmp_dir, test_diary_dir)
+    directories: set[Path] = transfer_files()
     assert len(directories) == 2
 
     day_dir_fotos = test_diary_dir/'2020/09-September/13-09-2020-Bamberg-tf'
@@ -72,10 +71,9 @@ def test_transfer_files(copy_fotos_tmp_dir, monkeypatch):
 
 
 @pytest.mark.media_files((tests_dir / tf_foto_no_day_dir,))
-def test_transfer_files_no_day_dir(monkeypatch, copy_fotos_tmp_dir):
+def test_transfer_files_no_day_dir(copy_fotos_tmp_dir):
     """Test if the directory for the foto and an HTML entry are created, if there is was none beforehand."""
     _ = copy_fotos_tmp_dir
-    monkeypatch.setattr(vars, 'tagebuch_dir', test_diary_dir)
 
     foto_1 = test_tmp_dir / tf_foto_no_day_dir
 
@@ -89,7 +87,7 @@ def test_transfer_files_no_day_dir(monkeypatch, copy_fotos_tmp_dir):
     matching_dirs = glob.glob(f"{test_diary_dir}/{year}/{month}-*/{day}-{month}-{year}-*")
     assert len(matching_dirs) == 0
 
-    directories: set[Path] = transfer_files(test_tmp_dir, test_diary_dir)
+    directories: set[Path] = transfer_files()
 
     # Assert newly created diary is added
     assert len(directories) == 1
@@ -109,11 +107,10 @@ def test_transfer_files_no_day_dir(monkeypatch, copy_fotos_tmp_dir):
 
 
 @pytest.mark.media_files((tests_dir / tf_foto_two_day_dir,))
-def test_transfer_files_two_day_dir(monkeypatch, copy_fotos_tmp_dir, create_second_day_dir):
+def test_transfer_files_two_day_dir(copy_fotos_tmp_dir, create_second_day_dir):
     """Test if two directories for the same day exists, here '2020/09-September/13-Bamberg' and '2020/09-September/13-Nicht-Bamberg'."""
     _ = copy_fotos_tmp_dir
     _ = create_second_day_dir
-    monkeypatch.setattr(vars, 'tagebuch_dir', test_diary_dir)
 
     foto_1 = test_tmp_dir / tf_foto_two_day_dir
 
@@ -123,7 +120,7 @@ def test_transfer_files_two_day_dir(monkeypatch, copy_fotos_tmp_dir, create_seco
     date_created = exif_lines[-1].split()[1]
     year, month, day = date_created.split(":", 2)
 
-    directories: set[Path] = transfer_files(test_tmp_dir, test_diary_dir)
+    directories: set[Path] = transfer_files()
 
     # Assert no directory was added (for further processing)
     assert len(directories) == 0

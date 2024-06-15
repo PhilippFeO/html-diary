@@ -6,8 +6,7 @@ import subprocess
 from pathlib import Path
 
 from utils import count_directories, make_new_entry, create_dir_file
-from vars import tagebuch_dir
-
+import vars
 from add_media_files import add_media_files
 
 # Necessary because returned values are in English
@@ -17,13 +16,12 @@ locale.setlocale(locale.LC_ALL, '')
 
 # TODO: in ifmain <26-05-2024>
 # Define the path to the directory containing the files
-tmp_dir = tagebuch_dir/'.tmp'
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
                     # Mit Datum: %d.%m.%Y
                     datefmt=' %Y.%m.%d  %H:%M:%S',
-                    filename=tagebuch_dir/'.logs/transfer_files_add_media_files.log.txt',
+                    filename=vars.DIARY_DIR/'.logs/transfer_files_add_media_files.log.txt',
                     filemode='a')
 length = 20
 logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
@@ -40,15 +38,16 @@ def copy_helper(media_file: Path,
     logging.info(f"Moved '{media_file}' to '{transfered_dir}'.")
 
 
-def transfer_files(tmp_dir: Path,
-                   tagebuch_dir: Path) -> set[Path]:
+# def transfer_files(tmp_dir: Path,
+#                    tagebuch_dir: Path) -> set[Path]:
+def transfer_files() -> set[Path]:
     """Copies Media files from .tmp to the according directory of the created date.
 
     To test this function, `tagebuch_dir` has to be parameter. Via pytest, I create a fake Tagebuch under `tmp_path`."""
     directories: set[Path] = set()
     # Loop through files in the directory
-    for f in os.listdir(tmp_dir):
-        media_file = tmp_dir/f
+    for f in os.listdir(vars.TMP_DIR):
+        media_file = vars.TMP_DIR/f
         if os.path.isfile(media_file):
             # Extract creation date from EXIF data
             exif_output: bytes = bytes()
@@ -93,16 +92,16 @@ def transfer_files(tmp_dir: Path,
                     day_dir = Path(matching_dirs[0])
                     copy_helper(media_file,
                                 day_dir,
-                                tagebuch_dir)
+                                vars.DIARY_DIR)
                     directories.add(day_dir)
                     logging.info(f"Added '{day_dir}' to `directories`.")
                 # TODO: Add Test for this case <26-05-2024>
                 case 0:
-                    day_dir, html_entry = make_new_entry(tagebuch_dir, day, month, year)
+                    day_dir, html_entry = make_new_entry(vars.DIARY_DIR, day, month, year)
                     create_dir_file(html_entry, day_dir, day, month, year)
                     copy_helper(media_file,
                                 day_dir,
-                                tagebuch_dir)
+                                vars.DIARY_DIR)
                     directories.add(day_dir)
                     logging.info(f"Added '{day_dir}' to `directories`.")
                 case _:
@@ -112,5 +111,5 @@ def transfer_files(tmp_dir: Path,
 
 
 if __name__ == "__main__":
-    directories: set[Path] = transfer_files(tmp_dir, tagebuch_dir)
+    directories: set[Path] = transfer_files()
     add_media_files(directories)

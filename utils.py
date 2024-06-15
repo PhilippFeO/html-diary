@@ -26,7 +26,7 @@ def create_stump(title: str) -> str:
 
 
 def count_directories(day: str, month: str, year: str) -> list[str]:
-    return glob(f"{vars.tagebuch_dir}/{year}/{month}-*/{day}-{month}-{year}-*")
+    return glob(f"{vars.DIARY_DIR}/{year}/{month}-*/{day}-{month}-{year}-*")
 
 
 def create_dir_file(html_entry: BeautifulSoup,

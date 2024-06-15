@@ -1,4 +1,5 @@
 from pathlib import Path
 
 
-tagebuch_dir: Path = Path.home()/'.tagebuch'
+DIARY_DIR: Path = Path.home()/'.tagebuch'
+TMP_DIR: Path = DIARY_DIR/'.tmp'

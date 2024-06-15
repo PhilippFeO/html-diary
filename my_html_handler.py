@@ -8,13 +8,13 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 from add_media_files import add_media_files_dir_file
-from vars import tagebuch_dir
+from vars import DIARY_DIR
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
                     # Mit Datum: %d.%m.%Y
                     datefmt=' %Y.%m.%d  %H:%M:%S',
-                    filename=tagebuch_dir/'.logs/handler.log.txt',
+                    filename=DIARY_DIR/'.logs/handler.log.txt',
                     filemode='a')
 length = 20
 logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
