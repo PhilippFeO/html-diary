@@ -1,10 +1,19 @@
+import pytest
 from bs4 import BeautifulSoup
 from look_into_the_past import look_into_the_past
 
 
-def test_look_into_the_past(monkeypatch):
-    date = '23.05.2024'
+# ─── Fixtures ──────────
+
+@pytest.fixture(autouse=True)
+def _mock_check(monkeypatch) -> None:
     monkeypatch.setattr('look_into_the_past.check', lambda _: True)
+
+
+# ─── Tests ──────────
+
+def test_look_into_the_past():
+    date = '23.05.2024'
 
     past_entries, html = look_into_the_past(date)
     assert past_entries
@@ -23,17 +32,15 @@ def test_look_into_the_past(monkeypatch):
     assert len(result.find_all('video')) == 2
 
 
-def test_no_past_entries(monkeypatch):
-    monkeypatch.setattr('look_into_the_past.check', lambda _: True)
+def test_no_past_entries():
     date = '32.05.2024'
     past_entries, _ = look_into_the_past(date)
 
     assert not past_entries
 
 
-def test_base_href(monkeypatch):
+def test_base_href():
     date = '04.06.2024'
-    monkeypatch.setattr('look_into_the_past.check', lambda _: True)
 
     past_entries, html = look_into_the_past(date)
     assert past_entries
