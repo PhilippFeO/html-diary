@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
+
 from tests.vars import (
     foto_1_name,
     foto_2_name,
