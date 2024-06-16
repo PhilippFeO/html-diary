@@ -1,4 +1,7 @@
 #!/home/philipp/.tagebuch/.venv/tagebuch/bin/python3
+"""Called manually/explictly."""
+
+import logging
 from glob import glob
 from pathlib import Path
 
@@ -11,7 +14,6 @@ def collect_dates_paths(directory: Path) -> set[tuple[str, Path]]:
     dates_paths: set[tuple[str, Path]] = set()  # dates are in format 'yyyy:mm:dd'
     for file in directory.iterdir():
         if Path.is_dir(file):
-            # TODO: Welches Verzeichnis, wenn Foto in Unterordner? <16-06-2024>
             folder_to_diary(file)
         elif Path.is_file(file):
             # Read Metadata to retrieve creation date
@@ -32,21 +34,29 @@ def folder_to_diary(directory: Path):
         match len(matching_dirs):
             # Ja, base-Pfad hinzufügen
             case 1:
+                # Open according entry
                 day_dir = matching_dirs[0]
                 html_files = glob(f'{day_dir}/*.html')
+                # Assert entry exists (glob pattern checks for directory but no directory is created without entry)
                 assert len(html_files) == 1, f'"{day_dir}" contains {len(html_files)} HTML files. There should be exactly 1.'
                 entry_file = html_files[0]
                 entry = BeautifulSoup(Path(entry_file).read_text(encoding='utf-8'), 'html.parser')
                 # No base tag (=> base.href attribute)
                 # Add base.href
-                if entry.head and not entry.head.base:
-                    base_tag = entry.new_tag('base', href=f'file://{path}')
+                assert entry.head, f"No 'head' in '{entry_file}'."  # Should not happen
+                href = f'file://{path}'
+                if not entry.head.base:
+                    base_tag = entry.new_tag('base', href=href)
                     entry.head.append(base_tag)
                     Path(entry_file).write_text(entry.prettify())
-                # Was, wenn schon einer existiert?
+                # base.href already exists
                 else:
-                    pass
-        #   Nein, Datei mit base-Pfad anlegen
+                    href_value = entry.head.base.get('href')
+                    # In case they differ, utter a warning but don't edit anything.
+                    if href_value != href:
+                        msg = f"base.href is '{href_value}' in '{entry_file}'. Can't add '{href}'."
+                        logging.warning(msg)
+                    # if both are equal, there is nothing to do
 
 
 if __name__ == "__main__":
