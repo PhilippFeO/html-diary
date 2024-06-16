@@ -24,11 +24,18 @@ def collect_dates_paths(directory: Path) -> set[tuple[str, Path]]:
     dates_paths: set[tuple[str, Path]] = set()  # dates are in format 'yyyy:mm:dd'
     for file in directory.iterdir():
         if Path.is_dir(file):
-            folder_to_diary(file)
+            dates_paths |= (collect_dates_paths(file))
         elif Path.is_file(file):
             # Read Metadata to retrieve creation date
             if date_created := get_date_created(file):
-                dates_paths.add((date_created, file.parent))
+                # Remove everythin after '~/Bilder/Subfolder/', ie
+                # ~/Bilder/Sub1/Sub2 -> ~/Bilder/Sub1
+                # Complicated, because using 'Path.parents[IDX]' doesn't work. I simply
+                # don't know how to monkeypatch the '[IDX]'/__getitem__ call.
+                base_dir = Path(
+                    *file.parts[
+                        :file.parts.index('Bilder') + 2])
+                dates_paths.add((date_created, base_dir))
             else:
                 continue
     return dates_paths
@@ -38,7 +45,7 @@ def folder_to_diary(directory: Path):
     dates_paths: set[tuple[str, Path]] = collect_dates_paths(directory)
     assert len(dates_paths) > 0, f'No dates collected. "dates" is empty: {dates_paths}.'
     for date, foto_dir_path in dates_paths:
-        # Schauen, ob Datei für Datum existiert
+        # Check if there is a dir matching the date
         year, month, day = date.split(':')
         matching_dirs = count_directories(day, month, year)
         match len(matching_dirs):
