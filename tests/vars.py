@@ -2,10 +2,11 @@ from pathlib import Path
 
 import vars
 
-tests_dir = vars.DIARY_DIR / 'tests'
-test_diary_dir: Path = tests_dir / 'test_tagebuch'
+test_dir = vars.DIARY_DIR / 'tests'
+test_diary_dir: Path = test_dir / 'test_tagebuch'
 test_tmp_dir: Path = test_diary_dir / '.tmp'
 test_transfered_dir: Path = test_tmp_dir / 'transfered'
+TEST_BILDER_DIR: Path = test_dir / 'Bilder'
 
 foto_1_name: Path = Path('transfer_files_foto_1.jpg')
 foto_2_name: Path = Path('transfer_files_foto_2.jpg')

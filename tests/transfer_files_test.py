@@ -12,7 +12,7 @@ from tests.vars import (
     test_diary_dir,
     test_tmp_dir,
     test_transfered_dir,
-    tests_dir,
+    test_dir,
     tf_foto_no_day_dir,
     tf_foto_two_day_dir,
     video_1_name,
@@ -43,9 +43,9 @@ def _create_second_day_dir():
 # ─── Tests ──────────
 
 @pytest.mark.usefixtures('_copy_fotos_tmp_dir')
-@pytest.mark.media_files((tests_dir / foto_1_name,
-                          tests_dir / foto_2_name,
-                          tests_dir / video_1_name))
+@pytest.mark.media_files((test_dir / foto_1_name,
+                          test_dir / foto_2_name,
+                          test_dir / video_1_name))
 def test_transfer_files():
     """Tests if media files are copied correctly from `.tmp/` to it's corresponding 'day_dir_{fotos, video}'. This directory must exists for `transfer_files()` to work properly."""
     directories: set[Path] = transfer_files()
@@ -68,7 +68,7 @@ def test_transfer_files():
 
 
 @pytest.mark.usefixtures('_copy_fotos_tmp_dir')
-@pytest.mark.media_files((tests_dir / tf_foto_no_day_dir,))
+@pytest.mark.media_files((test_dir / tf_foto_no_day_dir,))
 def test_transfer_files_no_day_dir():
     """Test if the directory for the foto and an HTML entry are created, if there is was none beforehand."""
     foto_1 = test_tmp_dir / tf_foto_no_day_dir
@@ -104,7 +104,7 @@ def test_transfer_files_no_day_dir():
 
 
 @pytest.mark.usefixtures('_create_second_day_dir')
-@pytest.mark.media_files((tests_dir / tf_foto_two_day_dir,))
+@pytest.mark.media_files((test_dir / tf_foto_two_day_dir,))
 def test_transfer_files_two_day_dir():
     """Test if two directories for the same day exists, here '2020/09-September/13-Bamberg' and '2020/09-September/13-Nicht-Bamberg'."""
     foto_1 = test_tmp_dir / tf_foto_two_day_dir
