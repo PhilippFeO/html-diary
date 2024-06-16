@@ -9,19 +9,20 @@ from vars import DIARY_DIR
 
 
 def add_media_files_dir_file(html_file: str | Path, foto_dir: str | Path):
-    """Returns a list with the tags to be inserted after the pre-tag."""
+    """Return a list with the tags to be inserted after the pre-tag."""
     logging.info(f'add_media_files_dir_file({html_file}, {foto_dir})')
+    html_file = Path(html_file)
+    foto_dir = Path(foto_dir)
     tags = []
 
-    with open(html_file, 'r') as file:
-        html_content = file.read()
+    html_content = html_file.read_text(encoding='utf-8')
     soup = BeautifulSoup(html_content, 'html.parser')
     pre_tag = soup.find('pre')
 
     # Insert the new elements after the <pre> tag
     if pre_tag:  # pre_tag may be None, insert_after() doesn't work on None
-        # When called with the intent to temporarly embed fotos from a folder, it is not guaranteed that this filder exists (I may have renamed it).
-        if not os.path.isdir(foto_dir):
+        # When called with the intent to temporarly embed fotos from a folder, it is not guaranteed that this folder exists (I may have renamed it).
+        if not Path.is_dir(foto_dir):
             logging.error(f"'{foto_dir}' doesn't exists")
             # Add visual feedback
             b = soup.new_tag('b')
@@ -29,8 +30,8 @@ def add_media_files_dir_file(html_file: str | Path, foto_dir: str | Path):
             tags.append(b)
             tags.append(soup.new_tag('br'))
             return tags
-        for filename in os.listdir(foto_dir):
-            f = Path(os.path.join(foto_dir, filename))
+        for filename in foto_dir.iterdir():
+            f = foto_dir / filename
             match f.suffix:
                 # Add <img src='...'/> tag for each foto
                 case '.jpg' | '.jpeg' | '.JPG' | '.JPEG' | '.png' | '.PNG':
@@ -61,12 +62,12 @@ def add_media_files_dir_file(html_file: str | Path, foto_dir: str | Path):
 
 
 def add_media_files(directories: set[Path]) -> None:
-    """Adds media files to a diary entry, ie. `directories` contains the directories to which media files were added but not yet embedded into the HTML file laying in the same directory. This function iterates over all files in each directory, creates the according HTML tag and adds it to the diary entry."""
+    """Add media files to a diary entry, ie. `directories` contains the directories to which media files were added but not yet embedded into the HTML file laying in the same directory. This function iterates over all files in each directory, creates the according HTML tag and adds it to the diary entry."""
     logging.info(f'{__name__}({directories})')
     for day_dir in directories:
         # Load HTML file
         if len((html_files := glob.glob(os.path.join(day_dir, '*.html')))) == 1:
-            html_file = html_files[0]
+            html_file = Path(html_files[0])
         else:
             logging.error(f"There are '{len(html_files)}' in '{day_dir}'. There should be exactly 1.")
             continue
@@ -75,9 +76,9 @@ def add_media_files(directories: set[Path]) -> None:
         # Insert tags after pre-tag
         tags = add_media_files_dir_file(html_file, day_dir)
         soup = None
-        with open(html_file, 'r') as file:
+        with Path.open(html_file, 'r') as file:
             soup = BeautifulSoup(file.read(), 'html.parser')
             if (pre_tag := soup.find('pre')):
                 pre_tag.insert_after(*tags)
-        with open(html_file, 'w') as file:
+        with Path.open(html_file, 'w') as file:
             file.write(soup.prettify())

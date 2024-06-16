@@ -2,12 +2,12 @@ import datetime
 import glob
 import locale
 import logging
-import os
 import sys
+from pathlib import Path
 
 from bs4 import BeautifulSoup, Tag
-from utils import create_stump
 
+from utils import create_stump
 from vars import DIARY_DIR
 
 locale.setlocale(locale.LC_ALL, '')
@@ -30,14 +30,15 @@ def entry_for_past_day(date: str):
             x = input("Überschrift: ")
             title = f'{weekday}, {date}: {x}'
             x = x.replace(' ', '-')
-            day_dir = day_dir_pattern.replace('*', x)
-            os.makedirs(day_dir)
+            day_dir = Path(day_dir_pattern.replace('*', x))
+            Path.mkdir(day_dir, parents=True)
             logging.info(f'Directory for {date} created: {day_dir}')
             html_skeleton = create_stump(title)
             entry_soup = BeautifulSoup(html_skeleton, 'html.parser')
             pre_tag = entry_soup.find('pre')
             if not isinstance(pre_tag, Tag):
-                raise Exception('The found pre-tag is not of type Tag')
+                msg = 'The found pre-tag is not of type Tag'
+                raise TypeError(msg)
             description = input(f'Enter description for {date}:\n')
             pre_tag.string = description
             with open((html_entry := f'{day_dir}/{day}-{month}-{year}-{weekday}-{x}.html'), 'w') as f:
@@ -49,10 +50,9 @@ def entry_for_past_day(date: str):
             logging.info(f'Directory for {date} already exists: {day_dirs[0]}')
             html_files = glob.glob(f'{day_dir_pattern}/*.html')
             assert len(html_files) == 1, f'"{day_dirs[0]}" contains {len(html_files)} HTML files. There should be exactly 1.'
-            html_file = html_files[0]
+            html_file = Path(html_files[0])
             logging.info(f'Entry for {date} exists: {html_file}')
-            with open(html_file, 'r') as f:
-                html = f.read()
+            html = html_file.read_text(encoding='utf-8')
             if not html:
                 raise Exception(f'"{html_file}" could not be red')
             entry_soup = BeautifulSoup(html, 'html.parser')
@@ -61,13 +61,11 @@ def entry_for_past_day(date: str):
             pre_tag = pre[0]
             if pre_tag.string:
                 raise Exception(f'Description for {date} exists: "{html_file}"')
-            else:
-                # Query user for input
-                description = input(f'Enter description for {date}:\n')
-                pre_tag.string = description
-                with open(html_file, 'w') as f:
-                    f.write(entry_soup.prettify())
-                logging.info(f'Description for Date {date} added to File "{html_file}"')
+            # Query user for input
+            description = input(f'Enter description for {date}:\n')
+            pre_tag.string = description
+            html_file.write_text(entry_soup.prettify())
+            logging.info(f'Description for Date {date} added to File "{html_file}"')
         # To many day_dirs
         case _:
             raise Exception(
