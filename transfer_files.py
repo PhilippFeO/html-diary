@@ -66,18 +66,18 @@ def transfer_files() -> set[Path]:
             # Move/Copy the media files to their corresponding diary entry.
             # Ie the entry fitting their created date.
             match len(matching_dirs):
-                case 1:
-                    # Transfer image to directory
-                    day_dir = Path(matching_dirs[0])
+                # TODO: Add Test for this case <26-05-2024>
+                case 0:
+                    day_dir, html_entry = assemble_new_entry(day, month, year)
+                    create_dir_and_file(html_entry, day_dir, day, month, year)
                     copy_helper(media_file,
                                 day_dir,
                                 vars.DIARY_DIR)
                     directories.add(day_dir)
                     logging.info(f"Added '{day_dir}' to `directories`.")
-                # TODO: Add Test for this case <26-05-2024>
-                case 0:
-                    day_dir, html_entry = assemble_new_entry(day, month, year)
-                    create_dir_and_file(html_entry, day_dir, day, month, year)
+                case 1:
+                    # Transfer image to directory
+                    day_dir = Path(matching_dirs[0])
                     copy_helper(media_file,
                                 day_dir,
                                 vars.DIARY_DIR)
