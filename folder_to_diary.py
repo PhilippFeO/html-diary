@@ -1,13 +1,23 @@
 #!/home/philipp/.tagebuch/.venv/tagebuch/bin/python3
 """Called manually/explictly."""
 
+# Necessary because returned values are in English
+# Can't stay in main because also needed during testing
+import locale
 import logging
 from glob import glob
 from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-from utils import count_directories, get_date_created
+from utils import (
+    assemble_new_entry,
+    count_directories,
+    create_dir_and_file,
+    get_date_created,
+)
+
+locale.setlocale(locale.LC_ALL, '')
 
 
 def collect_dates_paths(directory: Path) -> set[tuple[str, Path]]:
@@ -27,12 +37,12 @@ def collect_dates_paths(directory: Path) -> set[tuple[str, Path]]:
 def folder_to_diary(directory: Path):
     dates_paths: set[tuple[str, Path]] = collect_dates_paths(directory)
     assert len(dates_paths) > 0, f'No dates collected. "dates" is empty: {dates_paths}.'
-    for date, path in dates_paths:
+    for date, foto_dir_path in dates_paths:
         # Schauen, ob Datei für Datum existiert
         year, month, day = date.split(':')
         matching_dirs = count_directories(day, month, year)
         match len(matching_dirs):
-            # Ja, base-Pfad hinzufügen
+            # Add base.href to an entry
             case 1:
                 # Open according entry
                 day_dir = matching_dirs[0]
@@ -44,7 +54,7 @@ def folder_to_diary(directory: Path):
                 # No base tag (=> base.href attribute)
                 # Add base.href
                 assert entry.head, f"No 'head' in '{entry_file}'."  # Should not happen
-                href = f'file://{path}'
+                href = f'file://{foto_dir_path}'
                 if not entry.head.base:
                     base_tag = entry.new_tag('base', href=href)
                     entry.head.append(base_tag)
@@ -57,6 +67,10 @@ def folder_to_diary(directory: Path):
                         msg = f"base.href is '{href_value}' in '{entry_file}'. Can't add '{href}'."
                         logging.warning(msg)
                     # if both are equal, there is nothing to do
+            # No entry exists for the selected date => Create one
+            case 0:
+                day_dir, html_entry = assemble_new_entry(day, month, year, href=f'file://{foto_dir_path}')
+                create_dir_and_file(html_entry, day_dir, day, month, year)
 
 
 if __name__ == "__main__":
