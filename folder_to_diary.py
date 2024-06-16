@@ -42,6 +42,10 @@ def folder_to_diary(directory: Path):
         year, month, day = date.split(':')
         matching_dirs = count_directories(day, month, year)
         match len(matching_dirs):
+            # No entry exists for the selected date => Create one
+            case 0:
+                day_dir, html_entry = assemble_new_entry(day, month, year, href=f'file://{foto_dir_path}')
+                create_dir_and_file(html_entry, day_dir, day, month, year)
             # Add base.href to an entry
             case 1:
                 # Open according entry
@@ -67,10 +71,10 @@ def folder_to_diary(directory: Path):
                         msg = f"base.href is '{href_value}' in '{entry_file}'. Can't add '{href}'."
                         logging.warning(msg)
                     # if both are equal, there is nothing to do
-            # No entry exists for the selected date => Create one
-            case 0:
-                day_dir, html_entry = assemble_new_entry(day, month, year, href=f'file://{foto_dir_path}')
-                create_dir_and_file(html_entry, day_dir, day, month, year)
+            # >= 2 matching directories for a day
+            case _:
+                logging.warning(
+                    f"Found {len(matching_dirs)} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}")
 
 
 if __name__ == "__main__":
