@@ -6,12 +6,16 @@ import locale
 import logging
 import os
 import shutil
-import subprocess
 from pathlib import Path
 
 import vars
 from add_media_files import add_media_files
-from utils import count_directories, create_dir_file, make_new_entry, get_date_created
+from utils import (
+    assemble_new_entry,
+    count_directories,
+    create_dir_and_file,
+    get_date_created,
+)
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -72,8 +76,8 @@ def transfer_files() -> set[Path]:
                     logging.info(f"Added '{day_dir}' to `directories`.")
                 # TODO: Add Test for this case <26-05-2024>
                 case 0:
-                    day_dir, html_entry = make_new_entry(day, month, year)
-                    create_dir_file(html_entry, day_dir, day, month, year)
+                    day_dir, html_entry = assemble_new_entry(day, month, year)
+                    create_dir_and_file(html_entry, day_dir, day, month, year)
                     copy_helper(media_file,
                                 day_dir,
                                 vars.DIARY_DIR)

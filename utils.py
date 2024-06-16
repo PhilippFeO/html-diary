@@ -69,11 +69,12 @@ def get_date_created(file: Path) -> str | None:
             return None
 
 
-def create_dir_file(html_entry: BeautifulSoup,
-                    day_dir: "Path",
-                    day: str,
-                    month: str,
-                    year: str) -> None:
+def create_dir_and_file(html_entry: BeautifulSoup,
+                        day_dir: "Path",
+                        day: str,
+                        month: str,
+                        year: str) -> None:
+    """Create the directory of the day and the html file of the entry."""
     Path.mkdir(day_dir, parents=True)
     logging.info(f"Created Directory: '{day_dir}'")
     # Write the HTML (media files are added later as usual)
@@ -82,7 +83,11 @@ def create_dir_file(html_entry: BeautifulSoup,
     logging.info(f'Created no-description Entry for {year}-{month}-{day}: "{day_entry}"')
 
 
-def make_new_entry(day: str, month: str, year: str) -> tuple["Path", BeautifulSoup]:
+def assemble_new_entry(day: str, month: str, year: str) -> tuple["Path", BeautifulSoup]:
+    """Create new empty entry. See method body for more information.
+
+    Return `day_dir` for convenience. The name of the month and day have to be retrieved here anyway. This information is also necessary in `create_dir_and_file()`. Be returning `day_dir`, it don't have to be calculated twice.
+    """
     # Create new empty entry
     # Media files were added if there was an entry fitting the created date.
     # Some media files have no according entry for their created date. In this block,
