@@ -2,7 +2,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 from folder_to_diary import collect_dates_paths, folder_to_diary
-from tests.vars import tests_dir, test_diary_dir
+from tests.vars import test_diary_dir, tests_dir
 
 
 def test_collect_dates():
@@ -20,12 +20,10 @@ def test_folder_to_diary():
 
     folder_to_diary(bibione_fotos)
 
-    bibione1 = test_diary_dir / '30-05-2024-Donnerstag-base-href-hinzugefügt-ftd/30-05-2024-Donnerstag-base-href-hinzugefügt-ftd.html'
+    bibione1 = test_diary_dir / '2024/05-Mai/30-05-2024-Donnerstag-base-href-hinzugefuegt-ftd/30-05-2024-Donnerstag-base-href-hinzugefuegt-ftd.html'
 
-    # TODO: Breakpoint wird nicht erreicht <16-06-2024>
     entry = BeautifulSoup(bibione1.read_text(), 'html.parser')
 
     assert entry.head
     assert entry.head.base
-    assert entry.head.base.href
-    assert entry.head.base.href == 'file://' / bibione_fotos
+    assert entry.head.base.get('href') == 'file://' + str(bibione_fotos)
