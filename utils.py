@@ -78,12 +78,20 @@ def create_dir_and_file(html_entry: BeautifulSoup,
     Path.mkdir(day_dir, parents=True)
     logging.info(f"Created Directory: '{day_dir}'")
     # Write the HTML (media files are added later as usual)
-    day_entry = day_dir/f'{day}-{month}-{year}.html'
+    # Calculate weekday for html file name
+    date_obj = datetime.strptime(f'{year}:{month}:{day}', '%Y:%m:%d').date()
+    weekday = date_obj.strftime('%A')
+    day_entry = day_dir/f'{day}-{month}-{year}-{weekday}.html'
     Path(day_entry).write_text(html_entry.prettify())
     logging.info(f'Created no-description Entry for {year}-{month}-{day}: "{day_entry}"')
 
 
-def assemble_new_entry(day: str, month: str, year: str) -> tuple["Path", BeautifulSoup]:
+def assemble_new_entry(
+    day: str,
+    month: str,
+    year: str,
+    href: str | None = None,
+) -> tuple["Path", BeautifulSoup]:
     """Create new empty entry. See method body for more information.
 
     Return `day_dir` for convenience. The name of the month and day have to be retrieved here anyway. This information is also necessary in `create_dir_and_file()`. Be returning `day_dir`, it don't have to be calculated twice.
@@ -97,6 +105,10 @@ def assemble_new_entry(day: str, month: str, year: str) -> tuple["Path", Beautif
     title = f"{weekday}, {date_obj.strftime('%d. %B %Y')}"
     html_skeleton = create_stump(title)
     entry = BeautifulSoup(html_skeleton, 'html.parser')
+    assert entry.head, "No 'head' in the HTML skeleton."  # Should not happen
+    if href:
+        base_tag = entry.new_tag('base', href=href)
+        entry.head.append(base_tag)
     # For the sake of consistency, add an (empty) pre-tag
     # consistency: Every entry has one and add_files(…) logic is based on the existence of this pre-tag
     empty_pre_tag = entry.new_tag('pre')
