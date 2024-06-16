@@ -1,4 +1,5 @@
 import logging
+import subprocess
 from datetime import datetime
 from glob import glob
 from pathlib import Path
@@ -29,6 +30,45 @@ def count_directories(day: str, month: str, year: str) -> list[str]:
     return glob(f"{vars.DIARY_DIR}/{year}/{month}-*/{day}-{month}-{year}-*")
 
 
+def read_metadata(cmd: str, file: Path) -> str | None:
+    """Execute `cmd` (it's a `exif*` command) and return UTF-8 decoded string."""
+    # TODO: Log exception? <16-06-2024>
+    try:
+        output = subprocess.check_output([*cmd.split(), f'{file}'])
+        return output.decode('utf-8')
+    except subprocess.CalledProcessError:
+        logging.error(f"'{cmd} \"{file}\"' failed.")
+        return None
+
+
+def get_date_created(file: Path) -> str | None:
+    """Extract creation date in the format `yyyy:mm:dd` from EXIF data."""
+    match file.suffix:
+        case '.mp4' | '.MP4':
+            cmd = '/usr/bin/exiftool -CreateDate'
+            if exif_output := read_metadata(cmd, file):
+                # Retrieve date from following line:
+                # Create Date                     : 2023:05:12 13:58:16
+                return exif_output.split(' : ')[-1].split()[0]
+            logging.error(f"Probably, Video '{file}' has no 'CreateDate' in it's EXIF data.")
+            return None
+        case '.jpg' | '.jpeg' | '.png' | '.MP4' | '.JPG' | '.JPEG':
+            cmd = '/usr/bin/exif -t 0x9003 --ifd=EXIF'
+            if (exif_output := read_metadata(cmd, file)):
+                return exif_output.splitlines()[-1].split()[1]
+            logging.error(f"Probably, Foto '{file}' has no Tag '9003' in it's EXIF data.")
+            # PANO*.jpg
+            cmd = '/usr/bin/exiftool -GPSDateStamp'
+            if (exif_output := read_metadata(cmd, file)):
+                return exif_output.rstrip().split(' : ')[-1]
+            msg = f"\t{cmd}\nfailed. Probably, Foto '{file}' has no 'GPSDateStamp' in it's exif data."
+            logging.error(msg)
+            return None
+        case _:
+            logging.warning(f"Nothing done for File Type: '{file.suffix}'. Full path:\n\t{file}")
+            return None
+
+
 def create_dir_file(html_entry: BeautifulSoup,
                     day_dir: "Path",
                     day: str,
@@ -53,7 +93,7 @@ def make_new_entry(day: str, month: str, year: str) -> tuple["Path", BeautifulSo
     html_skeleton = create_stump(title)
     entry = BeautifulSoup(html_skeleton, 'html.parser')
     # For the sake of consistency, add an (empty) pre-tag
-    # consistency: Every entry has one and add_media_files(…) logic is based on the existence of this pre-tag
+    # consistency: Every entry has one and add_files(…) logic is based on the existence of this pre-tag
     empty_pre_tag = entry.new_tag('pre')
     if (h1_tag := entry.find('h1')):
         h1_tag.insert_after(empty_pre_tag)
