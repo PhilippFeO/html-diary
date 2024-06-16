@@ -40,7 +40,7 @@ def add_media_files_dir_file(html_file: str | Path, foto_dir: str | Path):
                     tags.append(soup.new_tag('br'))
                     logging.info(f"Added Foto: '{f}'")
                 # Add <video controls loop><source src='...'/></video>
-                case '.mp4':
+                case '.mp4' | '.MP4':
                     # Empty string == True
                     #   To be precise, any value equals True, for False, attribute has to be absent
                     # becomes <video controls loop>
