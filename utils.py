@@ -37,7 +37,7 @@ def read_metadata(cmd: str, file: Path) -> str | None:
         output = subprocess.check_output([*cmd.split(), f'{file}'])
         return output.decode('utf-8')
     except subprocess.CalledProcessError:
-        logging.error(f"'{cmd} \"{file}\"' failed.")
+        logging.error("'%s \"%s\"' failed.", cmd, file)
         return None
 
 
@@ -50,22 +50,21 @@ def get_date_created(file: Path) -> str | None:
                 # Retrieve date from following line:
                 # Create Date                     : 2023:05:12 13:58:16
                 return exif_output.split(' : ')[-1].split()[0]
-            logging.error(f"Probably, Video '{file}' has no 'CreateDate' in it's EXIF data.")
+            logging.error("Probably, Video '%s' has no 'CreateDate' in it's EXIF data.", file)
             return None
         case '.jpg' | '.jpeg' | '.png' | '.MP4' | '.JPG' | '.JPEG':
             cmd = '/usr/bin/exif -t 0x9003 --ifd=EXIF'
             if (exif_output := read_metadata(cmd, file)):
                 return exif_output.splitlines()[-1].split()[1]
-            logging.error(f"Probably, Foto '{file}' has no Tag '9003' in it's EXIF data.")
+            logging.error("Probably, Foto '%s' has no Tag '9003' in it's EXIF data.", file)
             # PANO*.jpg
             cmd = '/usr/bin/exiftool -GPSDateStamp'
             if (exif_output := read_metadata(cmd, file)):
                 return exif_output.rstrip().split(' : ')[-1]
-            msg = f"\t{cmd}\nfailed. Probably, Foto '{file}' has no 'GPSDateStamp' in it's exif data."
-            logging.error(msg)
+            logging.error("\t%s\nfailed. Probably, Foto '%s' has no 'GPSDateStamp' in it's exif data.", cmd, file)
             return None
         case _:
-            logging.warning(f"Nothing done for File Type: '{file.suffix}'. Full path:\n\t{file}")
+            logging.warning("Nothing done for File Type: '%s'. Full path:\n\t%s", file.suffix, file)
             return None
 
 
