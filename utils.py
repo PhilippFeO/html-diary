@@ -3,6 +3,7 @@ import subprocess
 from datetime import datetime
 from glob import glob
 from pathlib import Path
+from functools import cache
 
 from bs4 import BeautifulSoup
 
@@ -68,6 +69,15 @@ def get_date_created(file: Path) -> str | None:
             return None
 
 
+@cache
+def get_weekday(year: str,
+                month: str,
+                day: str) -> str:
+    # Calculate weekday for html file name
+    date_obj = datetime.strptime(f'{year}:{month}:{day}', '%Y:%m:%d').date()
+    return date_obj.strftime('%A')
+
+
 def create_dir_and_file(html_entry: BeautifulSoup,
                         day_dir: "Path",
                         day: str,
@@ -75,12 +85,10 @@ def create_dir_and_file(html_entry: BeautifulSoup,
                         year: str) -> None:
     """Create the directory of the day and the html file of the entry."""
     Path.mkdir(day_dir, parents=True)
-    logging.info(f"Created Directory: '{day_dir}'")
-    # Write the HTML (media files are added later as usual)
-    # Calculate weekday for html file name
-    date_obj = datetime.strptime(f'{year}:{month}:{day}', '%Y:%m:%d').date()
-    weekday = date_obj.strftime('%A')
+    logging.info("Created Directory: '%s'", day_dir)
+    weekday = get_weekday(year, month, day)
     day_entry = day_dir/f'{day}-{month}-{year}-{weekday}.html'
+    # Write the HTML (media files are added later as usual)
     Path(day_entry).write_text(html_entry.prettify())
     logging.info(f'Created no-description Entry for {year}-{month}-{day}: "{day_entry}"')
 
@@ -100,7 +108,7 @@ def assemble_new_entry(
     # Some media files have no according entry for their created date. In this block,
     # the (empty) entry is created to avoid remaining media files in .tmp/.
     date_obj = datetime.strptime(f'{year}:{month}:{day}', '%Y:%m:%d').date()
-    weekday = date_obj.strftime('%A')
+    weekday = get_weekday(year, month, day)
     title = f"{weekday}, {date_obj.strftime('%d. %B %Y')}"
     html_skeleton = create_stump(title)
     entry = BeautifulSoup(html_skeleton, 'html.parser')
