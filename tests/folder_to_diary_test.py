@@ -37,7 +37,7 @@ def test_ftd_href_present(caplog):
     folder_to_diary(dir_path)
 
     href_value = 'file:///home/philipp/.tagebuch/tests/Bilder/ftd-href_present 2024-05/'
-    entry_file = test_diary_dir / '2024/05-Mai/31-05-2024-Mittwoch-ftd-href-present/31-05-2024-Mittwoch-ftp-href-present.html'
+    entry_file = test_diary_dir / '2024/05-Mai/31-05-2024-Mittwoch-ftd-href-present/31-05-2024-Mittwoch-ftd-href-present.html'
     href = f'file://{dir_path}'
 
     msg_expected = f"base.href is '{href_value}' in '{entry_file}'. Can't add '{href}'."
