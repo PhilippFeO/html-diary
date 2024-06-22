@@ -57,7 +57,8 @@ def folder_to_diary(foto_dir: Path):
             case 0:
                 day_dir, html_entry = assemble_new_entry(day, month, year, href=f'file://{dates_paths[date]}')
                 create_dir_and_file(html_entry, day_dir, day, month, year)
-            # Add base.href to an entry
+            # Add base.href to an already existing entry
+            # Enty may or may have not a base.href attribute
             case 1:
                 # Open according entry
                 day_dir = matching_dirs[0]
