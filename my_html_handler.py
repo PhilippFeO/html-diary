@@ -12,8 +12,7 @@ from vars import DIARY_DIR
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
-                    # Mit Datum: %d.%m.%Y
-                    datefmt=' %Y.%m.%d  %H:%M:%S',
+                    datefmt=' %d.%m.%Y  %H:%M:%S',
                     filename=DIARY_DIR/'.logs/handler.log.txt',
                     filemode='a')
 length = 20
