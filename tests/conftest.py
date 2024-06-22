@@ -1,9 +1,9 @@
 import shutil
 
 import pytest
+from tests.vars import test_diary_dir, test_tmp_dir
 
 import vars
-from tests.vars import test_diary_dir, test_tmp_dir
 
 
 @pytest.fixture(autouse=True)
