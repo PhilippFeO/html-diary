@@ -5,9 +5,9 @@ import sys
 import tempfile
 from pathlib import Path
 
+from add_media_files import add_media_files_dir_file
 from bs4 import BeautifulSoup
 
-from add_media_files import add_media_files_dir_file
 from vars import DIARY_DIR
 
 logging.basicConfig(level=logging.INFO,
@@ -37,9 +37,9 @@ def helper(html_file, dir_path):
     subprocess.run(['/usr/bin/firefox', html_file], check=False)
 
 
-def read_base_href(html_file) -> Path | None:
+def read_base_href(html_file: Path) -> Path | None:
     logging.info('read_base_href( % s)', html_file)
-    if '.tagebuch' in html_file:
+    if '.tagebuch' in html_file.parts:
         # Retrieve head.base.href attribute to embed images
         # with open(html_file, 'r') as file:
         #     html_content = file.read()
@@ -49,6 +49,7 @@ def read_base_href(html_file) -> Path | None:
         if soup.head and soup.head.base and (href := soup.head.base.get('href')):
             if isinstance(href, str):
                 # Remove prefix 'file://' from base.href
+                # Replace '~' by 'Path.home()'
                 dir_path = Path(href[len('file://'):].replace('~', str(Path.home())))
                 logging.info('%s = ', dir_path)
                 return dir_path
@@ -61,7 +62,7 @@ def read_base_href(html_file) -> Path | None:
 if __name__ == "__main__":
     html_file = sys.argv[1]
     prefix = 'file://'
-    html_file = html_file[len(prefix):]
+    html_file = Path(html_file[len(prefix):])
     if (dir_path := read_base_href(html_file)):
         helper(html_file, dir_path)
     else:

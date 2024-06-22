@@ -4,13 +4,13 @@ import logging
 import subprocess
 from pathlib import Path
 
-from bs4 import BeautifulSoup
-
-import vars
 from add_media_files import add_media_files_dir_file
+from bs4 import BeautifulSoup
 from extract_html_body import extract_html_body, past_heading
 from my_html_handler import read_base_href
 from utils import create_stump
+
+import vars
 
 # Use different Log file when executed as test
 logging.basicConfig(level=logging.INFO,
@@ -25,7 +25,9 @@ logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
 
 def check(date: str) -> bool:
     """If date of today is equal to the last date for which a summery was generated return `False`, ie. don't create a new summery. (The summery was alread red).
-    If they differ, ie. no summery for today has been created, create one."""
+
+    If they differ, ie. no summery for today has been created, create one.
+    """
     create_summery = True
     # TODO: tagebuch-Dir as parameter for testing <26-05-2024>
     #   This function is currently not tested
@@ -33,16 +35,16 @@ def check(date: str) -> bool:
         last_date = f.read()
         create_summery = last_date != date
     if create_summery:
-        with open(last, 'w') as f:
-            f.write(date)
+        last.write_text(date, encoding='utf-8')
     return create_summery
 
 
 def look_into_the_past(date: str) -> tuple[bool, str]:
-    """Collects past entries of the current date.
+    """Collect past entries of the current date.
 
     - `date`: `str` in the format `dd.mm.yyyy`. No consistency checks are performed.
-    - `tagebuch_dir`: `Path` of the diary."""
+    - `tagebuch_dir`: `Path` of the diary.
+    """
     create_summery = check(date)
     if not create_summery:
         logging.info('The summery was already created and red.')
@@ -64,17 +66,21 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
         matching_files = glob.glob(f"{vars.DIARY_DIR}/{past_year}/{month}-*/{day}-*/*.html")
         match (nmb_entries := len(matching_files)):
             case 0:
-                logging.info(f'No entry for year {past_year}.')
+                logging.info("No entry for year '%s'.", past_year)
             case 1:
                 past_entries = True
                 h1 = overview.h1
                 past_entry: 'BeautifulSoup'
-                logging.info(f'{past_year}: File exists: "{(html_entry := matching_files[0])}". Extract media files.')
+                html_entry = Path(matching_files[0])
+                logging.info('%d: File exists: "%s". Extract media files.', past_year, html_entry)
+                # If entry already has a 'base.href' attribute
+                # Read it and add the media files within this dir to the overview
                 if (dir_path := read_base_href(html_entry)):
                     tags = add_media_files_dir_file(html_entry, dir_path)
                     past_entry = past_heading(f'{day}.{month}.{past_year}')
                     if (h2 := past_entry.h2):
                         h2.insert_after(*tags)
+                # No 'base.href' => Extract whole body, because it already contains the correct <img> and <video> tags
                 else:
                     past_entry = extract_html_body(html_entry, f'{day}.{month}.{past_year}')
                 # Merge past day into overview
@@ -82,7 +88,7 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
                     h1.append(past_entry)
             case _:
                 files = ',\n\t'.join(matching_files)
-                logging.error(f'There are {nmb_entries} files whereas there should be 1 or 0. The files are:\n\t{files}')
+                logging.error("There are '%s' files whereas there should be 1 or 0. The files are:\n\t'%s'", nmb_entries, files)
 
     return past_entries, overview.prettify()
 
