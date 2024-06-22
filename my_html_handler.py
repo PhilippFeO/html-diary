@@ -48,7 +48,7 @@ def read_base_href(html_file) -> Path | None:
         logging.info('Parsed: %s', html_file)
         if soup.head and soup.head.base and (href := soup.head.base.get('href')):
             if isinstance(href, str):
-                # Remove file:// from base.href
+                # Remove prefix 'file://' from base.href
                 dir_path = Path(href[len('file://'):].replace('~', str(Path.home())))
                 logging.info('%s = ', dir_path)
                 return dir_path
