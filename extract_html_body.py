@@ -24,8 +24,7 @@ def past_heading(past_date: str) -> BeautifulSoup:
 
 def extract_html_body(html_file,
                       past_date: str) -> BeautifulSoup:
-    """Extracts the <pre>, <img> and <video> tags from `html_file`, assembles it with a heading indicating how far in the past the day is."""
-
+    """Extract the <pre>, <img> and <video> tags from `html_file`, assembles it with a heading indicating how far in the past the day is."""
     new_soup = past_heading(past_date)
 
     with open(html_file) as fp:
