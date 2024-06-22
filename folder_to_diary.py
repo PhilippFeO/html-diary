@@ -9,7 +9,6 @@ from glob import glob
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-
 from utils import (
     assemble_new_entry,
     count_directories,
@@ -21,13 +20,13 @@ locale.setlocale(locale.LC_ALL, '')
 
 
 def collect_dates_paths(directory: Path) -> dict[str, Path]:
-    """Collect the dates of the fotos and return a mapping between date and `Path` of the foto."""
+    """Collect the dates of the fotos and return a mapping between `date` and `Path` of the foto."""
     dates_paths: dict[str, Path] = {}  # dates are in format 'yyyy:mm:dd'
     for file in directory.iterdir():
         # Recursion if 'file' is another subdir of fotos
         if Path.is_dir(file):
-            # in-place set union
-            dates_paths |= (collect_dates_paths(file))
+            # in-place union of sets
+            dates_paths |= collect_dates_paths(file)
         elif Path.is_file(file):
             # Read Metadata to retrieve creation date
             if date_created := get_date_created(file):
