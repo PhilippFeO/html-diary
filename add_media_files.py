@@ -14,7 +14,7 @@ def collect_fotos(foto_dir: Path,
     """Traverse directory recursively and search for media files."""
     for file in foto_dir.iterdir():
         if Path.is_dir(file):
-            tags.extend(collect_fotos(file, html, tags))
+            _ = collect_fotos(file, html, tags)
         else:
             complete_file_path = foto_dir / file
             match complete_file_path.suffix:
