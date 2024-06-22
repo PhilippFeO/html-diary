@@ -1,9 +1,9 @@
 import logging
 import subprocess
 from datetime import datetime
+from functools import cache
 from glob import glob
 from pathlib import Path
-from functools import cache
 
 from bs4 import BeautifulSoup
 
@@ -54,9 +54,12 @@ def get_date_created(file: Path) -> str | None:
             logging.error("Probably, Video '%s' has no 'CreateDate' in it's EXIF data.", file)
             return None
         case '.jpg' | '.jpeg' | '.png' | '.MP4' | '.JPG' | '.JPEG':
-            cmd = '/usr/bin/exif -t 0x9003 --ifd=EXIF'
-            if (exif_output := read_metadata(cmd, file)):
-                return exif_output.splitlines()[-1].split()[1]
+            # cmd = '/usr/bin/exif -t 0x9003 --ifd=EXIF'
+            cmd = '/usr/bin/exiftool -CreateDate'
+            if exif_output := read_metadata(cmd, file):
+                # Retrieve date from following line:
+                # Create Date                     : 2023:05:12 13:58:16
+                return exif_output.split(' : ')[-1].split()[0]
             logging.error("Probably, Foto '%s' has no Tag '9003' in it's EXIF data.", file)
             # PANO*.jpg
             cmd = '/usr/bin/exiftool -GPSDateStamp'
