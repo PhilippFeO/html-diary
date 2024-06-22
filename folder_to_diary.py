@@ -20,10 +20,13 @@ from utils import (
 locale.setlocale(locale.LC_ALL, '')
 
 
-def collect_dates_paths(directory: Path) -> set[tuple[str, Path]]:
-    dates_paths: set[tuple[str, Path]] = set()  # dates are in format 'yyyy:mm:dd'
+def collect_dates_paths(directory: Path) -> dict[str, Path]:
+    """Collect the dates of the fotos and return a mapping between date and `Path` of the foto."""
+    dates_paths: dict[str, Path] = {}  # dates are in format 'yyyy:mm:dd'
     for file in directory.iterdir():
+        # Recursion if 'file' is another subdir of fotos
         if Path.is_dir(file):
+            # in-place set union
             dates_paths |= (collect_dates_paths(file))
         elif Path.is_file(file):
             # Read Metadata to retrieve creation date
@@ -35,23 +38,24 @@ def collect_dates_paths(directory: Path) -> set[tuple[str, Path]]:
                 base_dir = Path(
                     *file.parts[
                         :file.parts.index('Bilder') + 2])
-                dates_paths.add((date_created, base_dir))
+                dates_paths[date_created] = base_dir
             else:
                 continue
     return dates_paths
 
 
-def folder_to_diary(directory: Path):
-    dates_paths: set[tuple[str, Path]] = collect_dates_paths(directory)
+def folder_to_diary(foto_dir: Path):
+    """Add a 'base.href' attribute to a diary entry for the submitted foto directory."""
+    dates_paths: dict[str, Path] = collect_dates_paths(foto_dir)
     assert len(dates_paths) > 0, f'No dates collected. "dates" is empty: {dates_paths}.'
-    for date, foto_dir_path in dates_paths:
+    for date in dates_paths:
         # Check if there is a dir matching the date
         year, month, day = date.split(':')
         matching_dirs = count_directories(day, month, year)
         match len(matching_dirs):
             # No entry exists for the selected date => Create one
             case 0:
-                day_dir, html_entry = assemble_new_entry(day, month, year, href=f'file://{foto_dir_path}')
+                day_dir, html_entry = assemble_new_entry(day, month, year, href=f'file://{dates_paths[date]}')
                 create_dir_and_file(html_entry, day_dir, day, month, year)
             # Add base.href to an entry
             case 1:
@@ -65,7 +69,7 @@ def folder_to_diary(directory: Path):
                 # No base tag (=> base.href attribute)
                 # Add base.href
                 assert entry.head, f"No 'head' in '{entry_file}'."  # Should not happen
-                href = f'file://{foto_dir_path}'
+                href = f'file://{dates_paths[date]}'
                 if not entry.head.base:
                     base_tag = entry.new_tag('base', href=href)
                     entry.head.append(base_tag)
