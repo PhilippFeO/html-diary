@@ -1,5 +1,7 @@
-from add_media_files import add_media_files_dir_file
-from tests.vars import test_diary_dir
+from bs4 import BeautifulSoup
+from add_media_files import add_media_files_dir_file, collect_fotos
+from tests.vars import TEST_BILDER_DIR, test_diary_dir
+from collections import Counter
 
 
 def test_add_media_files_dir_file():
