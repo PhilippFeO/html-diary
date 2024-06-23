@@ -102,7 +102,7 @@ def add_media_files_dir_file(diary_file: Path,
                              foto_dir: Path) -> list[Tag]:
     """Return a list with the tags to be inserted after the `<pre>`-tag.
 
-    `diary_file`: Should be the value of a `base.href`
+    `foto_dir`: Should be the value of a `base.href`
     """
     logging.info('add_media_files_dir_file(%s, %s)', diary_file, foto_dir)
 
@@ -123,6 +123,7 @@ def add_media_files_dir_file(diary_file: Path,
     return []
 
 
+# TODO: Add media files via 'head.base.href' <23-06-2024>
 def add_media_files(directories: set[Path]) -> None:
     """Add media files to a diary entry, ie. `directories` contains the directories to which media files were added but not yet embedded into the HTML file laying in the same directory. This function iterates over all files in each directory, creates the according HTML tag and adds it to the diary entry."""
     logging.info('%s(%s)', __name__, directories)

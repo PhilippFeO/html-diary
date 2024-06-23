@@ -23,6 +23,7 @@ def test_add_media_files_dir_file():
     assert tags[1].name == 'br'
 
 
+# TODO: Add test of 'collect_fotos()' with a video file <23-06-2024>
 def test_collect_fotos():
     """Test 'collect_fotos()' by retrieving all photos in 'base.href' which have the same creation date as the date of the diary entry.
 
