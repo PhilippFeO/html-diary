@@ -58,11 +58,13 @@ def collect_fotos(foto_dir: Path,
     `html`: HTML contents of a diary entry.
     `tags`: List with already created `Tag`s (necessary for recursion).
     """
+    logging.info("collect_fotos(foto_dir = %s, html = <SKIP>, tags = <SKIP>)", foto_dir)
     for file in foto_dir.iterdir():
         if Path.is_dir(file):
             _ = collect_fotos(file, html, tags)
         elif date_target := get_entry_date(html):
             complete_file_path = foto_dir / file
+            logging.info("Process %s", complete_file_path)
             match complete_file_path.suffix:
                 # Add <img src='...'/> tag for each foto
                 case '.jpg' | '.jpeg' | '.JPG' | '.JPEG' | '.png' | '.PNG':
@@ -99,12 +101,12 @@ def collect_fotos(foto_dir: Path,
 
 
 def add_media_files_dir_file(diary_file: Path,
-                             foto_dir: Path) -> list[Tag]:
+                             media_dir: Path) -> list[Tag]:
     """Return a list with the tags to be inserted after the `<pre>`-tag.
 
     `foto_dir`: Should be the value of a `base.href`
     """
-    logging.info('add_media_files_dir_file(%s, %s)', diary_file, foto_dir)
+    logging.info('add_media_files_dir_file(diary_file = %s, media_dir = %s)', diary_file, media_dir)
 
     html_content = diary_file.read_text(encoding='utf-8')
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -113,12 +115,12 @@ def add_media_files_dir_file(diary_file: Path,
     # Insert the new elements after the <pre> tag
     if pre_tag:  # pre_tag may be None, insert_after() doesn't work on None
         # When called with the intent to temporarly embed fotos from a folder, it is not guaranteed that this folder exists (I may have renamed it).
-        if Path.is_dir(foto_dir):
-            return collect_fotos(foto_dir, soup, [])
-        logging.error("'%s' is no directory", foto_dir)
+        if Path.is_dir(media_dir):
+            return collect_fotos(media_dir, soup, [])
+        logging.error("'%s' is no directory", media_dir)
         # Add visual feedback
         b = soup.new_tag('b')
-        b.append(f'{foto_dir} EXISTIERT NICHT')
+        b.append(f'{media_dir} EXISTIERT NICHT')
         return [b, soup.new_tag('br')]
     return []
 

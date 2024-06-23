@@ -18,10 +18,10 @@ length = 20
 logging.info('%s %s %s', bar := '-' * length, datetime.datetime.today(), bar)
 
 
-def helper(html_file: Path, dir_path: Path) -> str:
+def helper(html_file: Path, media_dir: Path) -> str:
     """Add media files in `dir_path` to diary entry."""
-    logging.info("helper()\n\t%s\n\t%s", html_file, dir_path)
-    tags = add_media_files_dir_file(html_file, dir_path)
+    logging.info("helper()\n\thtml_file = %s\n\tmedia_dir = %s", html_file, media_dir)
+    tags = add_media_files_dir_file(html_file, media_dir)
     logging.info('Media files added')
     html_content = Path(html_file).read_text(encoding='utf-8')
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -35,7 +35,7 @@ def helper(html_file: Path, dir_path: Path) -> str:
 
 def read_base_href(html_file: Path) -> Path | None:
     """Retrieve the value of `head.base.href` from a HTML entry."""
-    logging.info('read_base_href(%s)', html_file)
+    logging.info('read_base_href()\n\thtml_file = %s', html_file)
     if '.tagebuch' in html_file.parts:
         html_content = Path(html_file).read_text(encoding='utf-8')
         soup = BeautifulSoup(html_content, 'html.parser')
