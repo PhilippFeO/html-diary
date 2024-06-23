@@ -4,8 +4,8 @@ import os
 from pathlib import Path
 
 from bs4 import BeautifulSoup, Tag
-from utils import get_date_created
 
+from utils import get_date_created
 from vars import DIARY_DIR
 
 MONTH_NUM: dict[str, str] = {month: str(num + 1).zfill(2) for num, month in enumerate((
@@ -25,7 +25,10 @@ MONTH_NUM: dict[str, str] = {month: str(num + 1).zfill(2) for num, month in enum
 
 
 def get_entry_date(html: BeautifulSoup) -> str | None:
-    """Retrieve the date of the entry from it's HTML, ie. from the `<title>` tag."""
+    """Retrieve the date of the entry from it's HTML, ie. from the `<title>` tag.
+
+    `<title>` has the following scheme: `[d]d. Monthname yyyy: …`
+    """
     if html.head and html.head.title:
         # title = Weekday, [d]d. Monthname yyyy: Lorem Ipsum
         title = html.head.title.text
@@ -47,7 +50,13 @@ def collect_fotos(foto_dir: Path,
                   tags: list[Tag]) -> list[Tag]:
     """Traverse directory recursively and search for media files. Return a list of `<img>` and `<br>` Tags where the `<img>` Tags are Fotos taken on the same Date as the Date of the Entry. The Entry's Date is awkwardly retrieved from the title.
 
-    For a visual test, s `tests/look_into_the_past_test.py::test_litp_base_href().
+    For a visual test, s. `tests/look_into_the_past_test.py::test_litp_base_href()`.
+
+    Inverse function: `folder_to_diary.py::collect_dates_paths()`.
+
+    `foto_dir`: Directory containing the fotos to be embedded in `html`.
+    `html`: HTML contents of a diary entry.
+    `tags`: List with already created `Tag`s (necessary for recursion).
     """
     for file in foto_dir.iterdir():
         if Path.is_dir(file):
@@ -89,17 +98,15 @@ def collect_fotos(foto_dir: Path,
     return tags
 
 
-def add_media_files_dir_file(html_file: str | Path,
-                             foto_dir: str | Path):
-    """Return a list with the tags to be inserted after the pre-tag.
+def add_media_files_dir_file(diary_file: Path,
+                             foto_dir: Path) -> list[Tag]:
+    """Return a list with the tags to be inserted after the `<pre>`-tag.
 
-    :param foto_dir: Should be value of `base.href`
+    `diary_file`: Should be the value of a `base.href`
     """
-    logging.info('add_media_files_dir_file(%s, %s)', html_file, foto_dir)
-    html_file = Path(html_file)
-    foto_dir = Path(foto_dir)
+    logging.info('add_media_files_dir_file(%s, %s)', diary_file, foto_dir)
 
-    html_content = html_file.read_text(encoding='utf-8')
+    html_content = diary_file.read_text(encoding='utf-8')
     soup = BeautifulSoup(html_content, 'html.parser')
     pre_tag = soup.find('pre')
 

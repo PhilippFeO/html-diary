@@ -5,9 +5,9 @@ import sys
 import tempfile
 from pathlib import Path
 
-from add_media_files import add_media_files_dir_file
 from bs4 import BeautifulSoup
 
+from add_media_files import add_media_files_dir_file
 from vars import DIARY_DIR
 
 logging.basicConfig(level=logging.INFO,
@@ -19,12 +19,10 @@ length = 20
 logging.info('%s %s %s', bar := '-' * length, datetime.datetime.today(), bar)
 
 
-def helper(html_file, dir_path):
-    """Add media files in dir_path to diary entry."""
-    tags = add_media_files_dir_file(html_file, Path(dir_path))
+def helper(html_file: Path, dir_path: Path):
+    """Add media files in `dir_path` to diary entry."""
+    tags = add_media_files_dir_file(html_file, dir_path)
     logging.info('Media files added')
-    # with open(html_file, 'r') as file:
-    #     html_content = file.read()
     html_content = Path(html_file).read_text(encoding='utf-8')
     soup = BeautifulSoup(html_content, 'html.parser')
     if (pre_tag := soup.find('pre')):
@@ -32,17 +30,15 @@ def helper(html_file, dir_path):
     with tempfile.NamedTemporaryFile(delete=False) as html_tmp_file:
         html_tmp_file.write(bytes(soup.prettify(encoding='utf-8')))
         html_tmp_file.flush()
-        logging.info('Open %s', html_tmp_file.name)
-        html_file = html_tmp_file.name
-    subprocess.run(['/usr/bin/firefox', html_file], check=False)
+        html_file_name = html_tmp_file.name
+    logging.info('Open %s', html_tmp_file.name)
+    subprocess.run(['/usr/bin/firefox', html_file_name], check=False)
 
 
 def read_base_href(html_file: Path) -> Path | None:
+    """Retrieve the value of `head.base.href` from a HTML entry."""
     logging.info('read_base_href( % s)', html_file)
     if '.tagebuch' in html_file.parts:
-        # Retrieve head.base.href attribute to embed images
-        # with open(html_file, 'r') as file:
-        #     html_content = file.read()
         html_content = Path(html_file).read_text(encoding='utf-8')
         soup = BeautifulSoup(html_content, 'html.parser')
         logging.info('Parsed: %s', html_file)
@@ -53,9 +49,9 @@ def read_base_href(html_file: Path) -> Path | None:
                 dir_path = Path(href[len('file://'):].replace('~', str(Path.home())))
                 logging.info('%s = ', dir_path)
                 return dir_path
-            logging.error('`href` is not of type `str` but `list[str] | None`.')
+            logging.error("'href' is not of type 'str' but 'list[str] | None'.")
         else:
-            logging.info('Either no `head`, `head.base` or `href` attribute within `head.base`.')
+            logging.info("Either no 'head', 'head.base' or 'href' attribute within 'head.base'.")
     return None
 
 

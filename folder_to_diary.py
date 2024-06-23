@@ -9,6 +9,7 @@ from glob import glob
 from pathlib import Path
 
 from bs4 import BeautifulSoup
+
 from utils import (
     assemble_new_entry,
     count_directories,
@@ -20,31 +21,38 @@ locale.setlocale(locale.LC_ALL, '')
 
 
 def collect_dates_paths(directory: Path) -> dict[str, Path]:
-    """Collect the dates of the fotos and return a mapping between `date` and `Path` of the foto."""
+    """Collect the dates of the fotos and return a mapping between `date` and `Path` of the foto.
+
+    Since the 'greatest common path' is collected, the function is aware that fotos with the same creation date may appear in different subfolders.
+
+    Inverse function: `add_media_files.py::collect_fotos()`.
+    """
     dates_paths: dict[str, Path] = {}  # dates are in format 'yyyy:mm:dd'
     for file in directory.iterdir():
         # Recursion if 'file' is another subdir of fotos
         if Path.is_dir(file):
             # in-place union of sets
             dates_paths |= collect_dates_paths(file)
-        elif Path.is_file(file):
-            # Read Metadata to retrieve creation date
-            if date_created := get_date_created(file):
-                # Remove everythin after '~/Bilder/Subfolder/', ie
-                # ~/Bilder/Sub1/Sub2 -> ~/Bilder/Sub1
-                # Complicated, because using 'Path.parents[IDX]' doesn't work. I simply
-                # don't know how to monkeypatch the '[IDX]'/__getitem__ call.
-                base_dir = Path(
-                    *file.parts[
-                        :file.parts.index('Bilder') + 2])
-                dates_paths[date_created] = base_dir
-            else:
-                continue
+        # Read Metadata to retrieve creation date
+        elif Path.is_file(file) and (date_created := get_date_created(file)):
+            # Remove everythin after '~/Bilder/Subfolder/', ie
+            # ~/Bilder/Sub1/Sub2 -> ~/Bilder/Sub1
+            # Complicated, because using 'Path.parents[IDX]' doesn't work. I simply
+            # don't know how to monkeypatch the '[IDX]'/__getitem__ call.
+            base_dir = Path(
+                *file.parts[
+                    :file.parts.index('Bilder') + 2])
+            dates_paths[date_created] = base_dir
     return dates_paths
 
 
 def folder_to_diary(foto_dir: Path):
-    """Add a 'base.href' attribute to a diary entry for the submitted foto directory."""
+    """Add a 'base.href' attribute to a diary entry for the submitted `foto_dir`.
+
+    The `foto_dir` is searched for any media file. Then, the creation date and the file path(s) are saved in a mapping. For any date, the file path(s) are inserted in a diary entry via the `head.base.href` attribute or a new entry is created with a `head.base.href` attribute.
+
+    `foto_dir`: Directory containing fotos.
+    """
     dates_paths: dict[str, Path] = collect_dates_paths(foto_dir)
     assert len(dates_paths) > 0, f'No dates collected. "dates" is empty: {dates_paths}.'
     for date in dates_paths:
