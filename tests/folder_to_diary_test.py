@@ -11,14 +11,12 @@ def test_collect_dates_paths():
 
     `collect_dates_paths()` is aware that fotos with the same creation date may appear in different subfolders (s. prepared `Bilder/` directory), ie. for date `2024:05:31` is one path collected - the main one.
     """
-    dates_expected = ('2024:05:29', '2024:05:30', '2024:05:31', '2024:06:01',  '2024:06:02')
+    dates_expected = {'2024:05:29', '2024:05:30', '2024:05:31', '2024:06:01',  '2024:06:02'}
+
     directory = Path(TEST_BILDER_DIR / 'ftp-collect_dates_paths 2024-05')
+    dates_result = collect_dates_paths(directory)
 
-    dates_paths_expected = {date: directory for date in dates_expected}
-
-    dates_paths = collect_dates_paths(directory)
-
-    assert dates_paths_expected == dates_paths
+    assert dates_expected == dates_result
 
 
 def test_ftd_add_base_href():

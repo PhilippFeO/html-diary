@@ -20,30 +20,23 @@ from utils import (
 locale.setlocale(locale.LC_ALL, '')
 
 
-def collect_dates_paths(directory: Path) -> dict[str, Path]:
-    """Collect the dates of the fotos and return a mapping between `date` and `Path` of the foto.
+def collect_dates(foto_dir: Path) -> set[str]:
+    """Collect the dates of the fotos and return a `set` of all creation dates.
 
     Since the 'greatest common path' is collected, the function is aware that fotos with the same creation date may appear in different subfolders.
 
     Inverse function: `add_media_files.py::collect_fotos()`.
     """
-    dates_paths: dict[str, Path] = {}  # dates are in format 'yyyy:mm:dd'
-    for file in directory.iterdir():
+    dates: set[str] = set()  # dates are in format 'yyyy:mm:dd'
+    for file in foto_dir.iterdir():
         # Recursion if 'file' is another subdir of fotos
         if Path.is_dir(file):
             # in-place union of sets
-            dates_paths |= collect_dates_paths(file)
+            dates |= collect_dates(file)
         # Read Metadata to retrieve creation date
         elif Path.is_file(file) and (date_created := get_date_created(file)):
-            # Remove everythin after '~/Bilder/Subfolder/', ie
-            # ~/Bilder/Sub1/Sub2 -> ~/Bilder/Sub1
-            # Complicated, because using 'Path.parents[IDX]' doesn't work. I simply
-            # don't know how to monkeypatch the '[IDX]'/__getitem__ call.
-            base_dir = Path(
-                *file.parts[
-                    :file.parts.index('Bilder') + 2])
-            dates_paths[date_created] = base_dir
-    return dates_paths
+            dates.add(date_created)
+    return dates
 
 
 def folder_to_diary(foto_dir: Path):
@@ -53,16 +46,16 @@ def folder_to_diary(foto_dir: Path):
 
     `foto_dir`: Directory containing fotos.
     """
-    dates_paths: dict[str, Path] = collect_dates_paths(foto_dir)
-    assert len(dates_paths) > 0, f'No dates collected. "dates" is empty: {dates_paths}.'
-    for date in dates_paths:
+    dates: set[str] = collect_dates(foto_dir)
+    assert len(dates) > 0, f'No dates collected. "dates" is empty: {dates}.'
+    for date in dates:
         # Check if there is a dir matching the date
         year, month, day = date.split(':')
         matching_dirs = count_directories(day, month, year)
         match len(matching_dirs):
             # No entry exists for the selected date => Create one
             case 0:
-                day_dir, html_entry = assemble_new_entry(day, month, year, href=f'file://{dates_paths[date]}')
+                day_dir, html_entry = assemble_new_entry(day, month, year, href=f'file://{foto_dir}')
                 create_dir_and_file(html_entry, day_dir, day, month, year)
             # Add base.href to an already existing entry
             # Enty may or may have not a base.href attribute
@@ -77,7 +70,7 @@ def folder_to_diary(foto_dir: Path):
                 # No base tag (=> base.href attribute)
                 # Add base.href
                 assert entry.head, f"No 'head' in '{entry_file}'."  # Should not happen
-                href = f'file://{dates_paths[date]}'
+                href = f'file://{foto_dir}'
                 if not entry.head.base:
                     base_tag = entry.new_tag('base', href=href)
                     entry.head.append(base_tag)

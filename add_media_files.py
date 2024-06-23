@@ -52,7 +52,7 @@ def collect_fotos(foto_dir: Path,
 
     For a visual test, s. `tests/look_into_the_past_test.py::test_litp_base_href()`.
 
-    Inverse function: `folder_to_diary.py::collect_dates_paths()`.
+    Inverse function: `folder_to_diary.py::collect_dates()`.
 
     `foto_dir`: Directory containing the fotos to be embedded in `html`.
     `html`: HTML contents of a diary entry.
