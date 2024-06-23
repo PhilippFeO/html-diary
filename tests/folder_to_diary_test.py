@@ -2,7 +2,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-from folder_to_diary import collect_dates_paths, folder_to_diary
+from folder_to_diary import collect_dates, folder_to_diary
 from tests.vars import TEST_BILDER_DIR, test_diary_dir
 
 
@@ -14,13 +14,16 @@ def test_collect_dates_paths():
     dates_expected = {'2024:05:29', '2024:05:30', '2024:05:31', '2024:06:01',  '2024:06:02'}
 
     directory = Path(TEST_BILDER_DIR / 'ftp-collect_dates_paths 2024-05')
-    dates_result = collect_dates_paths(directory)
+    dates_result = collect_dates(directory)
 
     assert dates_expected == dates_result
 
 
 def test_ftd_add_base_href():
-    """Part of 'case 1': if."""
+    """Part of 'case 1': if.
+
+    Add `head.base.href` to an already existing diary entry.
+    """
     expected_path = TEST_BILDER_DIR / 'ftd-add_base_ref 2024-05'
 
     folder_to_diary(expected_path)
@@ -35,7 +38,10 @@ def test_ftd_add_base_href():
 
 
 def test_ftd_href_present(caplog):
-    """Part of 'case 1': else."""
+    """Part of 'case 1': else.
+
+    Test if firectory values match.
+    """
     dir_path = Path(TEST_BILDER_DIR / 'ftd-href_present 2024-05')
 
     folder_to_diary(dir_path)
@@ -49,7 +55,10 @@ def test_ftd_href_present(caplog):
 
 
 def test_ftd_create_new_entry():
-    """Tests 'case 0'."""
+    """Test 'case 0'.
+
+    Create new diary entry and add a `head.base.href` attribute.
+    """
     foto_dir = Path(TEST_BILDER_DIR / 'ftd-create_new_entry 2024-05')
 
     folder_to_diary(foto_dir)

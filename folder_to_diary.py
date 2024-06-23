@@ -40,9 +40,9 @@ def collect_dates(foto_dir: Path) -> set[str]:
 
 
 def folder_to_diary(foto_dir: Path):
-    """Add a 'base.href' attribute to a diary entry for the submitted `foto_dir`.
+    """Add a `head.base.href` attribute to a diary entry for the submitted `foto_dir`.
 
-    The `foto_dir` is searched for any media file. Then, the creation date and the file path(s) are saved in a mapping. For any date, the file path(s) are inserted in a diary entry via the `head.base.href` attribute or a new entry is created with a `head.base.href` attribute.
+    The `foto_dir` is searched for any media file. Then, the creation date is saved. For any date, the `foto_dir` is inserted in a diary entry via the `head.base.href` attribute or a new entry is created with a `head.base.href` attribute.
 
     `foto_dir`: Directory containing fotos.
     """
@@ -67,8 +67,8 @@ def folder_to_diary(foto_dir: Path):
                 assert len(html_files) == 1, f'"{day_dir}" contains {len(html_files)} HTML files. There should be exactly 1.'
                 entry_file = html_files[0]
                 entry = BeautifulSoup(Path(entry_file).read_text(encoding='utf-8'), 'html.parser')
-                # No base tag (=> base.href attribute)
-                # Add base.href
+                # No base tag (=> No base.href attribute)
+                # Add base.href to an already existing diary entry
                 assert entry.head, f"No 'head' in '{entry_file}'."  # Should not happen
                 href = f'file://{foto_dir}'
                 if not entry.head.base:
