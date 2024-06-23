@@ -42,8 +42,6 @@ def copy_helper(media_file: Path,
     logging.info("Moved '%s' to '%s'.", media_file, transfered_dir)
 
 
-# def transfer_files(tmp_dir: Path,
-#                    tagebuch_dir: Path) -> set[Path]:
 def transfer_files() -> set[Path]:
     """Copy Media files from .tmp to the according directory of the created date.
 
