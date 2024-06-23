@@ -42,7 +42,8 @@ def get_entry_date(html: BeautifulSoup) -> str | None:
         day = str(day[:-1]).zfill(2)
         month_num = MONTH_NUM[monthname]
         return f'{year}:{month_num}:{day}'
-    return None
+    msg = f'Impossible to retrieve the date from HTML:\n{html.prettify()}'
+    raise Exception(msg)
 
 
 def collect_fotos(foto_dir: Path,
