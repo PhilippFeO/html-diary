@@ -28,8 +28,7 @@ logging.basicConfig(level=logging.INFO,
                     datefmt=' %Y.%m.%d  %H:%M:%S',
                     filename=vars.DIARY_DIR/'.logs/transfer_files_add_media_files.log.txt',
                     filemode='a')
-hline = "-" * vars.LENGTH
-logging.info('%s %s %s', hline, datetime.datetime.today(), hline)
+logging.info(vars.LOG_STRING)
 
 
 def copy_helper(media_file: Path,
