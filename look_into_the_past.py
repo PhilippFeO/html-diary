@@ -4,13 +4,13 @@ import logging
 import subprocess
 from pathlib import Path
 
-from add_media_files import add_media_files_dir_file
 from bs4 import BeautifulSoup
+
+import vars
+from add_media_files import add_media_files_dir_file
 from extract_html_body import extract_html_body, past_heading
 from my_html_handler import read_base_href
 from utils import create_stump
-
-import vars
 
 # Use different Log file when executed as test
 logging.basicConfig(level=logging.INFO,
@@ -28,14 +28,13 @@ def check(date: str) -> bool:
 
     If they differ, ie. no summery for today has been created, create one.
     """
+    # TODO: This function is currently not tested <23-06-2024>
     create_summery = True
-    # TODO: tagebuch-Dir as parameter for testing <26-05-2024>
-    #   This function is currently not tested
-    with open((last := vars.DIARY_DIR/'.last_look_into_the_past.txt'), 'r') as f:
-        last_date = f.read()
-        create_summery = last_date != date
+    last_date_file = vars.DIARY_DIR/'.last_look_into_the_past.txt'
+    last_date = last_date_file.read_text(encoding='utf-8')
+    create_summery = last_date != date
     if create_summery:
-        last.write_text(date, encoding='utf-8')
+        last_date_file.write_text(date, encoding='utf-8')
     return create_summery
 
 
