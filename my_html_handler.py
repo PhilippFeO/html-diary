@@ -1,7 +1,6 @@
 import datetime
 import logging
 import subprocess
-import sys
 import tempfile
 from pathlib import Path
 
@@ -19,8 +18,9 @@ length = 20
 logging.info('%s %s %s', bar := '-' * length, datetime.datetime.today(), bar)
 
 
-def helper(html_file: Path, dir_path: Path):
+def helper(html_file: Path, dir_path: Path) -> str:
     """Add media files in `dir_path` to diary entry."""
+    logging.info("helper()\n\t%s\n\t%s", html_file, dir_path)
     tags = add_media_files_dir_file(html_file, dir_path)
     logging.info('Media files added')
     html_content = Path(html_file).read_text(encoding='utf-8')
@@ -30,14 +30,12 @@ def helper(html_file: Path, dir_path: Path):
     with tempfile.NamedTemporaryFile(delete=False) as html_tmp_file:
         html_tmp_file.write(bytes(soup.prettify(encoding='utf-8')))
         html_tmp_file.flush()
-        html_file_name = html_tmp_file.name
-    logging.info('Open %s', html_tmp_file.name)
-    subprocess.run(['/usr/bin/firefox', html_file_name], check=False)
+        return html_tmp_file.name
 
 
 def read_base_href(html_file: Path) -> Path | None:
     """Retrieve the value of `head.base.href` from a HTML entry."""
-    logging.info('read_base_href( % s)', html_file)
+    logging.info('read_base_href(%s)', html_file)
     if '.tagebuch' in html_file.parts:
         html_content = Path(html_file).read_text(encoding='utf-8')
         soup = BeautifulSoup(html_content, 'html.parser')
@@ -47,7 +45,7 @@ def read_base_href(html_file: Path) -> Path | None:
                 # Remove prefix 'file://' from base.href
                 # Replace '~' by 'Path.home()'
                 dir_path = Path(href[len('file://'):].replace('~', str(Path.home())))
-                logging.info('%s = ', dir_path)
+                logging.info('dir_path = %s', dir_path)
                 return dir_path
             logging.error("'href' is not of type 'str' but 'list[str] | None'.")
         else:
@@ -56,10 +54,10 @@ def read_base_href(html_file: Path) -> Path | None:
 
 
 if __name__ == "__main__":
+    import sys
     html_file = sys.argv[1]
     prefix = 'file://'
     html_file = Path(html_file[len(prefix):])
     if (dir_path := read_base_href(html_file)):
-        helper(html_file, dir_path)
-    else:
-        subprocess.run(['/usr/bin/firefox', html_file], check=False)
+        html_file = helper(html_file, dir_path)
+    subprocess.run(['/usr/bin/firefox', html_file], check=False)
