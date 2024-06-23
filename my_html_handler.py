@@ -55,7 +55,8 @@ def read_base_href(html_file: Path) -> Path | None:
 
 if __name__ == "__main__":
     import sys
-    html_file = sys.argv[1]
+    import urllib.parse
+    html_file = urllib.parse.unquote(sys.argv[1])
     prefix = 'file://'
     html_file = Path(html_file[len(prefix):])
     if (dir_path := read_base_href(html_file)):
