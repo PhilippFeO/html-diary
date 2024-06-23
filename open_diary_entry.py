@@ -1,4 +1,3 @@
-import datetime
 import logging
 import subprocess
 import tempfile
@@ -6,15 +5,15 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
+import vars
 from add_media_files import add_media_files_dir_file
-from vars import DIARY_DIR, LENGTH
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
                     datefmt=' %d.%m.%Y  %H:%M:%S',
-                    filename=DIARY_DIR/'.logs/handler.log.txt',
+                    filename=vars.DIARY_DIR/'.logs/open_diary_entry.log.txt',
                     filemode='a')
-logging.info('%s %s %s', hline := '-' * LENGTH, datetime.datetime.today(), hline)
+logging.info(vars.LOG_STRING)
 
 
 def helper(html_file: Path, media_dir: Path) -> str:
