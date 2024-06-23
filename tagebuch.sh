@@ -31,7 +31,9 @@ imgs=~/Bilder/Handy-Fotos/
 path=~/.tagebuch/$year/$month/$today
 if ~/.tagebuch/check_today_dir_exists.sh "$path"; then
     # Ask for new diary entry
-    today_date_for_heading=$(date "+%A, %d. %B %Y") # Proper date formatting for heading, f.i. Freitag, 28. April 2023
+    # Proper date formatting for heading, f.i. Mittwoch, 5. Juni 2024
+    # sed 's/ 0/ /' removey the leading 0 of a single digit day
+    today_date_for_heading=$(date "+%A, %d. %B %Y" | sed 's/ 0/ /') 
     # Answer saved in $?
     zenity --question --text="<span font='$zenity_font_size'>Tagebucheintrag für heute, $today_date_for_heading, anlegen?</span>" --ok-label="Ja" --cancel-label="Nein" --width=$zenity_width --height=$zenity_height --timeout=10
 
