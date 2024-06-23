@@ -16,8 +16,6 @@ def create_stump(title: str) -> str:
         '<html>'
         '  <head>'
         f'	<title>{title}</title>'
-        '	<!-- weitere Kopfinformationen -->'
-        '	<!-- Styles für <pre> -->'
         '	<link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">'
         '  </head>'
         '  <body>'
