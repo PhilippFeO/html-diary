@@ -24,7 +24,7 @@ MONTH_NUM: dict[str, str] = {month: str(num + 1).zfill(2) for num, month in enum
 ))}
 
 
-def get_entry_date(html: BeautifulSoup) -> str | None:
+def get_date_entry(html: BeautifulSoup) -> str | None:
     """Retrieve the date of the entry from it's HTML, ie. from the `<title>` tag.
 
     `<title>` has the following scheme: `[d]d. Monthname yyyy: …`
