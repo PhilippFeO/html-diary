@@ -28,8 +28,8 @@ logging.basicConfig(level=logging.INFO,
                     datefmt=' %Y.%m.%d  %H:%M:%S',
                     filename=vars.DIARY_DIR/'.logs/transfer_files_add_media_files.log.txt',
                     filemode='a')
-length = 20
-logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
+hline = "-" * vars.LENGTH
+logging.info('%s %s %s', hline, datetime.datetime.today(), hline)
 
 
 def copy_helper(media_file: Path,
@@ -37,10 +37,10 @@ def copy_helper(media_file: Path,
                 tagebuch_dir: Path):
     shutil.copy(media_file,
                 day_dir/media_file.name)
-    logging.info(f"Copied '{media_file}' to '{tagebuch_dir/day_dir/media_file.name}'")
+    logging.info("Copied '%s' to '%s'", media_file, tagebuch_dir/day_dir/media_file.name)
     shutil.move(media_file,
                 (transfered_dir := tagebuch_dir/'.tmp/transfered'))
-    logging.info(f"Moved '{media_file}' to '{transfered_dir}'.")
+    logging.info("Moved '%s' to '%s'.", media_file, transfered_dir)
 
 
 # def transfer_files(tmp_dir: Path,
@@ -74,7 +74,7 @@ def transfer_files() -> set[Path]:
                                 day_dir,
                                 vars.DIARY_DIR)
                     directories.add(day_dir)
-                    logging.info(f"Added '{day_dir}' to `directories`.")
+                    logging.info("Added '%s' to `directories`.", day_dir)
                 case 1:
                     # Transfer image to directory
                     day_dir = Path(matching_dirs[0])
@@ -82,10 +82,10 @@ def transfer_files() -> set[Path]:
                                 day_dir,
                                 vars.DIARY_DIR)
                     directories.add(day_dir)
-                    logging.info(f"Added '{day_dir}' to `directories`.")
+                    logging.info("Added '%s' to `directories`.", day_dir)
                 case _:
-                    logging.warning(
-                        f"Found {len(matching_dirs)} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}")
+                    msg = f"Found {len(matching_dirs)} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}"
+                    logging.warning(msg)
     return directories
 
 
