@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 
-from add_media_files import add_media_files_dir_file, collect_fotos, get_entry_date
+from add_media_files import create_tags, collect_fotos, get_date_entry
 from open_diary_entry import read_base_href
 from tests.vars import test_diary_dir
 
@@ -13,7 +13,7 @@ def test_add_media_files_dir_file():
     diary_file = test_diary_dir/'2024/06-Juni/05-06-2024-Mittwoch-Test-add_media_files_day_dir/05-06-2024-Mittwoch-Test-add_media_files_day_dir.html'
     not_existent_foto_dir = test_diary_dir/'lorem_ipsum/'
 
-    tags = add_media_files_dir_file(diary_file, not_existent_foto_dir)
+    tags = create_tags(diary_file, not_existent_foto_dir)
 
     num_tags_expected = 2
 
@@ -58,7 +58,7 @@ def test_get_entry_date_double_digit():
     entry_path = test_diary_dir / '2024/06-Juni/22-06-2024-Mittwoch-amf_collect_photos_specific_date/22-06-2024-Mittwoch-amf_collect_photos_specific_date.html'
     html = BeautifulSoup(entry_path.read_text(encoding='utf-8'), 'html.parser')
 
-    date = get_entry_date(html)
+    date = get_date_entry(html)
 
     assert date == date_expected
 
@@ -69,6 +69,6 @@ def test_get_entry_date_single_digit():
     entry_path = test_diary_dir / '2024/06-Juni/04-06-2024-Mittwoch-base.href-litp/04-06-2024-Mittwoch-base.href-litp.html'
     html = BeautifulSoup(entry_path.read_text(encoding='utf-8'), 'html.parser')
 
-    date = get_entry_date(html)
+    date = get_date_entry(html)
 
     assert date == date_expected

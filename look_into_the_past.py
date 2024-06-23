@@ -7,20 +7,18 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 import vars
-from add_media_files import add_media_files_dir_file
+from add_media_files import create_tags
 from extract_html_body import extract_html_body, past_heading
-from my_html_handler import read_base_href
+from open_diary_entry import read_base_href
 from utils import create_stump
 
 # Use different Log file when executed as test
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
-                    # Mit Datum: %d.%m.%Y
-                    datefmt=' %Y.%m.%d  %H:%M:%S',
+                    datefmt=' %d.%m.%Y  %H:%M:%S',
                     filename=vars.DIARY_DIR/'.logs/look_into_the_past.log.txt',
                     filemode='a')
-length = 20
-logging.info(f'{"-" * length} {datetime.datetime.today()} {"-" * length}')
+logging.info(vars.LOG_STRING)
 
 
 def check(date: str) -> bool:
@@ -65,7 +63,7 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
         matching_files = glob.glob(f"{vars.DIARY_DIR}/{past_year}/{month}-*/{day}-*/*.html")
         match (nmb_entries := len(matching_files)):
             case 0:
-                logging.info("No entry for year '%s'.", past_year)
+                continue
             case 1:
                 past_entries = True
                 h1 = overview.h1
@@ -75,7 +73,7 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
                 # If entry already has a 'base.href' attribute
                 # Read it and add the media files within this dir to the overview
                 if (dir_path := read_base_href(html_entry)):
-                    tags = add_media_files_dir_file(html_entry, dir_path)
+                    tags = create_tags(html_entry, dir_path)
                     past_entry = past_heading(f'{day}.{month}.{past_year}')
                     if (h2 := past_entry.h2):
                         h2.insert_after(*tags)
@@ -96,11 +94,10 @@ if __name__ == "__main__":
     date = datetime.datetime.today().strftime('%d.%m.%Y')
     past_entries, html = look_into_the_past(date)
     if past_entries:
-        html_path = Path('/tmp/look_into_the_past.html')
-        logging.info(f"Write collected past entried to '{html_path}'.")
-        # TODO: Use File Descriptors <24-05-2024>
-        with open(html_path, 'w') as html_file:
-            html_file.write(html)
-        subprocess.run(['firefox', html_path])
+        html_file = Path('/tmp/look_into_the_past.html')
+        logging.info("Write collected past entried to '%s'.", html_file)
+        html_file.write_text(html, encoding='utf-8')
+        subprocess.run(['/usr/bin/firefox', html_file], check=True)
     else:
-        logging.info(f"There aren't any past entries for {date} or a summery has already been created and red.")
+        logging.info("There aren't any past entries for '%s' or a summery has already been created and red.", date)
+    logging.shutdown()

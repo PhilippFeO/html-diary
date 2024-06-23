@@ -5,8 +5,8 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup, Tag
 
+import vars
 from utils import get_date_created
-from vars import DIARY_DIR
 
 MONTH_NUM: dict[str, str] = {month: str(num + 1).zfill(2) for num, month in enumerate((
     'Januar',
@@ -60,31 +60,32 @@ def collect_fotos(foto_dir: Path,
     `tags`: List with already created `Tag`s (necessary for recursion).
     """
     logging.info("collect_fotos(foto_dir = %s, html = <SKIP>, tags = <SKIP>)", foto_dir)
+    date_entry = get_date_entry(html)
     for file in foto_dir.iterdir():
         if Path.is_dir(file):
             _ = collect_fotos(file, html, tags)
-        elif date_target := get_entry_date(html):
+        else:
             complete_file_path = foto_dir / file
             logging.info("Process %s", complete_file_path)
             match complete_file_path.suffix:
                 # Add <img src='...'/> tag for each foto
                 case '.jpg' | '.jpeg' | '.JPG' | '.JPEG' | '.png' | '.PNG':
-                    date_created = get_date_created(file)
-                    if date_created == date_target:
-                        new_img = html.new_tag('img', src=DIARY_DIR/complete_file_path)
+                    # Create and add tag of 'file' if it's creation date is eqaul to the entry date
+                    if get_date_created(file) == date_entry:
+                        new_img = html.new_tag('img', src=vars.DIARY_DIR/complete_file_path)
                         # LIFO data structure, ie '<br/>' is the first element
                         tags.append(new_img)
                         tags.append(html.new_tag('br'))
                         logging.info("Added Foto: '%s'", complete_file_path)
                 # Add <video controls loop><source src='...'/></video>
                 case '.mp4' | '.MP4':
-                    date_created = get_date_created(file)
-                    if date_created == date_target:
+                    # Create and add tag of 'file' if it's creation date is eqaul to the entry date
+                    if get_date_created(file) == date_entry:
                         # Empty string == True
                         #   To be precise, any value equals True, for False, attribute has to be absent
                         # becomes <video controls loop>
                         new_video = html.new_tag('video', controls="", loop="")
-                        new_source = html.new_tag('source', src=DIARY_DIR/complete_file_path)
+                        new_source = html.new_tag('source', src=vars.DIARY_DIR/complete_file_path)
                         # Append the <source> tag to the <video> tag
                         new_video.append(new_source)
                         # LIFO data structure, ie '<br/>' is the first element
@@ -96,16 +97,15 @@ def collect_fotos(foto_dir: Path,
                     logging.info("(Obviously) Skipping the HTML Entry: '%s'", complete_file_path)
                 case _:
                     logging.warning("There is a new File Type in '%s': '%s'", foto_dir, complete_file_path)
-        else:
-            logging.warning("No 'head.title' found in HTML: %s", html.prettify())
     return tags
 
 
-def add_media_files_dir_file(diary_file: Path,
-                             media_dir: Path) -> list[Tag]:
+def create_tags(diary_file: Path,
+                media_dir: Path) -> list[Tag]:
     """Return a list with the tags to be inserted after the `<pre>`-tag.
 
-    `foto_dir`: Should be the value of a `base.href`
+    `diary_file`: Path to the diary html file to add media files to
+    `media_dir`: Should be the value of a `base.href`
     """
     logging.info('add_media_files_dir_file(diary_file = %s, media_dir = %s)', diary_file, media_dir)
 
@@ -140,7 +140,7 @@ def add_media_files(directories: set[Path]) -> None:
         logging.info("Add Media Files in '%s' to '%s' ...", day_dir, html_file)
 
         # Insert tags after pre-tag
-        tags = add_media_files_dir_file(html_file, day_dir)
+        tags = create_tags(html_file, day_dir)
         html = BeautifulSoup(html_file.read_text(encoding='utf-8'),
                              'html.parser')
         if (pre_tag := html.find('pre')):

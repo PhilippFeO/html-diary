@@ -1,6 +1,5 @@
 import pytest
 from bs4 import BeautifulSoup
-
 from look_into_the_past import look_into_the_past
 
 # ─── Fixtures ──────────

@@ -3,10 +3,10 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 import vars
-from add_media_files import add_media_files_dir_file
+from add_media_files import create_tags
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
@@ -17,9 +17,9 @@ logging.info(vars.LOG_STRING)
 
 
 def helper(html_file: Path, media_dir: Path) -> str:
-    """Add media files in `dir_path` to diary entry."""
+    """Add media files in `media_dir` to diary entry."""
     logging.info("helper(html_file = %s, media_dir = %s)", html_file, media_dir)
-    tags = add_media_files_dir_file(html_file, media_dir)
+    tags: list[Tag] = create_tags(html_file, media_dir)
     logging.info('Media files added')
     html_content = Path(html_file).read_text(encoding='utf-8')
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -45,7 +45,7 @@ def read_base_href(html_file: Path) -> Path | None:
                 dir_path = Path(href[len('file://'):].replace('~', str(Path.home())))
                 logging.info('dir_path = %s', dir_path)
                 return dir_path
-            logging.error("'href' is not of type 'str' but 'list[str] | None'.")
+            logging.warning("'href' is not of type 'str' but 'list[str] | None'.")
         else:
             logging.info("Either no 'head', 'head.base' or 'href' attribute within 'head.base'.")
     return None
