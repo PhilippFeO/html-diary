@@ -1,4 +1,4 @@
 #!/bin/bash
 # nemo action for opening a diary entry
 
-~/.tagebuch/wrapper_my_html_handler.sh "$1"
+~/.tagebuch/wrapper_open_diary_entry.sh "$1"

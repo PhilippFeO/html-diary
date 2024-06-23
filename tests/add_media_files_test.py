@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 from add_media_files import add_media_files_dir_file, collect_fotos, get_entry_date
-from my_html_handler import read_base_href
+from open_diary_entry import read_base_href
 from tests.vars import test_diary_dir
 
 

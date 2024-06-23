@@ -7,20 +7,19 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 from add_media_files import add_media_files_dir_file
-from vars import DIARY_DIR
+from vars import DIARY_DIR, LENGTH
 
 logging.basicConfig(level=logging.INFO,
                     format='[%(levelname)s: %(asctime)s] %(message)s',
                     datefmt=' %d.%m.%Y  %H:%M:%S',
                     filename=DIARY_DIR/'.logs/handler.log.txt',
                     filemode='a')
-length = 20
-logging.info('%s %s %s', bar := '-' * length, datetime.datetime.today(), bar)
+logging.info('%s %s %s', hline := '-' * LENGTH, datetime.datetime.today(), hline)
 
 
 def helper(html_file: Path, media_dir: Path) -> str:
     """Add media files in `dir_path` to diary entry."""
-    logging.info("helper()\n\thtml_file = %s\n\tmedia_dir = %s", html_file, media_dir)
+    logging.info("helper(html_file = %s, media_dir = %s)", html_file, media_dir)
     tags = add_media_files_dir_file(html_file, media_dir)
     logging.info('Media files added')
     html_content = Path(html_file).read_text(encoding='utf-8')
@@ -35,7 +34,7 @@ def helper(html_file: Path, media_dir: Path) -> str:
 
 def read_base_href(html_file: Path) -> Path | None:
     """Retrieve the value of `head.base.href` from a HTML entry."""
-    logging.info('read_base_href()\n\thtml_file = %s', html_file)
+    logging.info('read_base_href(html_file = %s)', html_file)
     if '.tagebuch' in html_file.parts:
         html_content = Path(html_file).read_text(encoding='utf-8')
         soup = BeautifulSoup(html_content, 'html.parser')

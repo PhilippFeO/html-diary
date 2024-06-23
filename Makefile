@@ -22,7 +22,7 @@ past:
 
 # [p]hoto [d]ir
 pd:
-	python3 my_html_handler.py /home/philipp/.tagebuch/2020/09-September/13-09-2020-Sonntag-Bamberg/13-09-2020-Bamberg.html
+	python3 open_diary_entry.py /home/philipp/.tagebuch/2020/09-September/13-09-2020-Sonntag-Bamberg/13-09-2020-Bamberg.html
 
 
 # ─── Logs ──────────
