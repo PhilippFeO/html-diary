@@ -1,19 +1,19 @@
 import shutil
 
 import pytest
-from tests.vars import test_diary_dir, test_tmp_dir
 
 import vars
+from tests.vars import TEST_DIARY_DIR, TEST_TMP_DIR
 
 
 @pytest.fixture(autouse=True)
 def _mock_diary_dir(monkeypatch) -> None:
-    monkeypatch.setattr(vars, 'DIARY_DIR', test_diary_dir)
+    monkeypatch.setattr(vars, 'DIARY_DIR', TEST_DIARY_DIR)
 
 
 @pytest.fixture(autouse=True)
 def _mock_tmp_dir(monkeypatch) -> None:
-    monkeypatch.setattr(vars, 'TMP_DIR', test_tmp_dir)
+    monkeypatch.setattr(vars, 'TMP_DIR', TEST_TMP_DIR)
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -26,11 +26,11 @@ def _setup_diary():
     """
     # shutil.copytree() returns destination directory but this is static variable anyway
     _ = shutil.copytree(vars.DIARY_DIR/'tests/test_tagebuch.original',
-                        test_diary_dir,
+                        TEST_DIARY_DIR,
                         ignore=lambda src, names: ('README.md',))  # noqa: ARG005
     yield
     # TODO: Analogue to look_into_the_past_test.py: Only if CLI arg was passed <27-05-2024>
     # Without sleeping, the generated HTML summary doesn't show media files because they were deleted too early
     # import time
     # time.sleep(1)
-    shutil.rmtree(test_diary_dir)
+    shutil.rmtree(TEST_DIARY_DIR)

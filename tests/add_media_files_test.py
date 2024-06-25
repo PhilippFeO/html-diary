@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 
 from add_media_files import collect_fotos, create_tags, get_date_entry
 from open_diary_entry import read_base_href
-from tests.vars import test_diary_dir
+from tests.vars import TEST_DIARY_DIR
 
 
 def test_create_tags():
@@ -10,8 +10,8 @@ def test_create_tags():
 
     The other outcomes of `add_media_files_dir_file()` are either obvious or tested in other tests, fi. `test_collect_fotos()`.
     """
-    diary_file = test_diary_dir/'2024/06-Juni/05-06-2024-Mittwoch-Test-add_media_files_day_dir/05-06-2024-Mittwoch-Test-add_media_files_day_dir.html'
-    not_existent_foto_dir = test_diary_dir/'lorem_ipsum/'
+    diary_file = TEST_DIARY_DIR/'2024/06-Juni/05-06-2024-Mittwoch-Test-add_media_files_day_dir/05-06-2024-Mittwoch-Test-add_media_files_day_dir.html'
+    not_existent_foto_dir = TEST_DIARY_DIR/'lorem_ipsum/'
 
     tags = create_tags(diary_file, not_existent_foto_dir)
 
@@ -29,7 +29,7 @@ def test_collect_fotos():
 
     For a visual test, s `tests/look_into_the_past_test.py::test_litp_base_href()`.
     """
-    entry_path = test_diary_dir / '2024/06-Juni/22-06-2024-Mittwoch-amf_collect_photos_specific_date/22-06-2024-Mittwoch-amf_collect_photos_specific_date.html'
+    entry_path = TEST_DIARY_DIR / '2024/06-Juni/22-06-2024-Mittwoch-amf_collect_photos_specific_date/22-06-2024-Mittwoch-amf_collect_photos_specific_date.html'
     soup = BeautifulSoup(entry_path.read_text(encoding='utf-8'),
                          'html.parser')
 
@@ -55,7 +55,7 @@ def test_collect_fotos():
 def test_get_entry_date_double_digit():
     date_expected = '2024:06:22'
 
-    entry_path = test_diary_dir / '2024/06-Juni/22-06-2024-Mittwoch-amf_collect_photos_specific_date/22-06-2024-Mittwoch-amf_collect_photos_specific_date.html'
+    entry_path = TEST_DIARY_DIR / '2024/06-Juni/22-06-2024-Mittwoch-amf_collect_photos_specific_date/22-06-2024-Mittwoch-amf_collect_photos_specific_date.html'
     html = BeautifulSoup(entry_path.read_text(encoding='utf-8'), 'html.parser')
 
     date = get_date_entry(html)
@@ -66,7 +66,7 @@ def test_get_entry_date_double_digit():
 def test_get_entry_date_single_digit():
     date_expected = '2024:06:04'
 
-    entry_path = test_diary_dir / '2024/06-Juni/04-06-2024-Mittwoch-base.href-litp/04-06-2024-Mittwoch-base.href-litp.html'
+    entry_path = TEST_DIARY_DIR / '2024/06-Juni/04-06-2024-Mittwoch-base.href-litp/04-06-2024-Mittwoch-base.href-litp.html'
     html = BeautifulSoup(entry_path.read_text(encoding='utf-8'), 'html.parser')
 
     date = get_date_entry(html)

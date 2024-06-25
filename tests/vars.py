@@ -1,16 +1,13 @@
-from pathlib import Path
+
+from typing import TYPE_CHECKING
 
 import vars
 
-test_dir = vars.DIARY_DIR / 'tests'
-test_diary_dir: Path = test_dir / 'test_tagebuch'
-test_tmp_dir: Path = test_diary_dir / '.tmp'
-test_transfered_dir: Path = test_tmp_dir / 'transfered'
-TEST_BILDER_DIR: Path = test_dir / 'Bilder'
+if TYPE_CHECKING:
+    from pathlib import Path
 
-foto_1_name: Path = Path('transfer_files_foto_1.jpg')
-foto_2_name: Path = Path('transfer_files_foto_2.jpg')
-tf_foto_no_day_dir: Path = Path('transfer_files_no_day_dir.jpg')
-tf_foto_two_day_dir: Path = Path('transfer_files_two_day_dir.jpg')
-
-video_1_name: Path = Path('transfer_files_video_1.mp4')
+TEST_DIR = vars.DIARY_DIR / 'tests'
+TEST_DIARY_DIR: 'Path' = TEST_DIR / 'test_tagebuch'
+TEST_TMP_DIR: 'Path' = TEST_DIARY_DIR / '.tmp'
+TEST_TRANSFERED_DIR: 'Path' = TEST_TMP_DIR / 'transfered'
+TEST_BILDER_DIR: 'Path' = TEST_DIR / 'Bilder'

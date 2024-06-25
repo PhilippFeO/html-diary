@@ -3,7 +3,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 from folder_to_diary import collect_dates, folder_to_diary
-from tests.vars import TEST_BILDER_DIR, test_diary_dir
+from tests.vars import TEST_BILDER_DIR, TEST_DIARY_DIR
 
 
 def test_collect_dates_paths():
@@ -28,7 +28,7 @@ def test_ftd_add_base_href():
 
     folder_to_diary(expected_path)
 
-    location_entry = test_diary_dir / '2024/05-Mai/30-05-2024-Donnerstag-ftp-add-base-ref/30-05-2024-Donnerstag-ftp-add-base-ref.html'
+    location_entry = TEST_DIARY_DIR / '2024/05-Mai/30-05-2024-Donnerstag-ftp-add-base-ref/30-05-2024-Donnerstag-ftp-add-base-ref.html'
 
     entry = BeautifulSoup(location_entry.read_text(), 'html.parser')
 
@@ -47,7 +47,7 @@ def test_ftd_href_present(caplog):
     folder_to_diary(dir_path)
 
     href_value = 'file:///home/philipp/.tagebuch/tests/Bilder/ftd-href_present 2024-05/'
-    entry_file = test_diary_dir / '2024/05-Mai/31-05-2024-Mittwoch-ftd-href-present/31-05-2024-Mittwoch-ftd-href-present.html'
+    entry_file = TEST_DIARY_DIR / '2024/05-Mai/31-05-2024-Mittwoch-ftd-href-present/31-05-2024-Mittwoch-ftd-href-present.html'
     href = f'file://{dir_path}'
 
     msg_expected = f"base.href is '{href_value}' in '{entry_file}'. Can't add '{href}'."
@@ -63,8 +63,8 @@ def test_ftd_create_new_entry():
 
     folder_to_diary(foto_dir)
 
-    day_2024_06_01 = test_diary_dir / '2024/06-Juni/01-06-2024-Samstag/01-06-2024-Samstag.html'
-    day_2024_06_02 = test_diary_dir / '2024/06-Juni/02-06-2024-Sonntag/02-06-2024-Sonntag.html'
+    day_2024_06_01 = TEST_DIARY_DIR / '2024/06-Juni/01-06-2024-Samstag/01-06-2024-Samstag.html'
+    day_2024_06_02 = TEST_DIARY_DIR / '2024/06-Juni/02-06-2024-Sonntag/02-06-2024-Sonntag.html'
     assert Path.is_file(day_2024_06_01)
     assert Path.is_file(day_2024_06_02)
 
