@@ -2,7 +2,7 @@
 git_root_dir := $(shell git rev-parse --show-toplevel) 
 test_diary_dir := './tests/test_tagebuch'
 
-.Phony: all test clean cleantest look media le lt ll past pd
+.Phony: all test clean cleantest look le lt ll past ode tf
 
 all:
 	bash tagebuch.sh
@@ -14,14 +14,15 @@ clean:
 look:
 	python3 look_into_the_past.py
 
-media:
+# [t]ransfer [f]iles
+tf:
 	python3 transfer_files.py
 
 past:
 	./entry_for_past_day.sh
 
-# [p]hoto [d]ir
-pd:
+# [o]pen [d]iary [e]ntry
+ode:
 	python3 open_diary_entry.py /home/philipp/.tagebuch/2020/09-September/13-09-2020-Sonntag-Bamberg/13-09-2020-Bamberg.html
 
 
