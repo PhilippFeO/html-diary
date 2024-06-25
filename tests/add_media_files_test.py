@@ -1,12 +1,12 @@
 from bs4 import BeautifulSoup
 
-from add_media_files import create_tags, collect_fotos, get_date_entry
+from add_media_files import collect_fotos, create_tags, get_date_entry
 from open_diary_entry import read_base_href
 from tests.vars import test_diary_dir
 
 
-def test_add_media_files_dir_file():
-    """Test `add_media_files_dir_file()` when the provided `foto_dir` doesn't exists.
+def test_create_tags():
+    """Test `create_tags()` when the provided `foto_dir` doesn't exists.
 
     The other outcomes of `add_media_files_dir_file()` are either obvious or tested in other tests, fi. `test_collect_fotos()`.
     """

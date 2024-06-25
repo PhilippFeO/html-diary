@@ -1,5 +1,3 @@
-import datetime
-
 # Necessary because returned values are in English
 # Can't stay in main because also needed during testing
 import locale
