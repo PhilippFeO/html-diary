@@ -2,14 +2,10 @@
 git_root_dir := $(shell git rev-parse --show-toplevel) 
 test_diary_dir := './tests/test_tagebuch'
 
-.Phony: all test clean cleantest look le lt ll past ode tf
+.Phony: all test cleantest look le lt ll ode pe tf
 
 all:
 	bash tagebuch.sh
-
-clean:
-	@# test -d ./2024/05-Mai/24-05-2024-Freitag* && rm -r ./2024/05-Mai/24-05-2024-Freitag* || return 0
-	echo "Empty."
 
 look:
 	python3 look_into_the_past.py
@@ -18,7 +14,8 @@ look:
 tf:
 	python3 transfer_files.py
 
-past:
+# [p]ast [e]ntry
+pe:
 	./entry_for_past_day.sh
 
 # [o]pen [d]iary [e]ntry
@@ -56,5 +53,3 @@ test: cleantest
 # Verbose tests, ie. with normal output
 vtest:
 	@cd $(git_root_dir) && python3 -m pytest -rA -s tests/
-
-
