@@ -109,6 +109,6 @@ def folder_to_diary(foto_dir: Path,
 
 if __name__ == "__main__":
     CWD = Path.cwd()
-    assert 'Bilder' in CWD.parents, 'Not in ~/Bilder.'
+    assert 'Bilder' in CWD.parts, f'Not in ~/Bilder, {CWD = }'
     location = input('Ort: ')
     folder_to_diary(CWD, location)
