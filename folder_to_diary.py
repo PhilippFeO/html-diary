@@ -49,6 +49,8 @@ def folder_to_diary(foto_dir: Path,
     """
     dates: set[str] = collect_dates(foto_dir)
     assert len(dates) > 0, f'No dates collected. "dates" is empty: {dates}.'
+    newline = '\n'
+    print(f"Collected Dates:\n{newline.join(dates)}")  # noqa: T201
     for date in dates:
         # Check if there is a dir matching the date
         year, month, day = date.split(':')
