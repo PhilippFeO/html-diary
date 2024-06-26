@@ -13,7 +13,7 @@ def helper(html_file: Path, media_dir: Path) -> str:
     """Add media files in `media_dir` to diary entry."""
     logging.info("Args: html_file = %s, media_dir = %s", html_file, media_dir)
     tags: list[Tag] = create_tags(html_file, media_dir)
-    logging.info('Media files added')
+    logging.info("Insert created tags after '<pre>'")
     html_content = Path(html_file).read_text(encoding='utf-8')
     soup = BeautifulSoup(html_content, 'html.parser')
     if (pre_tag := soup.find('pre')):

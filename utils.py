@@ -52,6 +52,7 @@ def get_date_created(file: Path) -> str | None:
             if exif_output := read_metadata(cmd, file):
                 # Retrieve date from following line:
                 # Create Date                     : 2023:05:12 13:58:16
+                # ' : ' on purpose, to split at the very first ':'
                 return exif_output.split(' : ')[-1].split()[0]
             logging.error("Probably, Video '%s' has no 'CreateDate' in it's EXIF data.", file)
             return None
@@ -61,11 +62,13 @@ def get_date_created(file: Path) -> str | None:
             if exif_output := read_metadata(cmd, file):
                 # Retrieve date from following line:
                 # Create Date                     : 2023:05:12 13:58:16
+                # ' : ' on purpose, to split at the very first ':'
                 return exif_output.split(' : ')[-1].split()[0]
-            logging.error("Probably, Foto '%s' has no Tag '9003' in it's EXIF data.", file)
+            logging.info("Foto '%s' has no '-CreateDate' in it's EXIF data.", file)
             # PANO*.jpg
             cmd = '/usr/bin/exiftool -GPSDateStamp'
             if (exif_output := read_metadata(cmd, file)):
+                # ' : ' on purpose, to split at the very first ':'
                 return exif_output.rstrip().split(' : ')[-1]
             logging.error("\t%s\nfailed. Probably, Foto '%s' has no 'GPSDateStamp' in it's exif data.", cmd, file)
             return None
