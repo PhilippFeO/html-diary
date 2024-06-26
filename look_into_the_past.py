@@ -96,7 +96,6 @@ if __name__ == "__main__":
                         filemode='a')
     logging.info('%s %s %s', vars.HLINE, 'look_into_the_past.py', vars.HLINE)
     date = datetime.datetime.today().strftime('%d.%m.%Y')
-    date = '12.06.2024'
     past_entries, html = look_into_the_past(date)
     if past_entries:
         html_file = Path('/tmp/look_into_the_past.html')
