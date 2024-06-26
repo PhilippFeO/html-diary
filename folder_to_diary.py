@@ -8,7 +8,7 @@ import logging
 from glob import glob
 from pathlib import Path
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 from utils import (
     assemble_new_entry,
@@ -39,7 +39,8 @@ def collect_dates(foto_dir: Path) -> set[str]:
     return dates
 
 
-def folder_to_diary(foto_dir: Path):
+def folder_to_diary(foto_dir: Path,
+                    location: str):
     """Add a `head.base.href` attribute to a diary entry for the submitted `foto_dir`.
 
     The `foto_dir` is searched for any media file. Then, the creation date is saved. For any date, the `foto_dir` is inserted in a diary entry via the `head.base.href` attribute or a new entry is created with a `head.base.href` attribute.
@@ -55,7 +56,8 @@ def folder_to_diary(foto_dir: Path):
         match len(matching_dirs):
             # No entry exists for the selected date => Create one
             case 0:
-                day_dir, html_entry = assemble_new_entry(day, month, year, href=f'file://{foto_dir}')
+                # TODO: In 'create_stump()' einfügen <26-06-2024>
+                day_dir, html_entry = assemble_new_entry(day, month, year, location, href=f'file://{foto_dir}')
                 create_dir_and_file(html_entry, day_dir, day, month, year)
             # Add base.href to an already existing entry
             # Enty may or may have not a base.href attribute
@@ -74,6 +76,10 @@ def folder_to_diary(foto_dir: Path):
                 if not entry.head.base:
                     base_tag = entry.new_tag('base', href=href)
                     entry.head.append(base_tag)
+                    pre = entry.find('pre')
+                    assert isinstance(pre, Tag), f'<pre> is not of Type "Tag". File: {entry_file}'
+                    assert isinstance(pre.string, str), f'<pre> is empty. File {entry_file}'
+                    pre.string = pre.string + f'\n\nOrt: {location}'
                     Path(entry_file).write_text(entry.prettify())
                 # base.href already exists
                 else:
@@ -82,7 +88,17 @@ def folder_to_diary(foto_dir: Path):
                     if href_value != href:
                         msg = f"base.href is '{href_value}' in '{entry_file}'. Can't add '{href}'."
                         logging.warning(msg)
-                    # if both are equal, there is nothing to do
+                    pre = entry.find('pre')
+                    if isinstance(pre, Tag) and isinstance(pre.string, str):
+                        description = pre.string
+                        if 'Ort: ' in description:
+                            logging.warning("'%s' already contains 'Ort: '", entry_file)
+                        else:
+                            pre.string = description + f'\n\nOrt: {location}'
+                    else:
+                        msg = f"Either <pre> is not of Type 'Tag' or 'pre.string' is None. File: {entry_file}"
+                        raise Exception(msg)
+                # if both are equal, there is nothing to do
             # >= 2 matching directories for a day
             case _:
                 logging.warning(
@@ -92,4 +108,5 @@ def folder_to_diary(foto_dir: Path):
 if __name__ == "__main__":
     CWD = Path.cwd()
     assert 'Bilder' in CWD.parents, 'Not in ~/Bilder.'
-    folder_to_diary(CWD)
+    location = input('Ort: ')
+    folder_to_diary(CWD, location)

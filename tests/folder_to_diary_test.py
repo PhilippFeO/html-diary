@@ -26,7 +26,7 @@ def test_ftd_add_base_href():
     """
     expected_path = TEST_BILDER_DIR / 'ftd-add_base_ref 2024-05'
 
-    folder_to_diary(expected_path)
+    folder_to_diary(expected_path, 'Erde')
 
     location_entry = TEST_DIARY_DIR / '2024/05-Mai/30-05-2024-Donnerstag-ftp-add-base-ref/30-05-2024-Donnerstag-ftp-add-base-ref.html'
 
@@ -35,6 +35,10 @@ def test_ftd_add_base_href():
     assert entry.head
     assert entry.head.base
     assert entry.head.base.get('href') == f'file://{expected_path}'
+    assert entry.body
+    assert entry.body.pre
+    assert entry.body.pre.string
+    assert 'Ort: Erde' in entry.body.pre.string
 
 
 def test_ftd_href_present(caplog):
@@ -44,7 +48,7 @@ def test_ftd_href_present(caplog):
     """
     dir_path = Path(TEST_BILDER_DIR / 'ftd-href_present 2024-05')
 
-    folder_to_diary(dir_path)
+    folder_to_diary(dir_path, 'Erde')
 
     href_value = 'file:///home/philipp/.tagebuch/tests/Bilder/ftd-href_present 2024-05/'
     entry_file = TEST_DIARY_DIR / '2024/05-Mai/31-05-2024-Mittwoch-ftd-href-present/31-05-2024-Mittwoch-ftd-href-present.html'
@@ -61,7 +65,7 @@ def test_ftd_create_new_entry():
     """
     foto_dir = Path(TEST_BILDER_DIR / 'ftd-create_new_entry 2024-05')
 
-    folder_to_diary(foto_dir)
+    folder_to_diary(foto_dir, 'Erde')
 
     day_2024_06_01 = TEST_DIARY_DIR / '2024/06-Juni/01-06-2024-Samstag/01-06-2024-Samstag.html'
     day_2024_06_02 = TEST_DIARY_DIR / '2024/06-Juni/02-06-2024-Sonntag/02-06-2024-Sonntag.html'
@@ -69,6 +73,9 @@ def test_ftd_create_new_entry():
     assert Path.is_file(day_2024_06_02)
 
     entry_2024_06_01 = BeautifulSoup(day_2024_06_01.read_text(), 'html.parser')
+    assert entry_2024_06_01.body
+    assert entry_2024_06_01.body.pre
+    assert entry_2024_06_01.body.pre.string == 'Ort: Erde'
     assert entry_2024_06_01.head
     assert entry_2024_06_01.head.base
     assert entry_2024_06_01.head.base.get('href') == f'file://{foto_dir}'
@@ -76,3 +83,6 @@ def test_ftd_create_new_entry():
     assert entry_2024_06_02.head
     assert entry_2024_06_02.head.base
     assert entry_2024_06_02.head.base.get('href') == f'file://{foto_dir}'
+    assert entry_2024_06_02.body
+    assert entry_2024_06_02.body.pre
+    assert entry_2024_06_02.body.pre.string == 'Ort: Erde'

@@ -4,13 +4,13 @@ import logging
 import subprocess
 from pathlib import Path
 
-from bs4 import BeautifulSoup
-
-import vars
 from add_media_files import create_tags
+from bs4 import BeautifulSoup, Tag
 from extract_html_body import extract_html_body, past_heading
 from open_diary_entry import read_base_href
 from utils import create_stump
+
+import vars
 
 # Use different Log file when executed as test
 logging.basicConfig(level=logging.INFO,
@@ -52,8 +52,12 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
     title = f'Heute, {date}, am...'
     # Contents of past days will be inserted after h1
     # TODO: Check if body or h1 is better for appending <22-05-2024>
-    html_skeleton = create_stump(title)
+    html_skeleton = create_stump(title, '')
     overview = BeautifulSoup(html_skeleton, 'html.parser')
+    if isinstance(pre := overview.find('pre'), Tag):
+        pre.decompose()
+    else:
+        logging.error("'<pre>' in 'html_skeleton' is not of Type 'Tag'. Date: {date}.")
 
     # In case there are no past entries for a date, the returned is basically empty. Further processing is not necessary, then.
     past_entries = False

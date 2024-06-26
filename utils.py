@@ -10,16 +10,20 @@ from bs4 import BeautifulSoup
 import vars
 
 
-def create_stump(title: str) -> str:
+def create_stump(title: str,
+                 location: str) -> str:
     return (
         "<!DOCTYPE html>"
         '<html>'
         '  <head>'
-        f'	<title>{title}</title>'
-        '	<link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">'
+        f'    <title>{title}</title>'
+        '    <link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">'
         '  </head>'
         '  <body>'
-        f'	<h1>{title}</h1>'
+        f'    <h1>{title}</h1>'
+        '    <pre>'
+        f"{f'Ort: {location}' if location != '' else ''}"
+        '</pre>'
         '  </body>'
         '</html>'
     )
@@ -98,6 +102,7 @@ def assemble_new_entry(
     day: str,
     month: str,
     year: str,
+    location: str = '',
     href: str | None = None,
 ) -> tuple["Path", BeautifulSoup]:
     """Create new empty entry. See method body for more information.
@@ -111,20 +116,12 @@ def assemble_new_entry(
     date_obj = datetime.strptime(f'{year}:{month}:{day}', '%Y:%m:%d').date()
     weekday = get_weekday(year, month, day)
     title = f"{weekday}, {date_obj.strftime('%d. %B %Y')}"
-    html_skeleton = create_stump(title)
+    html_skeleton = create_stump(title, location)
     entry = BeautifulSoup(html_skeleton, 'html.parser')
     assert entry.head, "No 'head' in the HTML skeleton."  # Should not happen
     if href:
         base_tag = entry.new_tag('base', href=href)
         entry.head.append(base_tag)
-    # For the sake of consistency, add an (empty) pre-tag
-    # consistency: Every entry has one and add_files(…) logic is based on the existence of this pre-tag
-    empty_pre_tag = entry.new_tag('pre')
-    if (h1_tag := entry.find('h1')):
-        h1_tag.insert_after(empty_pre_tag)
-        month_name = date_obj.strftime('%B')
-        # Create entry with empty pre-tag
-        day_dir: Path = vars.DIARY_DIR/year/f'{month}-{month_name}/{day}-{month}-{year}-{weekday}'
-        return day_dir, entry
-    logging.error(msg := 'Parsing HTML Skeleton in `make_new_entry` went wrong. No h1-Tag.')
-    raise Exception(msg)
+    month_name = date_obj.strftime('%B')
+    day_dir: Path = vars.DIARY_DIR/year/f'{month}-{month_name}/{day}-{month}-{year}-{weekday}'
+    return day_dir, entry

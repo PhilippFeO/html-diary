@@ -6,7 +6,6 @@ import os
 import shutil
 from pathlib import Path
 
-import vars
 from add_media_files import add_media_files
 from utils import (
     assemble_new_entry,
@@ -14,6 +13,8 @@ from utils import (
     create_dir_and_file,
     get_date_created,
 )
+
+import vars
 
 locale.setlocale(locale.LC_ALL, '')
 
