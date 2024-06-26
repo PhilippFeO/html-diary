@@ -73,16 +73,18 @@ def collect_fotos(media_dir: Path,
                 # Add <img src='...'/> tag for each foto
                 case '.jpg' | '.jpeg' | '.JPG' | '.JPEG' | '.png' | '.PNG':
                     # Create and add tag of 'file' if it's creation date is eqaul to the entry date
-                    if get_date_created(media_file) == date_entry:
+                    if (date_created := get_date_created(media_file)) == date_entry:
                         new_img = html.new_tag('img', src=vars.DIARY_DIR/media_file)
                         # LIFO data structure, ie '<br/>' is the first element
                         tags.append(new_img)
                         tags.append(html.new_tag('br'))
                         logging.info("Added Foto: '%s'", media_file)
+                    else:
+                        logging.warning("Date mismatch: %s (media_file) != %s (entry). Nothing done for '%s'", date_created, date_entry, media_file)
                 # Add <video controls loop><source src='...'/></video>
                 case '.mp4' | '.MP4':
                     # Create and add tag of 'file' if it's creation date is eqaul to the entry date
-                    if get_date_created(media_file) == date_entry:
+                    if (date_created := get_date_created(media_file)) == date_entry:
                         # Empty string == True
                         #   To be precise, any value equals True, for False, attribute has to be absent
                         # becomes <video controls loop>
@@ -94,6 +96,8 @@ def collect_fotos(media_dir: Path,
                         tags.append(new_video)
                         tags.append(html.new_tag('br'))
                         logging.info("Added Video: '%s'", media_file)
+                    else:
+                        logging.warning("Date mismatch: %s (media_file) != %s (entry). Nothing done for '%s'", date_created, date_entry, media_file)
                 # Skip html complete_file_path
                 case '.html':
                     logging.info("(Obviously) Skipping the HTML Entry: '%s'", media_file)
