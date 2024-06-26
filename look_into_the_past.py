@@ -4,21 +4,15 @@ import logging
 import subprocess
 from pathlib import Path
 
-from add_media_files import create_tags
 from bs4 import BeautifulSoup, Tag
+
+import vars
+from add_media_files import create_tags
 from extract_html_body import extract_html_body, past_heading
 from open_diary_entry import read_base_href
 from utils import create_stump
 
-import vars
-
 # Use different Log file when executed as test
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)s: %(asctime)s] %(message)s',
-                    datefmt=' %d.%m.%Y  %H:%M:%S',
-                    filename=vars.DIARY_DIR/'.logs/look_into_the_past.log.txt',
-                    filemode='a')
-logging.info(vars.LOG_STRING)
 
 
 def check(date: str) -> bool:
@@ -95,7 +89,14 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO,
+                        format=vars.LOG_FORMAT,
+                        datefmt=vars.LOG_DATEFMT,
+                        filename=vars.LOG_FILE,
+                        filemode='a')
+    logging.info('%s %s %s', vars.HLINE, 'look_into_the_past.py', vars.HLINE)
     date = datetime.datetime.today().strftime('%d.%m.%Y')
+    date = '12.06.2024'
     past_entries, html = look_into_the_past(date)
     if past_entries:
         html_file = Path('/tmp/look_into_the_past.html')

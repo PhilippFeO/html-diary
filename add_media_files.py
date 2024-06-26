@@ -30,7 +30,7 @@ def get_date_entry(html: BeautifulSoup) -> str | None:
 
     `<title>` has the following scheme: `[d]d. Monthname yyyy: …`
     """
-    logging.info("%s(html = <SKIP>)", __name__)
+    logging.info("Argument: html = <SKIP>")
     if html.head and html.head.title:
         # title = Weekday, [d]d. Monthname yyyy: Lorem Ipsum
         title = html.head.title.text
@@ -62,7 +62,7 @@ def collect_fotos(media_dir: Path,
     `html`: HTML contents of a diary entry.
     `tags`: List with already created `Tag`s (necessary for recursion).
     """
-    logging.info("%s(foto_dir = %s, html = <SKIP>, tags = <SKIP>)", __name__, media_dir)
+    logging.info("Args: media_dir = %s, html = <SKIP>, tags = <SKIP>", media_dir)
     date_entry = get_date_entry(html)
     for media_file in media_dir.iterdir():
         if Path.is_dir(media_file):
@@ -109,7 +109,7 @@ def create_tags(diary_file: Path,
     `diary_file`: Path to the diary html file to add media files to
     `media_dir`: Should be the value of a `base.href` attribute or the 'day directory'. In `add_media_files()` it's the 'day directory', in `look_into_the_past.py::look_into_the_past()` it's the value of `head.base.href`.
     """
-    logging.info('%s(diary_file = %s, media_dir = %s)', __name__, diary_file, media_dir)
+    logging.info('Args: diary_file = %s, media_dir = %s', diary_file, media_dir)
 
     html_content = diary_file.read_text(encoding='utf-8')
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -134,7 +134,7 @@ def add_media_files(directories: set[Path]) -> None:
 
     `directories` contains the directories into which media files were moved but not yet embedded into the HTML file laying in the same directory. This function iterates over all files in each directory, creates the according HTML tag and adds it to the diary entry. Most of the time, the directories in `directories` are the directories of a day.
     """
-    logging.info('%s(%s)', __name__, directories)
+    logging.info('Args: %s', directories)
     for day_dir in directories:
         # Load HTML file
         if len(html_files := glob.glob(os.path.join(day_dir, '*.html'))) == 1:

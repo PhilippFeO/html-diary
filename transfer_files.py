@@ -6,6 +6,7 @@ import os
 import shutil
 from pathlib import Path
 
+import vars
 from add_media_files import add_media_files
 from utils import (
     assemble_new_entry,
@@ -14,20 +15,7 @@ from utils import (
     get_date_created,
 )
 
-import vars
-
 locale.setlocale(locale.LC_ALL, '')
-
-# TODO: in ifmain <26-05-2024>
-# Define the path to the directory containing the files
-
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)s: %(asctime)s] %(message)s',
-                    # Mit Datum: %d.%m.%Y
-                    datefmt=' %Y.%m.%d  %H:%M:%S',
-                    filename=vars.DIARY_DIR/'.logs/transfer_files_add_media_files.log.txt',
-                    filemode='a')
-logging.info(vars.LOG_STRING)
 
 
 def copy_helper(media_file: Path,
@@ -86,5 +74,11 @@ def transfer_files() -> set[Path]:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO,
+                        format=vars.LOG_FORMAT,
+                        datefmt=vars.LOG_DATEFMT,
+                        filename=vars.LOG_FILE,
+                        filemode='a')
+    logging.info('%s %s %s', vars.HLINE, 'transfer_files.py', vars.HLINE)
     directories: set[Path] = transfer_files()
     add_media_files(directories)

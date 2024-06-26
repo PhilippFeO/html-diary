@@ -8,17 +8,10 @@ from bs4 import BeautifulSoup, Tag
 import vars
 from add_media_files import create_tags
 
-logging.basicConfig(level=logging.INFO,
-                    format='[%(levelname)s: %(asctime)s] %(message)s',
-                    datefmt=' %d.%m.%Y  %H:%M:%S',
-                    filename=vars.DIARY_DIR/'.logs/open_diary_entry.log.txt',
-                    filemode='a')
-logging.info(vars.LOG_STRING)
-
 
 def helper(html_file: Path, media_dir: Path) -> str:
     """Add media files in `media_dir` to diary entry."""
-    logging.info("helper(html_file = %s, media_dir = %s)", html_file, media_dir)
+    logging.info("Args: html_file = %s, media_dir = %s", html_file, media_dir)
     tags: list[Tag] = create_tags(html_file, media_dir)
     logging.info('Media files added')
     html_content = Path(html_file).read_text(encoding='utf-8')
@@ -33,7 +26,7 @@ def helper(html_file: Path, media_dir: Path) -> str:
 
 def read_base_href(html_file: Path) -> Path | None:
     """Retrieve the value of `head.base.href` from a HTML entry."""
-    logging.info('read_base_href(html_file = %s)', html_file)
+    logging.info('Arg: html_file = %s', html_file)
     if '.tagebuch' in html_file.parts:
         html_content = Path(html_file).read_text(encoding='utf-8')
         soup = BeautifulSoup(html_content, 'html.parser')
@@ -47,11 +40,17 @@ def read_base_href(html_file: Path) -> Path | None:
                 return dir_path
             logging.warning("'href' is not of type 'str' but 'list[str] | None'.")
         else:
-            logging.info("Either no 'head', 'head.base' or 'href' attribute within 'head.base'.")
+            logging.info("Either no 'head', 'head.base' or 'href' attribute within 'head.base'. Maybe media files reside next to to %s", html_file)
     return None
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO,
+                        format=vars.LOG_FORMAT,
+                        datefmt=vars.LOG_DATEFMT,
+                        filename=vars.LOG_FILE,
+                        filemode='a')
+    logging.info('%s %s %s', vars.HLINE, 'open_diary_entry.py', vars.HLINE)
     import sys
     import urllib.parse
     html_file = urllib.parse.unquote(sys.argv[1])
