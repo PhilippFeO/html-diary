@@ -53,7 +53,7 @@ def transfer_files() -> set[Path]:
                 # TODO: Add Test for this case <26-05-2024>
                 case 0:
                     day_dir, html_entry = assemble_new_entry(day, month, year)
-                    create_dir_and_file(html_entry, day_dir, day, month, year)
+                    create_dir_and_file(html_entry, day_dir)
                     copy_helper(media_file,
                                 day_dir,
                                 vars.DIARY_DIR)

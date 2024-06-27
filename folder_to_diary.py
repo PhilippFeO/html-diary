@@ -40,7 +40,7 @@ def collect_dates(foto_dir: Path) -> set[str]:
 
 
 def folder_to_diary(foto_dir: Path,
-                    location: str):
+                    location: str = ''):
     """Add a `head.base.href` attribute to a diary entry for the submitted `foto_dir`.
 
     The `foto_dir` is searched for any media file. Then, the creation date is saved. For any date, the `foto_dir` is inserted in a diary entry via the `head.base.href` attribute or a new entry is created with a `head.base.href` attribute.
@@ -58,9 +58,8 @@ def folder_to_diary(foto_dir: Path,
         match len(matching_dirs):
             # No entry exists for the selected date => Create one
             case 0:
-                # TODO: In 'create_stump()' einfügen <26-06-2024>
                 day_dir, html_entry = assemble_new_entry(day, month, year, location, href=f'file://{foto_dir}')
-                create_dir_and_file(html_entry, day_dir, day, month, year)
+                create_dir_and_file(html_entry, day_dir)
             # Add base.href to an already existing entry
             # Enty may or may have not a base.href attribute
             case 1:

@@ -5,6 +5,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
+
 from tests.vars import (
     TEST_DIARY_DIR,
     TEST_DIR,

@@ -67,8 +67,8 @@ def test_ftd_create_new_entry():
 
     folder_to_diary(foto_dir, 'Erde')
 
-    day_2024_06_01 = TEST_DIARY_DIR / '2024/06-Juni/01-06-2024-Samstag/01-06-2024-Samstag.html'
-    day_2024_06_02 = TEST_DIARY_DIR / '2024/06-Juni/02-06-2024-Sonntag/02-06-2024-Sonntag.html'
+    day_2024_06_01 = TEST_DIARY_DIR / '2024/06-Juni/01-06-2024-Samstag-Erde/01-06-2024-Samstag-Erde.html'
+    day_2024_06_02 = TEST_DIARY_DIR / '2024/06-Juni/02-06-2024-Sonntag-Erde/02-06-2024-Sonntag-Erde.html'
     assert Path.is_file(day_2024_06_01)
     assert Path.is_file(day_2024_06_02)
 

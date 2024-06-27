@@ -46,8 +46,7 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
     title = f'Heute, {date}, am...'
     # Contents of past days will be inserted after h1
     # TODO: Check if body or h1 is better for appending <22-05-2024>
-    html_skeleton = create_stump(title, '')
-    overview = BeautifulSoup(html_skeleton, 'html.parser')
+    overview = create_stump(title, '')
     if isinstance(pre := overview.find('pre'), Tag):
         pre.decompose()
     else:

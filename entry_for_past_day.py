@@ -33,13 +33,12 @@ def entry_for_past_day(date: str):
             day_dir = Path(day_dir_pattern.replace('*', activity))
             Path.mkdir(day_dir, parents=True)
             logging.info("Directory for '%s' created: %s", {date}, {day_dir})
-            html_skeleton = create_stump(title, '')
-            entry_soup = BeautifulSoup(html_skeleton, 'html.parser')
-            pre_tag = entry_soup.new_tag('pre')
+            entry = create_stump(title, '')
+            pre_tag = entry.new_tag('pre')
             description = input(f'Enter description for {date}:\n')
             pre_tag.string = description
             html_entry = Path(f'{day_dir}/{day}-{month}-{year}-{weekday}-{activity}.html')
-            html_entry.write_text(entry_soup.prettify(), encoding='utf-8')
+            html_entry.write_text(entry.prettify(), encoding='utf-8')
             logging.info('New Entry created: %s', {html_entry})
         # day-dir already exists and hence an entry file
         # transfer_files() can create no-description entries which contain media files only
@@ -53,8 +52,8 @@ def entry_for_past_day(date: str):
             if not html:
                 msg = f"{html_file} could not be red."
                 raise Exception(msg)
-            entry_soup = BeautifulSoup(html, 'html.parser')
-            pre = entry_soup.find_all('pre')
+            entry = BeautifulSoup(html, 'html.parser')
+            pre = entry.find_all('pre')
             assert len(pre) == 1, f'Number of pre-tags: {len(pre)}. There should be exactly 1 in "{html_file}".'
             pre_tag = pre[0]
             if pre_tag.string:
@@ -63,7 +62,7 @@ def entry_for_past_day(date: str):
             # Query user for input
             description = input(f'Enter description for {date}:\n')
             pre_tag.string = description
-            html_file.write_text(entry_soup.prettify())
+            html_file.write_text(entry.prettify())
             logging.info("Description for Date '%s' added to File '%s'", date, html_file)
         # To many day_dirs
         case _:
