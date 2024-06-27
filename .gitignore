@@ -5,6 +5,7 @@
 todo.md
 .logs/
 *.tar.gz
+*.vim
 
 höhepunkte.txt
 .last_look_into_the_past.txt
