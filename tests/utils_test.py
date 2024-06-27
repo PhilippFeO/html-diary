@@ -1,3 +1,5 @@
+import pytest
+
 from tests.vars import (
     TEST_BILDER_DIR,
     TEST_DIARY_DIR,
@@ -15,18 +17,18 @@ def test_create_dir_and_file():
     assert (day_dir/f'{day_dir.name}.html').is_file()
 
 
-def test_assemble_new_entry():
+@pytest.mark.parametrize("location", ['Erde', ''])
+def test_assemble_new_entry(location):
     day = '27'
     month = '06'
     year = '2024'
-    location = 'Erde'
     href = str(TEST_BILDER_DIR / 'u-assemble_new_entry')
 
     day_dir, html = assemble_new_entry(day, month, year, location, href)
 
-    assert day_dir == TEST_DIARY_DIR/'2024/06-Juni/27-06-2024-Donnerstag-Erde'
+    assert day_dir == TEST_DIARY_DIR/f"2024/06-Juni/27-06-2024-Donnerstag{f'-{location}' if location != '' else ''}"
     assert html.head
     assert html.head.title
-    assert html.head.title.string == f'Donnerstag, {day}. Juni {year}: {location}'
+    assert html.head.title.string == f"Donnerstag, {day}. Juni {year}{f': {location}' if location != '' else ''}"
     assert html.head.base
     assert html.head.base.get('href') == href
