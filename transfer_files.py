@@ -6,7 +6,6 @@ import os
 import shutil
 from pathlib import Path
 
-import vars
 from add_media_files import add_media_files
 from utils import (
     assemble_new_entry,
@@ -14,6 +13,8 @@ from utils import (
     create_dir_and_file,
     get_date_created,
 )
+
+import vars
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -39,20 +40,16 @@ def transfer_files() -> set[Path]:
     for f in os.listdir(vars.TMP_DIR):
         media_file = vars.TMP_DIR/f
         if Path.is_file(media_file):
-            date_created = get_date_created(media_file)
-            # split 'yyyy:mm:dd'
-            if date_created:
-                year, month, day = date_created.split(":", 2)
-            else:
+            if not (date_created := get_date_created(media_file)):
                 continue
-            matching_dirs = count_directories(day, month, year)
+            matching_dirs = count_directories(date_created)
 
             # Move/Copy the media files to their corresponding diary entry.
             # Ie the entry fitting their created date.
             match len(matching_dirs):
                 # TODO: Add Test for this case <26-05-2024>
                 case 0:
-                    day_dir, html_entry = assemble_new_entry(day, month, year)
+                    day_dir, html_entry = assemble_new_entry(date_created)
                     create_dir_and_file(html_entry, day_dir)
                     copy_helper(media_file,
                                 day_dir,
@@ -68,7 +65,7 @@ def transfer_files() -> set[Path]:
                     directories.add(day_dir)
                     logging.info("Added '%s' to `directories`.", day_dir)
                 case _:
-                    msg = f"Found {len(matching_dirs)} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}"
+                    msg = f"Found {len(matching_dirs)} matching Directories obeying '{date_created.year}/{date_created.month}-*/{date_created.day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}"
                     logging.warning(msg)
     return directories
 

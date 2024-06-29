@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-
+from date import Date
 from folder_to_diary import collect_dates, folder_to_diary
 from tests.vars import TEST_BILDER_DIR, TEST_DIARY_DIR
 
@@ -11,7 +11,7 @@ def test_collect_dates_paths():
 
     `collect_dates_paths()` is aware that fotos with the same creation date may appear in different subfolders (s. prepared `Bilder/` directory), ie. for date `2024:05:31` is one path collected - the main one.
     """
-    dates_expected = {'2024:05:29', '2024:05:30', '2024:05:31', '2024:06:01',  '2024:06:02'}
+    dates_expected = {Date('2024:05:29'), Date('2024:05:30'), Date('2024:05:31'), Date('2024:06:01'),  Date('2024:06:02')}
 
     directory = Path(TEST_BILDER_DIR / 'ftp-collect_dates_paths 2024-05')
     dates_result = collect_dates(directory)

@@ -4,18 +4,19 @@ import logging
 import subprocess
 from pathlib import Path
 
-from bs4 import BeautifulSoup, Tag
-
-import vars
 from add_media_files import create_tags
+from bs4 import BeautifulSoup, Tag
+from date import Date
 from extract_html_body import extract_html_body, past_heading
 from open_diary_entry import read_base_href
 from utils import create_stump
 
+import vars
+
 # Use different Log file when executed as test
 
 
-def check(date: str) -> bool:
+def check(date: Date) -> bool:
     """If date of today is equal to the last date for which a summery was generated return `False`, ie. don't create a new summery. (The summery was alread red).
 
     If they differ, ie. no summery for today has been created, create one.
@@ -23,14 +24,15 @@ def check(date: str) -> bool:
     # TODO: This function is currently not tested <23-06-2024>
     create_summery = True
     last_date_file = vars.DIARY_DIR/'.last_look_into_the_past.txt'
-    last_date = last_date_file.read_text(encoding='utf-8')
+    last_date = Date(last_date_file.read_text(encoding='utf-8'),
+                     sep='.')
     create_summery = last_date != date
     if create_summery:
         last_date_file.write_text(date, encoding='utf-8')
     return create_summery
 
 
-def look_into_the_past(date: str) -> tuple[bool, str]:
+def look_into_the_past(date: Date) -> tuple[bool, str]:
     """Collect past entries of the current date.
 
     - `date`: `str` in the format `dd.mm.yyyy`. No consistency checks are performed.
@@ -40,8 +42,6 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
     if not create_summery:
         logging.info('The summery was already created and red.')
         return False, ''
-
-    day, month, this_year = date.split(".", 2)
 
     title = f'Heute, {date}, am...'
     # Contents of past days will be inserted after h1
@@ -56,8 +56,8 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
     past_entries = False
 
     # for past_year in range(1996, int(this_year) + 1):
-    for past_year in range(int(this_year), 1995, -1):
-        matching_files = glob.glob(f"{vars.DIARY_DIR}/{past_year}/{month}-*/{day}-*/*.html")
+    for past_year in range(int(date.year), 1995, -1):
+        matching_files = glob.glob(f"{vars.DIARY_DIR}/{past_year}/{date.month}-*/{date.day}-*/*.html")
         match (nmb_entries := len(matching_files)):
             case 0:
                 continue
@@ -71,12 +71,13 @@ def look_into_the_past(date: str) -> tuple[bool, str]:
                 # Read it and add the media files within this dir to the overview
                 if (dir_path := read_base_href(html_entry)):
                     tags = create_tags(html_entry, dir_path)
-                    past_entry = past_heading(f'{day}.{month}.{past_year}')
+                    past_date = Date(f'{date.day}.{date.month}.{date.year}', sep='.')
+                    past_entry = past_heading(past_date)
                     if (h2 := past_entry.h2):
                         h2.insert_after(*tags)
                 # No 'base.href' => Extract whole body, because it already contains the correct <img> and <video> tags
                 else:
-                    past_entry = extract_html_body(html_entry, f'{day}.{month}.{past_year}')
+                    past_entry = extract_html_body(html_entry, Date(f'{date.day}.{date.month}.{past_year}', sep='.'))
                 # Merge past day into overview
                 if h1:
                     h1.append(past_entry)
@@ -94,7 +95,7 @@ if __name__ == "__main__":
                         filename=vars.LOG_FILE,
                         filemode='a')
     logging.info('%s %s %s', vars.HLINE, 'look_into_the_past.py', vars.HLINE)
-    date = datetime.datetime.today().strftime('%d.%m.%Y')
+    date = Date(datetime.datetime.today().strftime('%d.%m.%Y'), sep='.')
     past_entries, html = look_into_the_past(date)
     if past_entries:
         html_file = Path('/tmp/look_into_the_past.html')

@@ -7,9 +7,9 @@ import locale
 import logging
 from glob import glob
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from bs4 import BeautifulSoup, Tag
-
 from utils import (
     assemble_new_entry,
     count_directories,
@@ -17,17 +17,20 @@ from utils import (
     get_date_created,
 )
 
+if TYPE_CHECKING:
+    from date import Date
+
 locale.setlocale(locale.LC_ALL, '')
 
 
-def collect_dates(foto_dir: Path) -> set[str]:
+def collect_dates(foto_dir: Path) -> set['Date']:
     """Collect the dates of the fotos and return a `set` of all creation dates.
 
     Since the 'greatest common path' is collected, the function is aware that fotos with the same creation date may appear in different subfolders.
 
     Inverse function: `add_media_files.py::collect_fotos()`.
     """
-    dates: set[str] = set()  # dates are in format 'yyyy:mm:dd'
+    dates: set[Date] = set()  # dates are in format 'yyyy:mm:dd'
     for file in foto_dir.iterdir():
         # Recursion if 'file' is another subdir of fotos
         if Path.is_dir(file):
@@ -47,18 +50,18 @@ def folder_to_diary(foto_dir: Path,
 
     `foto_dir`: Directory containing fotos.
     """
-    dates: set[str] = collect_dates(foto_dir)
+    dates: set[Date] = collect_dates(foto_dir)
     assert len(dates) > 0, f'No dates collected. "dates" is empty: {dates}.'
     newline = '\n'
-    print(f"Collected Dates:\n{newline.join(dates)}")  # noqa: T201
+    print(f"Collected Dates:\n{newline.join(str(date) for date in dates)}")  # noqa: T201
     for date in dates:
         # Check if there is a dir matching the date
-        year, month, day = date.split(':')
-        matching_dirs = count_directories(day, month, year)
+        # year, month, day = date_str.split(':')
+        matching_dirs = count_directories(date)
         match len(matching_dirs):
             # No entry exists for the selected date => Create one
             case 0:
-                day_dir, html_entry = assemble_new_entry(day, month, year, location, href=f'file://{foto_dir}')
+                day_dir, html_entry = assemble_new_entry(date, location, href=f'file://{foto_dir}')
                 create_dir_and_file(html_entry, day_dir)
             # Add base.href to an already existing entry
             # Enty may or may have not a base.href attribute
@@ -103,7 +106,7 @@ def folder_to_diary(foto_dir: Path,
             # >= 2 matching directories for a day
             case _:
                 logging.warning(
-                    f"Found {len(matching_dirs)} matching Directories obeying '{year}/{month}-*/{day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}")
+                    f"Found {len(matching_dirs)} matching Directories obeying '{date.year}/{date.month}-*/{date.day}-*'. There should be exactly 1. The Directories are:\n{', '.join(matching_dirs)}")
 
 
 if __name__ == "__main__":

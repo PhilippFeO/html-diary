@@ -1,6 +1,6 @@
 import pytest
 from bs4 import BeautifulSoup
-
+from date import Date
 from look_into_the_past import look_into_the_past
 
 # ─── Fixtures ──────────
@@ -15,7 +15,7 @@ def _mock_check(monkeypatch) -> None:
 
 def test_look_into_the_past():
     num_pre_tag_expected = 4
-    date = '23.05.2024'
+    date = Date('23.05.2024', sep='.')
 
     past_entries, html = look_into_the_past(date)
     assert past_entries
@@ -51,7 +51,7 @@ def test_look_into_the_past():
 
 
 def test_no_past_entries():
-    date = '32.05.2024'
+    date = Date('28.05.1990', sep='.')
     past_entries, _ = look_into_the_past(date)
 
     assert not past_entries
@@ -61,7 +61,7 @@ def test_litp_base_href():
     """Test `look_into_the_past()` with an entry containing the `base.href` attribute."""
     num_images_expected = 3
 
-    date = '22.06.2024'
+    date = Date('22.06.2024', sep='.')
     past_entries, html = look_into_the_past(date)
     assert past_entries
 

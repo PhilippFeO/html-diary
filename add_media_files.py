@@ -4,9 +4,10 @@ import os
 from pathlib import Path
 
 from bs4 import BeautifulSoup, Tag
+from date import Date
+from utils import get_date_created
 
 import vars
-from utils import get_date_created
 
 # {Januar: 01, Februar: 02, ..., Dezember: 12}
 MONTH_NUM: dict[str, str] = {month: str(num + 1).zfill(2) for num, month in enumerate((
@@ -25,7 +26,7 @@ MONTH_NUM: dict[str, str] = {month: str(num + 1).zfill(2) for num, month in enum
 ))}
 
 
-def get_date_entry(html: BeautifulSoup) -> str | None:
+def get_date_entry(html: BeautifulSoup) -> Date | None:
     """Retrieve the date of the entry from it's HTML, ie. from the `<title>` tag.
 
     `<title>` has the following scheme: `[d]d. Monthname yyyy: …`
@@ -44,7 +45,7 @@ def get_date_entry(html: BeautifulSoup) -> str | None:
         # handle [d]d.
         day = str(day[:-1]).zfill(2)
         month_num = MONTH_NUM[monthname]
-        return f'{year}:{month_num}:{day}'
+        return Date(f'{year}:{month_num}:{day}')
     msg = f'Impossible to retrieve the date from HTML:\n{html.prettify()}'
     raise Exception(msg)
 

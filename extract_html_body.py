@@ -2,13 +2,14 @@ import logging
 from datetime import datetime
 
 from bs4 import BeautifulSoup, NavigableString, Tag
+from date import Date
 from num2words import num2words
 
 
-def past_heading(past_date: str) -> BeautifulSoup:
+def past_heading(past_date: 'Date') -> BeautifulSoup:
     # Configure heading for entry depending on the number of years it lays in the past
     this_year = int(datetime.today().strftime('%Y'))
-    diff = this_year - (past_date_year := int(past_date.split('.')[-1]))
+    diff = this_year - (past_date_year := int(past_date.year))
     # Just to be sure
     # TODO: Reformulieren, ich finde es besser, wenn Text mit "vor einem Jahr, DATUM" startet <09-06-2024>
     assert diff >= 0, f'Difference between {this_year} and {past_date_year} is {diff}<0. Should be >=0.'
@@ -23,7 +24,7 @@ def past_heading(past_date: str) -> BeautifulSoup:
 
 
 def extract_html_body(html_file,
-                      past_date: str) -> BeautifulSoup:
+                      past_date: 'Date') -> BeautifulSoup:
     """Extract the <pre>, <img> and <video> tags from `html_file`, assembles it with a heading indicating how far in the past the day is."""
     new_soup = past_heading(past_date)
 
@@ -58,4 +59,4 @@ def extract_html_body(html_file,
 
 
 if __name__ == "__main__":
-    extract_html_body('2020/09-September/13-Bamberg/2020-09-13_Bamberg.html', '13.09.2020')
+    extract_html_body('2020/09-September/13-Bamberg/2020-09-13_Bamberg.html', Date('13.09.2020', sep='.'))
