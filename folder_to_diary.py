@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from bs4 import BeautifulSoup, Tag
+
 from utils import (
     assemble_new_entry,
     count_directories,
@@ -52,8 +53,7 @@ def folder_to_diary(foto_dir: Path,
     """
     dates: set[Date] = collect_dates(foto_dir)
     assert len(dates) > 0, f'No dates collected. "dates" is empty: {dates}.'
-    newline = '\n'
-    print(f"Collected Dates:\n{newline.join(str(date) for date in dates)}")  # noqa: T201
+    logging.info('Collected Date:\n%s', '\n\t'.join(str(date) for date in dates))
     for date in dates:
         # Check if there is a dir matching the date
         # year, month, day = date_str.split(':')
