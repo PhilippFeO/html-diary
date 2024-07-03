@@ -4,9 +4,9 @@ from glob import glob
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-from date import Date
 
 import vars
+from date import Date
 
 
 def create_stump(title: str,
@@ -48,7 +48,7 @@ def read_metadata(cmd: str, file: Path) -> str | None:
 def get_date_created(file: Path) -> Date | None:
     """Extract creation date in the format `yyyy:mm:dd` from EXIF data."""
     match file.suffix:
-        case '.mp4' | '.MP4':
+        case '.jpg' | '.jpeg' | '.png' | '.mp4' | '.JPG' | '.JPEG' | '.mp4' | '.MP4':
             cmd = '/usr/bin/exiftool -CreateDate'
             if exif_output := read_metadata(cmd, file):
                 # Retrieve date from following line:
@@ -56,17 +56,7 @@ def get_date_created(file: Path) -> Date | None:
                 # ' : ' on purpose, to split at the very first ':'
                 date_str = exif_output.split(' : ')[-1].split()[0]
                 return Date(date_str)
-            logging.error("Probably, Video '%s' has no 'CreateDate' in it's EXIF data.", file)
-            return None
-        case '.jpg' | '.jpeg' | '.png' | '.MP4' | '.JPG' | '.JPEG':
-            cmd = '/usr/bin/exiftool -CreateDate'
-            if exif_output := read_metadata(cmd, file):
-                # Retrieve date from following line:
-                # Create Date                     : 2023:05:12 13:58:16
-                # ' : ' on purpose, to split at the very first ':'
-                date_str = exif_output.split(' : ')[-1].split()[0]
-                return Date(date_str)
-            logging.info("Foto '%s' has no '-CreateDate' in it's EXIF data.", file)
+            logging.info("File '%s' has no '-CreateDate' in it's EXIF data.", file)
             # PANO*.jpg
             cmd = '/usr/bin/exiftool -GPSDateStamp'
             if (exif_output := read_metadata(cmd, file)):
