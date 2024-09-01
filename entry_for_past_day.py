@@ -13,7 +13,8 @@ from utils import create_stump
 locale.setlocale(locale.LC_ALL, '')
 
 
-def entry_for_past_day(date: str):
+def entry_for_past_day(date: str, heading: str):
+    """Print the path to the html entry to start nvim with this file in the calling bash script."""
     date_obj = datetime.datetime.strptime(date, '%Y-%m-%d').date()
     weekday = date_obj.strftime('%A')
     month_name = date_obj.strftime('%B')
@@ -27,19 +28,16 @@ def entry_for_past_day(date: str):
     match len(day_dirs):
         case 0:  # No day-dir exists yet
             logging.info("No directory for '%s' exists.", date)
-            activity = input("Überschrift: ")
-            title = f'{weekday}, {day}. {month_name} {year}: {activity}'
-            activity = activity.replace(' ', '-')
-            day_dir = Path(day_dir_pattern.replace('*', activity))
+            title = f'{weekday}, {day}. {month_name} {year}: {heading}'
+            heading = heading.replace(' ', '-')
+            day_dir = Path(day_dir_pattern.replace('*', heading))
             Path.mkdir(day_dir, parents=True)
             logging.info("Directory for '%s' created: %s", {date}, {day_dir})
             entry = create_stump(title, '')
-            pre_tag = entry.new_tag('pre')
-            description = input(f'Enter description for {date}:\n')
-            pre_tag.string = description
-            html_entry = Path(f'{day_dir}/{day}-{month}-{year}-{weekday}-{activity}.html')
+            html_entry = Path(f'{day_dir}/{day}-{month}-{year}-{weekday}-{heading}.html')
             html_entry.write_text(entry.prettify(), encoding='utf-8')
             logging.info('New Entry created: %s', {html_entry})
+            return str(html_entry)
         # day-dir already exists and hence an entry file
         # transfer_files() can create no-description entries which contain media files only
         case 1:
@@ -60,14 +58,15 @@ def entry_for_past_day(date: str):
                 msg = f'Description for {date} exists: "{html_file}".'
                 raise Exception(msg)
             # Query user for input
-            description = input(f'Enter description for {date}:\n')
-            pre_tag.string = description
-            html_file.write_text(entry.prettify())
-            logging.info("Description for Date '%s' added to File '%s'", date, html_file)
+            # description = input(f'Enter description for {date}:\n')
+            # pre_tag.string = description
+            # html_file.write_text(entry.prettify())
+            # logging.info("Description for Date '%s' added to File '%s'", date, html_file)
+            return str(html_file)
         # To many day_dirs
         case _:
-            raise Exception(
-                f"Found {len(day_dirs)} matching Directories obeying '{day_dir_pattern}'. There should be exactly 1. The Directories are:\n{', '.join(day_dirs)}")
+            msg = f"Found {len(day_dirs)} matching Directories obeying '{day_dir_pattern}'. There should be exactly 1. The Directories are:\n{', '.join(day_dirs)}"
+            raise Exception(msg)
 
 
 if __name__ == "__main__":
@@ -80,4 +79,6 @@ if __name__ == "__main__":
                         filemode='a')
     logging.info('%s %s %s', vars.HLINE, 'entry_for_past_day.py', vars.HLINE)
 
-    entry_for_past_day(sys.argv[1])
+    # sys.argv[1]: yyyy-mm-dd, str
+    # sys.argv[2]: heading, str
+    entry_for_past_day(sys.argv[1], sys.argv[2])

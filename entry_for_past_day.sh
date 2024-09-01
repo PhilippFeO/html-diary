@@ -8,6 +8,10 @@ selected_date=$(zenity --calendar --date-format=%Y-%m-%d --year="$year" --text="
 
 # Only proceed on "OK"
 if [ $? -eq 0 ]; then
-	# ~/.tagebuch/make_new_entry.sh "$past_date" ""
-	python3 entry_for_past_day.py "$selected_date"
+	echo "Überschrift: "
+	read -r heading
+
+	file=$(python3 entry_for_past_day.py "$selected_date" "$heading")
+
+	/home/philipp/.local/bin/kitty --title "Tagebucheintrag" nvim "+call cursor(13, 8) | startinsert" "$file" &
 fi
