@@ -13,5 +13,7 @@ if [ $? -eq 0 ]; then
 
 	file=$(python3 entry_for_past_day.py "$selected_date" "$heading")
 
+	echo $file
+
 	/home/philipp/.local/bin/kitty --title "Tagebucheintrag" nvim "+call cursor(13, 8) | startinsert" "$file" &
 fi

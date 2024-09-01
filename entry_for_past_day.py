@@ -81,4 +81,4 @@ if __name__ == "__main__":
 
     # sys.argv[1]: yyyy-mm-dd, str
     # sys.argv[2]: heading, str
-    entry_for_past_day(sys.argv[1], sys.argv[2])
+    print(entry_for_past_day(sys.argv[1], sys.argv[2]))
