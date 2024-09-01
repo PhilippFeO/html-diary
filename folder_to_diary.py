@@ -64,7 +64,7 @@ def folder_to_diary(foto_dir: Path,
                 day_dir, html_entry = assemble_new_entry(date, location, href=f'file://{foto_dir}')
                 create_dir_and_file(html_entry, day_dir)
             # Add base.href to an already existing entry
-            # Enty may or may have not a base.href attribute
+            # Entry may or may have not a base.href attribute
             case 1:
                 # Open according entry
                 day_dir = matching_dirs[0]
@@ -81,9 +81,10 @@ def folder_to_diary(foto_dir: Path,
                     base_tag = entry.new_tag('base', href=href)
                     entry.head.append(base_tag)
                     pre = entry.find('pre')
+                    assert pre is not None, f'<pre> not found. File: {entry_file}'
                     assert isinstance(pre, Tag), f'<pre> is not of Type "Tag". File: {entry_file}'
-                    assert isinstance(pre.string, str), f'<pre> is empty. File {entry_file}'
-                    pre.string = pre.string + f'\n\nOrt: {location}'
+                    # assert isinstance(pre.string, str), f'<pre> is empty. File {entry_file} {type(pre.string)}'
+                    pre.string = pre.string + f'\n\nOrt: {location}' if pre.string is not None else f'Ort: {location}'
                     Path(entry_file).write_text(entry.prettify())
                 # base.href already exists
                 else:
@@ -114,3 +115,5 @@ if __name__ == "__main__":
     assert 'Bilder' in CWD.parts, f'Not in ~/Bilder, {CWD = }'
     location = input('Ort: ')
     folder_to_diary(CWD, location)
+    # import subprocess
+    # subprocess.run(f'notfiy-send {CWD}'.split())

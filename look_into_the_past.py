@@ -4,14 +4,14 @@ import logging
 import subprocess
 from pathlib import Path
 
-from add_media_files import create_tags
 from bs4 import BeautifulSoup, Tag
+
+import vars
+from add_media_files import create_tags
 from date import Date
 from extract_html_body import extract_html_body, past_heading
 from open_diary_entry import read_base_href
 from utils import create_stump
-
-import vars
 
 # Use different Log file when executed as test
 

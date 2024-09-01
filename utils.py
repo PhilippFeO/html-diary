@@ -19,8 +19,8 @@ def create_stump(title: str,
         '    <link rel="stylesheet" href="/home/philipp/.tagebuch/style.css">'
         '  </head>'
         '  <body>'
-        f'    <h1>{title}</h1>'
-        '    <pre>'
+        f'   <h1>{title}</h1>'
+        '      <pre>'
         f"{f'Ort: {location}' if location != '' else ''}"
         '</pre>'
         '  </body>'
