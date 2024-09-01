@@ -1,0 +1,12 @@
+[Nemo Action]
+Active=true
+# Displayed Name in context menu
+# _ in front of letter indicates keyboard shortcut
+Name=In Tagebuch einbetten
+Comment=Füge in Tagebucheintrag die Fotos des aktuellen Verzeichnisses hinzu
+# <> necessary if scripts lies in nemo/actions/
+Exec=<wrapper_folder_to_diary.sh>
+# Icon-Name=folder
+Selection=any
+Extensions=any;
+Quote=double
