@@ -8,7 +8,6 @@ all:
 	bash tagebuch.sh
 
 look:
-	echo '' > .last_look_into_the_past.txt
 	python3 look_into_the_past.py
 
 # [t]ransfer [f]iles
