@@ -27,6 +27,9 @@ class Date:
     def __str__(self) -> str:
         return f'{self.day}.{self.month}.{self.year}'
 
+    def __repr__(self) -> str:
+        return f'{self.__str__()}, {self.weekday}, {self.monthname}, {self.title_fmt}'
+
 
 if __name__ == "__main__":
     d = Date('28.07.2024', sep='.')
