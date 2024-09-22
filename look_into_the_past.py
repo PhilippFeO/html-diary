@@ -10,7 +10,7 @@ import vars
 from add_media_files import create_tags
 from date import Date
 from entry import Entry
-from extract_html_body import extract_html_body, past_heading
+from extract_html_body import past_heading
 from utils import create_stump
 
 # Use different Log file when executed as test
@@ -76,7 +76,16 @@ def look_into_the_past(date: Date) -> tuple[bool, str]:
                         h2.insert_after(*tags)
                 # No 'base.href' => Extract whole body, because it already contains the correct <img> and <video> tags
                 else:
-                    past_entry_bs = extract_html_body(entry.file, Date(f'{date.day}.{date.month}.{past_year}', sep='.'))
+                    # past_entry_bs = extract_html_body(entry.file, Date(f'{date.day}.{date.month}.{past_year}', sep='.'))
+                    # past_entry_bs = entry.soup.body
+                    assert entry.soup.body
+                    h1 = entry.soup.body.h1
+                    assert h1 is not None
+                    # Create a new h2 tag with the same content as the h1 tag
+                    h2 = entry.soup.new_tag('h2')
+                    h2.string = entry.past_heading.string
+                    h1.replace_with(h2)
+
                 # Merge past day into overview
                 h1.append(past_entry_bs)
             case _:
