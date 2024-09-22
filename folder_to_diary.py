@@ -113,7 +113,8 @@ def folder_to_diary(foto_dir: Path,
 if __name__ == "__main__":
     CWD = Path.cwd()
     assert 'Bilder' in CWD.parts, f'Not in ~/Bilder, {CWD = }'
-    location = input('Ort: ')
-    folder_to_diary(CWD, location)
+    # location = input('Ort: ')
+    # folder_to_diary(CWD, location)
+    folder_to_diary(CWD)
     # import subprocess
     # subprocess.run(f'notfiy-send {CWD}'.split())
