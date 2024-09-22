@@ -1,5 +1,3 @@
-import datetime
-import glob
 import logging
 import subprocess
 from pathlib import Path
@@ -10,7 +8,6 @@ import vars
 from add_media_files import create_tags
 from date import Date
 from entry import Entry
-from extract_html_body import past_heading
 from utils import create_stump
 
 # Use different Log file when executed as test
@@ -52,47 +49,39 @@ def look_into_the_past(date: Date) -> tuple[bool, str]:
         logging.error("'<pre>' in 'html_skeleton' is not of Type 'Tag'. Date: {date}.")
 
     # In case there are no past entries for a date, the returned is basically empty. Further processing is not necessary, then.
-    past_entries = False
+    past_entries_exists = False
 
     # for past_year in range(1996, int(this_year) + 1):
     for past_year in range(int(date.year), 1995, -1):
-        entry = Entry(past_year, date.month, date.day)
-        match (entry.num_files):
-            case 0:
-                continue
-            case 1:
-                past_entries = True
-                h1 = overview.h1
-                assert h1 is not None
-                logging.info('%d: File exists: "%s". Extract media files.', past_year, entry.file)
-                # If entry already has a 'base.href' attribute
-                # Read it and add the media files within this dir to the overview
-                # if (dir_path := read_base_href(entry.file)):
-                if entry.base_href_path:
-                    tags = create_tags(entry.file, entry.base_href_path)
-                    past_date = Date(f'{date.day}.{date.month}.{past_year}', sep='.')
-                    past_entry_bs = past_heading(past_date)
-                    if (h2 := past_entry_bs.h2):
-                        h2.insert_after(*tags)
-                # No 'base.href' => Extract whole body, because it already contains the correct <img> and <video> tags
-                else:
-                    # past_entry_bs = extract_html_body(entry.file, Date(f'{date.day}.{date.month}.{past_year}', sep='.'))
-                    # past_entry_bs = entry.soup.body
-                    assert entry.soup.body
-                    h1 = entry.soup.body.h1
-                    assert h1 is not None
-                    # Create a new h2 tag with the same content as the h1 tag
-                    h2 = entry.soup.new_tag('h2')
-                    h2.string = entry.past_heading.string
-                    h1.replace_with(h2)
-
-                # Merge past day into overview
-                h1.append(past_entry_bs)
-            case _:
-                files = ',\n\t'.join(entry.matching_files)
-                logging.error("There are '%s' files whereas there should be 1 or 0. The files are:\n\t'%s'", entry.num_files, files)
-
-    return past_entries, overview.prettify()
+        try:
+            entry = Entry(past_year, date.month, date.day)
+        # Probably no file for the day in the year 'past_year'
+        except AssertionError:
+            continue
+        past_entries_exists = True
+        assert overview.h1 is not None
+        logging.info('%d: File exists: "%s". Extract media files.', past_year, entry.file)
+        # If entry already has a 'base.href' attribute
+        # Read it and add the media files within this dir to the overview
+        if entry.base_href:
+            tags = create_tags(entry.file, entry.base_href)
+            new_h2 = f'<h2>{entry.past_heading(past_year)}</h2>'
+            past_entry = BeautifulSoup(new_h2, 'html.parser')
+            if (h2 := past_entry.h2):
+                h2.insert_after(*tags)
+            # Merge past day into overview
+            overview.h1.append(past_entry)
+        # No 'base.href' => Reuse whole body, because it already contains the correct <img> and <video> tags. Create a new h2 tag with the same content as the h1 tag
+        else:
+            assert entry.soup.body is not None
+            h1_entry = entry.soup.body.h1
+            assert h1_entry is not None
+            h2 = entry.soup.new_tag('h2')
+            h2.string = entry.past_heading(past_year)
+            h1_entry.replace_with(h2)
+            # Merge past day into overview
+            overview.h1.append(entry.soup.body)
+    return past_entries_exists, overview.prettify()
 
 
 if __name__ == "__main__":
