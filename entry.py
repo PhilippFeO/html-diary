@@ -2,24 +2,33 @@ import glob
 import logging
 from pathlib import Path
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString, PageElement, Tag
 
 import vars
+from date import Date
+from extract_html_body import past_heading
 
 
 class Entry:
 
     def __init__(self, year: int, month: str, day: str):
+        self.date = Date(f'{day}.{month}.{year}', sep='.')
         self.matching_files = glob.glob(f"{vars.DIARY_DIR}/{year}/{month}-*/{day}-*/*.html")
         self.num_files = len(self.matching_files)
         if self.num_files > 1:
             msg = f'Es gibt zu viele Dateien für den {day}.{month}.{year}.'
             raise Exception(msg)
         self.base_href_path = self.__read_base_href()
+        self.soup = BeautifulSoup(self.file.read_text(encoding='utf-8'), 'html.parser')
+        self.past_heading = past_heading(self.date)
 
+    # TODO: Turn into cached_property <21-09-2024>
     @property
     def file(self) -> Path:
-        return Path(self.matching_files[0]) if self.num_files == 1 else Path()
+        if self.num_files == 1:
+            return Path(self.matching_files[0])
+        msg = f'Es gibt keine Datei für den {self.date}'
+        raise Exception(msg)
 
     def __read_base_href(self) -> Path | None:
         """Retrieve the value of `head.base.href` from the HTML entry."""
