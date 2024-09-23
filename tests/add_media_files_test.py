@@ -1,5 +1,4 @@
 from add_media_files import collect_fotos, create_tags, get_date_entry
-from bs4 import BeautifulSoup
 from date import Date
 from entry import Entry
 from tests.vars import TEST_DIARY_DIR
@@ -53,21 +52,13 @@ def test_collect_fotos():
 
 def test_get_entry_date_double_digit():
     date_expected = Date('2024:06:22')
-
-    entry_path = TEST_DIARY_DIR / '2024/06-Juni/22-06-2024-Mittwoch-amf_collect_photos_specific_date/22-06-2024-Mittwoch-amf_collect_photos_specific_date.html'
-    html = BeautifulSoup(entry_path.read_text(encoding='utf-8'), 'html.parser')
-
-    date = get_date_entry(html)
-
+    entry = Entry(date_expected.year, date_expected.month, date_expected.day)
+    date = get_date_entry(entry.soup)
     assert date == date_expected
 
 
 def test_get_entry_date_single_digit():
     date_expected = Date('2024:06:04')
-
-    entry_path = TEST_DIARY_DIR / '2024/06-Juni/04-06-2024-Mittwoch-base.href-litp/04-06-2024-Mittwoch-base.href-litp.html'
-    html = BeautifulSoup(entry_path.read_text(encoding='utf-8'), 'html.parser')
-
-    date = get_date_entry(html)
-
+    entry = Entry(date_expected.year, date_expected.month, date_expected.day)
+    date = get_date_entry(entry.soup)
     assert date == date_expected
