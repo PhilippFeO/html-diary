@@ -4,15 +4,15 @@ from datetime import datetime
 from pathlib import Path
 
 from bs4 import BeautifulSoup
+from date import Date
 from num2words import num2words
 
 import vars
-from date import Date
 
 
 class Entry:
 
-    def __init__(self, year: int, month: str, day: str):
+    def __init__(self, year: str, month: str, day: str):
         self.date = Date(f'{day}.{month}.{year}', sep='.')
         self.matching_files = glob.glob(f"{vars.DIARY_DIR}/{year}/{month}-*/{day}-*/*.html")
         self.num_files = len(self.matching_files)

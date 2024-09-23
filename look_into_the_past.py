@@ -2,13 +2,13 @@ import logging
 import subprocess
 from pathlib import Path
 
-from bs4 import BeautifulSoup, Tag
-
-import vars
 from add_media_files import create_tags
+from bs4 import BeautifulSoup, Tag
 from date import Date
 from entry import Entry
 from utils import create_stump
+
+import vars
 
 # Use different Log file when executed as test
 
@@ -54,7 +54,7 @@ def look_into_the_past(date: Date) -> tuple[bool, str]:
     # for past_year in range(1996, int(this_year) + 1):
     for past_year in range(int(date.year), 1995, -1):
         try:
-            entry = Entry(past_year, date.month, date.day)
+            entry = Entry(str(past_year), date.month, date.day)
         # Probably no file for the day in the year 'past_year'
         except AssertionError:
             continue
