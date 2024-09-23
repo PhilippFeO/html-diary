@@ -5,6 +5,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup, Tag
 
+from entry import Entry
 import vars
 from date import Date
 from utils import get_date_created
@@ -107,29 +108,27 @@ def collect_fotos(media_dir: Path,
     return tags
 
 
-def create_tags(diary_file: Path,
+def create_tags(entry: Entry,
                 media_dir: Path) -> list[Tag]:
     """Return a list with the tags to be inserted after the `<pre>`-tag.
 
     `diary_file`: Path to the diary html file to add media files to
     `media_dir`: Should be the value of a `base.href` attribute or the 'day directory'. In `add_media_files()` it's the 'day directory', in `look_into_the_past.py::look_into_the_past()` it's the value of `head.base.href`.
     """
-    logging.info('Args: diary_file = %s, media_dir = %s', diary_file, media_dir)
+    logging.info('Args: entry.file = %s, media_dir = %s', entry.file, media_dir)
 
-    html_content = diary_file.read_text(encoding='utf-8')
-    soup = BeautifulSoup(html_content, 'html.parser')
-    pre_tag = soup.find('pre')
+    pre_tag = entry.soup.find('pre')
 
     # Insert the new elements after the <pre> tag
-    if pre_tag:  # pre_tag may be None, insert_after() doesn't work on None
+    if pre_tag is not None:  # pre_tag may be None, insert_after() doesn't work on None
         # When called with the intent to temporarly embed fotos from a folder, it is not guaranteed that this folder exists (I may have renamed it).
         if Path.is_dir(media_dir):
-            return collect_fotos(media_dir, soup, [])
+            return collect_fotos(media_dir, entry.soup, [])
         logging.error("'%s' is no directory", media_dir)
         # Add visual feedback
-        b = soup.new_tag('b')
+        b = entry.soup.new_tag('b')
         b.append(f'{media_dir} EXISTIERT NICHT')
-        return [b, soup.new_tag('br')]
+        return [b, entry.soup.new_tag('br')]
     return []
 
 
@@ -141,18 +140,11 @@ def add_media_files(directories: set[Path]) -> None:
     """
     logging.info('Args: %s', directories)
     for day_dir in directories:
-        # Load HTML file
-        if len(html_files := glob.glob(os.path.join(day_dir, '*.html'))) == 1:
-            html_file = Path(html_files[0])
-        else:
-            logging.error("There are '%d' in '%s'. There should be exactly 1.", len(html_files), day_dir)
-            continue
-        logging.info("Add Media Files in '%s' to '%s' ...", day_dir, html_file)
+        entry = Entry(path=day_dir)
+        logging.info("Add Media Files in '%s' to '%s' ...", day_dir, entry.file)
 
         # Insert tags after pre-tag
-        tags = create_tags(html_file, day_dir)
-        html = BeautifulSoup(html_file.read_text(encoding='utf-8'),
-                             'html.parser')
-        if (pre_tag := html.find('pre')):
+        tags = create_tags(entry.file, day_dir)
+        if (pre_tag := entry.soup.find('pre')):
             pre_tag.insert_after(*tags)
-        html_file.write_text(html.prettify(), encoding='utf-8')
+        entry.file.write_text(entry.soup.prettify(), encoding='utf-8')
