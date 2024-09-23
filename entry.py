@@ -16,14 +16,16 @@ class Entry:
     def __init__(self, date: Date | None = None, path: Path | None = None):
         if date is not None:
             self.date = date
-            self.matching_files = glob.glob(f"{vars.DIARY_DIR}/{self.date.year}/{self.date.month}-*/{self.date.day}-*/*.html")
-            self.num_files = len(self.matching_files)
-            assert self.num_files == 1, f'There are {self.num_files} != 1 files for {self.date}: {self.matching_files}'
-            self.file = Path(self.matching_files[0])
+            glob_pattern = f"{vars.DIARY_DIR}/{self.date.year}/{self.date.month}-*/{self.date.day}-*/*.html"
         elif path is not None:
-            html_files = glob.glob(os.path.join(path, '*.html'))
-            assert len(html_files) == 1, f'There are {self.num_files} != 1 files for {self.date}: {self.matching_files}'
-            self.file = Path(html_files[0])
+            glob_pattern = os.path.join(path, '*.html')
+        else:
+            msg = 'date and path are None'
+            raise Exception(msg)
+        self.matching_files = glob.glob(glob_pattern)
+        self.num_files = len(self.matching_files)
+        assert len(self.matching_files) == 1, f'There are {self.num_files} != 1 files for {self.date}: {self.matching_files}'
+        self.file = Path(self.matching_files[0])
         self.soup = BeautifulSoup(self.file.read_text(encoding='utf-8'), 'html.parser')
 
     @property
