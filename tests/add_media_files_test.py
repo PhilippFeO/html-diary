@@ -1,7 +1,7 @@
 from add_media_files import collect_fotos, create_tags, get_date_entry
 from bs4 import BeautifulSoup
 from date import Date
-from open_diary_entry import read_base_href
+from entry import Entry
 from tests.vars import TEST_DIARY_DIR
 
 
@@ -29,13 +29,12 @@ def test_collect_fotos():
 
     For a visual test, s `tests/look_into_the_past_test.py::test_litp_base_href()`.
     """
-    entry_path = TEST_DIARY_DIR / '2024/06-Juni/22-06-2024-Mittwoch-amf_collect_photos_specific_date/22-06-2024-Mittwoch-amf_collect_photos_specific_date.html'
-    soup = BeautifulSoup(entry_path.read_text(encoding='utf-8'),
-                         'html.parser')
+    entry = Entry('2024', '06', '22')
 
-    foto_dir = read_base_href(entry_path)
-    assert foto_dir
-    tags_result = collect_fotos(foto_dir, soup, [])
+    foto_dir = entry.base_href
+    assert foto_dir is not None
+
+    tags_result = collect_fotos(foto_dir, entry.soup, [])
 
     nmb_imgs_in_foto_dir = 3
     nmb_br_in_foto_dir = 3
