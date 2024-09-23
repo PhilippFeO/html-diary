@@ -28,7 +28,9 @@ def test_collect_fotos():
 
     For a visual test, s `tests/look_into_the_past_test.py::test_litp_base_href()`.
     """
-    entry = Entry('2024', '06', '22')
+    entry = Entry(
+        date=Date('06.22.2024', sep='.'),
+    )
 
     foto_dir = entry.base_href
     assert foto_dir is not None
@@ -52,13 +54,21 @@ def test_collect_fotos():
 
 def test_get_entry_date_double_digit():
     date_expected = Date('2024:06:22')
-    entry = Entry(date_expected.year, date_expected.month, date_expected.day)
+    entry = Entry(
+        date=Date(
+            f'{date_expected.day}.{date_expected.month}.{date_expected.month}',
+            sep='.'),
+    )
     date = get_date_entry(entry.soup)
     assert date == date_expected
 
 
 def test_get_entry_date_single_digit():
     date_expected = Date('2024:06:04')
-    entry = Entry(date_expected.year, date_expected.month, date_expected.day)
+    entry = Entry(
+        date=Date(
+            f'{date_expected.day}.{date_expected.month}.{date_expected.month}',
+            sep='.'),
+    )
     date = get_date_entry(entry.soup)
     assert date == date_expected

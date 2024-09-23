@@ -1,23 +1,29 @@
 import glob
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-from date import Date
 from num2words import num2words
 
 import vars
+from date import Date
 
 
 class Entry:
 
-    def __init__(self, year: str, month: str, day: str):
-        self.date = Date(f'{day}.{month}.{year}', sep='.')
-        self.matching_files = glob.glob(f"{vars.DIARY_DIR}/{year}/{month}-*/{day}-*/*.html")
-        self.num_files = len(self.matching_files)
-        assert self.num_files == 1, f'There are {self.num_files} != 1 files for {self.date}: {self.matching_files}'
-        self.file = Path(self.matching_files[0])
+    def __init__(self, date: Date | None = None, path: Path | None = None):
+        if date is not None:
+            self.date = date
+            self.matching_files = glob.glob(f"{vars.DIARY_DIR}/{self.date.year}/{self.date.month}-*/{self.date.day}-*/*.html")
+            self.num_files = len(self.matching_files)
+            assert self.num_files == 1, f'There are {self.num_files} != 1 files for {self.date}: {self.matching_files}'
+            self.file = Path(self.matching_files[0])
+        elif path is not None:
+            html_files = glob.glob(os.path.join(path, '*.html'))
+            assert len(html_files) == 1, f'There are {self.num_files} != 1 files for {self.date}: {self.matching_files}'
+            self.file = Path(html_files[0])
         self.soup = BeautifulSoup(self.file.read_text(encoding='utf-8'), 'html.parser')
 
     @property
