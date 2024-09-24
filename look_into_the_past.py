@@ -68,7 +68,7 @@ def look_into_the_past(date: Date) -> tuple[bool, str]:
         # If entry already has a 'base.href' attribute
         # Read it and add the media files within this dir to the overview
         if entry.base_href:
-            tags = create_tags(entry.file, entry.base_href)
+            tags = create_tags(entry, entry.base_href)
             new_h2 = f'<h2>{entry.past_heading(past_year)}</h2>'
             past_entry = BeautifulSoup(new_h2, 'html.parser')
             if (h2 := past_entry.h2):

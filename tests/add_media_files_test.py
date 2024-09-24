@@ -1,18 +1,20 @@
-from add_media_files import collect_fotos, create_tags, get_date_entry
+from add_media_files import collect_fotos, create_tags
 from date import Date
 from entry import Entry
 from tests.vars import TEST_DIARY_DIR
 
 
 def test_create_tags():
-    """Test `create_tags()` when the provided `foto_dir` doesn't exists.
+    """Test `create_tags()` when the provided `media_dir` doesn't exists.
 
     The other outcomes of `add_media_files_dir_file()` are either obvious or tested in other tests, fi. `test_collect_fotos()`.
     """
-    diary_file = TEST_DIARY_DIR/'2024/06-Juni/05-06-2024-Mittwoch-Test-add_media_files_day_dir/05-06-2024-Mittwoch-Test-add_media_files_day_dir.html'
+    day_dir = TEST_DIARY_DIR/'2024/06-Juni/05-06-2024-Mittwoch-Test-add_media_files_day_dir'
     not_existent_foto_dir = TEST_DIARY_DIR/'lorem_ipsum/'
 
-    tags = create_tags(diary_file, not_existent_foto_dir)
+    entry = Entry(path_to_parent_dir=day_dir)
+
+    tags = create_tags(entry, not_existent_foto_dir)
 
     num_tags_expected = 2
 
@@ -29,13 +31,13 @@ def test_collect_fotos():
     For a visual test, s `tests/look_into_the_past_test.py::test_litp_base_href()`.
     """
     entry = Entry(
-        date=Date('06.22.2024', sep='.'),
+        date=Date('22.06.2024', sep='.'),
     )
 
     foto_dir = entry.base_href
     assert foto_dir is not None
 
-    tags_result = collect_fotos(foto_dir, entry.soup, [])
+    tags_result = collect_fotos(foto_dir, entry, [])
 
     nmb_imgs_in_foto_dir = 3
     nmb_br_in_foto_dir = 3
@@ -56,19 +58,17 @@ def test_get_entry_date_double_digit():
     date_expected = Date('2024:06:22')
     entry = Entry(
         date=Date(
-            f'{date_expected.day}.{date_expected.month}.{date_expected.month}',
+            f'{date_expected.day}.{date_expected.month}.{date_expected.year}',
             sep='.'),
     )
-    date = get_date_entry(entry.soup)
-    assert date == date_expected
+    assert entry.date == date_expected
 
 
 def test_get_entry_date_single_digit():
     date_expected = Date('2024:06:04')
     entry = Entry(
         date=Date(
-            f'{date_expected.day}.{date_expected.month}.{date_expected.month}',
+            f'{date_expected.day}.{date_expected.month}.{date_expected.year}',
             sep='.'),
     )
-    date = get_date_entry(entry.soup)
-    assert date == date_expected
+    assert entry.date == date_expected
