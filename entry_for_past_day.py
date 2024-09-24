@@ -8,6 +8,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 import vars
+from entry import Entry
 from utils import create_stump
 
 locale.setlocale(locale.LC_ALL, '')
@@ -33,36 +34,27 @@ def entry_for_past_day(date: str, heading: str):
             day_dir = Path(day_dir_pattern.replace('*', heading))
             Path.mkdir(day_dir, parents=True)
             logging.info("Directory for '%s' created: %s", {date}, {day_dir})
-            entry = create_stump(title, '')
-            html_entry = Path(f'{day_dir}/{day}-{month}-{year}-{weekday}-{heading}.html')
-            html_entry.write_text(entry.prettify(), encoding='utf-8')
-            logging.info('New Entry created: %s', {html_entry})
-            return str(html_entry)
+            stump = create_stump(title, '')
+            entry_file = Path(f'{day_dir}/{day}-{month}-{year}-{weekday}-{heading}.html')
+            entry_file.write_text(stump.prettify(), encoding='utf-8')
+            logging.info('New Entry created: %s', {entry_file})
+            return str(entry_file)
         # day-dir already exists and hence an entry file
         # transfer_files() can create no-description entries which contain media files only
         case 1:
             logging.info("Directory for '%s' already exists: %s", {date}, {day_dirs[0]})
-            html_files = glob.glob(f'{day_dir_pattern}/*.html')
-            assert len(html_files) == 1, f'"{day_dirs[0]}" contains {len(html_files)} HTML files. There should be exactly 1.'
-            html_file = Path(html_files[0])
-            logging.info("Entry for '%s' exists: %s", date, html_file)
-            html = html_file.read_text(encoding='utf-8')
-            if not html:
-                msg = f"{html_file} could not be red."
-                raise Exception(msg)
-            entry = BeautifulSoup(html, 'html.parser')
-            pre = entry.find_all('pre')
-            assert len(pre) == 1, f'Number of pre-tags: {len(pre)}. There should be exactly 1 in "{html_file}".'
+            entry = Entry(path_to_parent_dir=Path(day_dirs[0]))
+            pre = entry.soup.find_all('pre')
+            assert len(pre) == 1, f'Number of pre-tags: {len(pre)}. There should be exactly 1 in "{entry.file}".'
             pre_tag = pre[0]
-            if pre_tag.string:
-                msg = f'Description for {date} exists: "{html_file}".'
+            if pre_tag.string is not None or pre_tag.string != '':
+                msg = f'Description for {date} exists: "{entry.file}".'
                 raise Exception(msg)
             # Query user for input
-            # description = input(f'Enter description for {date}:\n')
-            # pre_tag.string = description
-            # html_file.write_text(entry.prettify())
-            # logging.info("Description for Date '%s' added to File '%s'", date, html_file)
-            return str(html_file)
+            pre_tag.string = input(f'Enter description for {date}:\n')
+            entry.file.write_text(entry.soup.prettify())
+            logging.info("Description for Date '%s' added to File '%s'", date, entry.file)
+            return str(entry.file)
         # To many day_dirs
         case _:
             msg = f"Found {len(day_dirs)} matching Directories obeying '{day_dir_pattern}'. There should be exactly 1. The Directories are:\n{', '.join(day_dirs)}"
