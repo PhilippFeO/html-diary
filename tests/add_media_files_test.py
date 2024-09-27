@@ -1,4 +1,6 @@
-from add_media_files import collect_fotos, create_tags
+import pytest
+
+from add_media_files import collect_fotos
 from date import Date
 from entry import Entry
 from tests.vars import TEST_DIARY_DIR
@@ -9,19 +11,10 @@ def test_create_tags():
 
     The other outcomes of `add_media_files_dir_file()` are either obvious or tested in other tests, fi. `test_collect_fotos()`.
     """
-    day_dir = TEST_DIARY_DIR/'2024/06-Juni/05-06-2024-Mittwoch-Test-add_media_files_day_dir'
     not_existent_foto_dir = TEST_DIARY_DIR/'lorem_ipsum/'
 
-    entry = Entry(path_to_parent_dir=day_dir)
-
-    tags = create_tags(entry, not_existent_foto_dir)
-
-    num_tags_expected = 2
-
-    assert len(tags) == num_tags_expected
-    assert tags[0].name == 'b'
-    assert tags[0].string == f'{not_existent_foto_dir} EXISTIERT NICHT'
-    assert tags[1].name == 'br'
+    with pytest.raises(AssertionError):
+        _ = Entry(path_to_parent_dir=not_existent_foto_dir)
 
 
 # TODO: Add test of 'collect_fotos()' with a video file <23-06-2024>

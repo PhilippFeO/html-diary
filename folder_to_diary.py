@@ -11,10 +11,9 @@ from typing import TYPE_CHECKING
 
 from bs4 import BeautifulSoup, Tag
 
+from entry import Entry
 from utils import (
-    assemble_new_entry,
     count_directories,
-    create_dir_and_file,
     get_date_created,
 )
 
@@ -61,8 +60,9 @@ def folder_to_diary(foto_dir: Path,
         match len(matching_dirs):
             # No entry exists for the selected date => Create one
             case 0:
-                day_dir, html_entry = assemble_new_entry(date, location, href=f'file://{foto_dir}')
-                create_dir_and_file(html_entry, day_dir)
+                # day_dir, html_entry = assemble_new_entry(date, location, href=f'file://{foto_dir}')
+                # create_dir_and_file(html_entry, day_dir)
+                entry = Entry(new_entry=(date, location, f'file://{foto_dir}'))
             # Add base.href to an already existing entry
             # Entry may or may have not a base.href attribute
             case 1:

@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from entry import Entry
 from tests.vars import (
     TEST_DIARY_DIR,
     TEST_DIR,
@@ -13,6 +14,7 @@ from tests.vars import (
     TEST_TRANSFERED_DIR,
 )
 from transfer_files import transfer_files
+from utils import create_stump
 
 FOTO_1_NAME: Path = Path('transfer_files_foto_1.jpg')
 FOTO_2_NAME: Path = Path('transfer_files_foto_2.jpg')
@@ -49,12 +51,17 @@ def _create_second_day_dir():
                           TEST_DIR / VIDEO_1_NAME))
 def test_transfer_files():
     """Tests if media files are copied correctly from `.tmp/` to it's corresponding 'day_dir_{fotos, video}'. This directory must exists for `transfer_files()` to work properly."""
-    directories: set[Path] = transfer_files()
-    nmb_different_day_dirs = 2
-    assert len(directories) == nmb_different_day_dirs
-
     day_dir_fotos = TEST_DIARY_DIR/'2020/09-September/13-09-2020-Bamberg-tf'
     day_dir_video = TEST_DIARY_DIR/'2023/05-Mai/12-05-2023-Eisbachwelle-tf'
+
+    # Create dummy entry file, so that constructor call in match-case-1 works.
+    title = "Montag, 16. Juni 2022:"
+    (day_dir_fotos/'dummy.html').write_text(create_stump(title=title).prettify())
+    (day_dir_video/'dummy.html').write_text(create_stump(title=title).prettify())
+
+    entries: set[Entry] = transfer_files()
+    nmb_different_entries = 2
+    assert len(entries) == nmb_different_entries
 
     assert Path.is_file(day_dir_fotos / FOTO_1_NAME)
     assert Path.is_file(day_dir_fotos / FOTO_2_NAME)
@@ -84,7 +91,7 @@ def test_transfer_files_no_day_dir():
     matching_dirs = glob.glob(f"{TEST_DIARY_DIR}/{year}/{month}-*/{day}-{month}-{year}-*")
     assert len(matching_dirs) == 0
 
-    directories: set[Path] = transfer_files()
+    directories: set[Entry] = transfer_files()
 
     # Assert newly created diary is added
     assert len(directories) == 1
@@ -116,7 +123,7 @@ def test_transfer_files_two_day_dir():
     date_created = exif_lines[-1].split()[1]
     year, month, day = date_created.split(":", 2)
 
-    directories: set[Path] = transfer_files()
+    directories: set[Entry] = transfer_files()
 
     # Assert no directory was added (for further processing)
     assert len(directories) == 0

@@ -2,17 +2,17 @@ import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from entry import Entry
-from utils import get_date_created
-
 import vars
+from utils import get_date_created
 
 if TYPE_CHECKING:
     from bs4 import Tag
 
+    from entry import Entry
+
 
 def collect_fotos(media_dir: Path,
-                  entry: Entry,
+                  entry: "Entry",
                   tags: list["Tag"]) -> list["Tag"]:
     """Traverse directory recursively and search for media files. Return a list of `<img>` and `<br>` Tags where the `<img>` Tags are Fotos taken on the same Date as the Date of the Entry. The Entry's Date is awkwardly retrieved from the title.
 
@@ -67,7 +67,7 @@ def collect_fotos(media_dir: Path,
     return tags
 
 
-def create_tags(entry: Entry,
+def create_tags(entry: "Entry",
                 media_dir: Path) -> list["Tag"]:
     """Return a list with the tags to be inserted after the `<pre>`-tag.
 
@@ -91,18 +91,17 @@ def create_tags(entry: Entry,
 
 
 # TODO: Add media files via 'head.base.href' <23-06-2024>
-def add_media_files(directories: set[Path]) -> None:
+def add_media_files(entries: set["Entry"]) -> None:
     """Add media files to a diary entry.
 
     `directories` contains the directories into which media files were moved but not yet embedded into the HTML file laying in the same directory. This function iterates over all files in each directory, creates the according HTML tag and adds it to the diary entry. Most of the time, the directories in `directories` are the directories of a day.
     """
-    logging.info('Args: %s', directories)
-    for day_dir in directories:
-        entry = Entry(path_to_parent_dir=day_dir)
-        logging.info("Add Media Files in '%s' to '%s' ...", day_dir, entry.file)
+    logging.info('Args: %s', entries)
+    for entry in entries:
+        logging.info("Add Media Files in '%s' to '%s' ...", entry.file.parent, entry.file)
 
         # Insert tags after pre-tag
         tags = create_tags(entry, entry.file.parent)
-        if (pre_tag := entry.soup.find('pre')):
+        if (pre_tag := entry.soup.find('pre')) is not None:
             pre_tag.insert_after(*tags)
         entry.file.write_text(entry.soup.prettify(), encoding='utf-8')
