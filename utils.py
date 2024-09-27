@@ -76,38 +76,3 @@ def get_date_created(media_file: 'Path') -> Date | None:
         case _:
             logging.warning("Nothing done for File Type: '%s'. Full path:\n\t%s", media_file.suffix, media_file)
             return None
-
-
-# def create_dir_and_file(html_entry: "BeautifulSoup",
-#                         day_dir: "Path") -> None:
-#     """Create the directory of the day and the html file of the entry."""
-#     Path.mkdir(day_dir, parents=True)
-#     logging.info("Created Directory: '%s'", day_dir)
-#     day_entry = day_dir/f'{day_dir.name}.html'
-#     # Write the HTML (media files are added later as usual)
-#     Path(day_entry).write_text(html_entry.prettify())
-#     logging.info('Created no-description Entry: %s', day_entry)
-
-
-# def assemble_new_entry(
-#     date: Date,
-#     location: str = '',
-#     href: str | None = None,
-# ) -> tuple["Path", "BeautifulSoup"]:
-#     """Create new empty entry. See method body for more information.
-#
-#     Return `day_dir` for convenience. The name of the month and day have to be retrieved here anyway. This information is also necessary in `create_dir_and_file()`. Be returning `day_dir`, it doesn't have to be calculated twice.
-#     """
-#     # Create new empty entry
-#     # Media files were added if there was an entry fitting the created date.
-#     # Some media files have no according entry for their created date. In this block,
-#     # the (empty) entry is created to avoid remaining media files in .tmp/.
-#     title = f"{date.weekday}, {date.title_fmt}{f': {location}' if location != '' else ''}"
-#     entry = create_stump(title, location)
-#     assert entry.head, "No 'head' in the HTML skeleton."  # Should not happen
-#     if href:
-#         base_tag = entry.new_tag('base', href=href)
-#         entry.head.append(base_tag)
-#     day_dir: Path = vars.DIARY_DIR/date.year / \
-#         f"{date.month}-{date.monthname}/{date.day}-{date.month}-{date.year}-{date.weekday}{f'-{location}' if location != '' else ''}"
-#     return day_dir, entry

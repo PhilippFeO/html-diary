@@ -6,14 +6,13 @@ import os
 import shutil
 from pathlib import Path
 
+import vars
 from add_media_files import add_media_files
 from entry import Entry
 from utils import (
     count_directories,
     get_date_created,
 )
-
-import vars
 
 locale.setlocale(locale.LC_ALL, '')
 

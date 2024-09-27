@@ -5,11 +5,11 @@ from datetime import datetime
 from pathlib import Path
 
 from bs4 import BeautifulSoup
-from date import Date
 from num2words import num2words
-from utils import create_stump
 
 import vars
+from date import Date
+from utils import create_stump
 
 # {Januar: 01, Februar: 02, ..., Dezember: 12}
 MONTH_NUM: dict[str, str] = {month: str(num + 1).zfill(2) for num, month in enumerate((
@@ -31,10 +31,12 @@ MONTH_NUM: dict[str, str] = {month: str(num + 1).zfill(2) for num, month in enum
 class Entry:
 
     def __init__(self, **kwargs):
+        # Create a completly new entry, directory, file with stump HTML
         key_new_entry = 'new_entry'
+        # "Load" an existing Entry based on the date
         key_date = 'date'
+        # "Load" an existing Entry based on the parent directory
         key_path_to_parent_dir = 'path_to_parent_dir'
-        # Create new diary entry
         if key_new_entry in kwargs:
             # Disassemble tuple
             new_entry_path_value = kwargs[key_new_entry]
@@ -125,6 +127,7 @@ class Entry:
                 h2 = f"... {past_date}, vor {num2words(diff, lang='de')} Jahren"
         return h2
 
+    # TODO: Add some form of 'date' attribute to the <head> of the HTML to make this function obsolete <27-09-2024>
     def get_date_from_html(self) -> Date | None:
         """Retrieve the date of the entry from it's HTML, ie. from the `<title>` tag.
 
