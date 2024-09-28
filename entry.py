@@ -5,11 +5,11 @@ from datetime import datetime
 from pathlib import Path
 
 from bs4 import BeautifulSoup
+from date import Date
 from num2words import num2words
+from utils import create_stump
 
 import vars
-from date import Date
-from utils import create_stump
 
 # {Januar: 01, Februar: 02, ..., Dezember: 12}
 MONTH_NUM: dict[str, str] = {month: str(num + 1).zfill(2) for num, month in enumerate((

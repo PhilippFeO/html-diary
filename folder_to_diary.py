@@ -1,16 +1,11 @@
-#!/home/philipp/.tagebuch/.venv/tagebuch/bin/python3
-"""Called manually/explictly."""
-
 # Necessary because returned values are in English
 # Can't stay in main because also needed during testing
 import locale
 import logging
-from glob import glob
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from bs4 import BeautifulSoup, Tag
-
+from bs4 import Tag
 from entry import Entry
 from utils import (
     count_directories,
@@ -66,42 +61,35 @@ def folder_to_diary(foto_dir: Path,
             # Add base.href to an already existing entry
             # Entry may or may have not a base.href attribute
             case 1:
-                # Open according entry
-                day_dir = matching_dirs[0]
-                html_files = glob(f'{day_dir}/*.html')
-                # Assert entry exists (glob pattern checks for directory but no directory is created without entry)
-                assert len(html_files) == 1, f'"{day_dir}" contains {len(html_files)} HTML files. There should be exactly 1.'
-                entry_file = html_files[0]
-                entry = BeautifulSoup(Path(entry_file).read_text(encoding='utf-8'), 'html.parser')
+                entry = Entry(path_to_parent_dir=matching_dirs[0])
                 # No base tag (=> No base.href attribute)
                 # Add base.href to an already existing diary entry
-                assert entry.head, f"No 'head' in '{entry_file}'."  # Should not happen
+                assert entry.soup.head, f"No 'head' in '{entry.file}'."  # Should not happen
                 href = f'file://{foto_dir}'
-                if not entry.head.base:
-                    base_tag = entry.new_tag('base', href=href)
-                    entry.head.append(base_tag)
-                    pre = entry.find('pre')
-                    assert pre is not None, f'<pre> not found. File: {entry_file}'
-                    assert isinstance(pre, Tag), f'<pre> is not of Type "Tag". File: {entry_file}'
-                    # assert isinstance(pre.string, str), f'<pre> is empty. File {entry_file} {type(pre.string)}'
+                if not entry.soup.head.base:
+                    base_tag = entry.soup.new_tag('base', href=href)
+                    entry.soup.head.append(base_tag)
+                    pre = entry.soup.find('pre')
+                    assert pre is not None, f'<pre> not found. File: {entry.file}'
+                    assert isinstance(pre, Tag), f'<pre> is not of Type "Tag". File: {entry.file}'
                     pre.string = pre.string + f'\n\nOrt: {location}' if pre.string is not None else f'Ort: {location}'
-                    Path(entry_file).write_text(entry.prettify())
+                    Path(entry.file).write_text(entry.soup.prettify())
                 # base.href already exists
                 else:
-                    href_value = entry.head.base.get('href')
+                    href_value = entry.soup.head.base.get('href')
                     # In case they differ, utter a warning but don't edit anything.
                     if href_value != href:
-                        msg = f"base.href is '{href_value}' in '{entry_file}'. Can't add '{href}'."
+                        msg = f"base.href is '{href_value}' in '{entry.file}'. Can't add '{href}'."
                         logging.warning(msg)
-                    pre = entry.find('pre')
+                    pre = entry.soup.find('pre')
                     if isinstance(pre, Tag) and isinstance(pre.string, str):
                         description = pre.string
                         if 'Ort: ' in description:
-                            logging.warning("'%s' already contains 'Ort: '", entry_file)
+                            logging.warning("'%s' already contains 'Ort: '", entry.file)
                         else:
                             pre.string = description + f'\n\nOrt: {location}'
                     else:
-                        msg = f"Either <pre> is not of Type 'Tag' or 'pre.string' is None. File: {entry_file}"
+                        msg = f"Either <pre> is not of Type 'Tag' or 'pre.string' is None. File: {entry.file}"
                         raise Exception(msg)
                 # if both are equal, there is nothing to do
             # >= 2 matching directories for a day
