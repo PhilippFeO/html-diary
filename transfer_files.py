@@ -47,7 +47,7 @@ def transfer_files() -> set[Entry]:
             match len(matching_dirs):
                 # TODO: Add Test for this case <26-05-2024>
                 case 0:
-                    entry = Entry(new_entry=(date_created, '', ''))
+                    entry = Entry(create_entry=(date_created, '', ''))
                     copy_helper(media_file,
                                 entry.file.parent,
                                 vars.DIARY_DIR)

@@ -62,7 +62,7 @@ def folder_to_diary(foto_dir: Path,
             case 0:
                 # day_dir, html_entry = assemble_new_entry(date, location, href=f'file://{foto_dir}')
                 # create_dir_and_file(html_entry, day_dir)
-                entry = Entry(new_entry=(date, location, f'file://{foto_dir}'))
+                entry = Entry(create_entry=(date, location, f'file://{foto_dir}'))
             # Add base.href to an already existing entry
             # Entry may or may have not a base.href attribute
             case 1:

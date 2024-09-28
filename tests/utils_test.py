@@ -28,7 +28,7 @@ def test_assemble_new_entry(location):
     href = str(TEST_BILDER_DIR / 'u-assemble_new_entry')
 
     # day_dir, html = assemble_new_entry(date, location, href)
-    entry = Entry(new_entry=(date, location, href))
+    entry = Entry(create_entry=(date, location, href))
 
     assert entry.file.parent == TEST_DIARY_DIR/f"2024/06-Juni/27-06-2024-Donnerstag{f'-{location}' if location != '' else ''}"
     assert entry.soup.head

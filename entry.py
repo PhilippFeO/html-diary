@@ -32,14 +32,14 @@ class Entry:
 
     def __init__(self, **kwargs):
         # Create a completly new entry, directory, file with stump HTML
-        key_new_entry = 'new_entry'
+        key_create_entry = 'create_entry'
         # "Load" an existing Entry based on the date
         key_date = 'date'
         # "Load" an existing Entry based on the parent directory
         key_path_to_parent_dir = 'path_to_parent_dir'
-        if key_new_entry in kwargs:
+        if key_create_entry in kwargs:
             # Disassemble tuple
-            new_entry_path_value = kwargs[key_new_entry]
+            new_entry_path_value = kwargs[key_create_entry]
             date: Date = new_entry_path_value[0]
             location: str = new_entry_path_value[1]
             href: str = new_entry_path_value[2]
