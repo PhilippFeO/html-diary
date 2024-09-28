@@ -50,6 +50,10 @@ cleantest:
 test: cleantest
 	@cd $(git_root_dir) && python3 -m pytest -rA -s tests/
 
+# Call via 'make ktest TEST=TESTMETHOD'
+ktest: cleantest
+	@cd $(git_root_dir) && python3 -m pytest -rA -s tests/ -k $(test)
+
 # Verbose tests, ie. with normal output
 vtest:
 	@cd $(git_root_dir) && python3 -m pytest -rA -sv tests/
